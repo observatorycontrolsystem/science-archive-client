@@ -5,9 +5,14 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    messages: []
+    messages: [],
+    urls: {}
   },
   mutations: {
+    setRuntimeConfig(state, payload) {
+      console.log('setting runtime config', payload);
+      state.urls = payload;
+    },
     clearAllMessages(state) {
       /* Clear all messages */
       state.messages = [];
