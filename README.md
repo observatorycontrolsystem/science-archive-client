@@ -1,4 +1,4 @@
-# science-archive-client
+# Science Archive Client
 
 ## Project setup
 ```
@@ -20,10 +20,12 @@ npm run build
 npm run test:unit
 ```
 
-### Lints and fixes files
+### Lints files and prints out lint errors
 ```
-npm run lint
+npm run lint:check
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Lints and fixes files
+```
+npm run lint:fix
+```
