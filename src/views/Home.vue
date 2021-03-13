@@ -1,17 +1,14 @@
 <template>
-  <div>
-    Home content
-    {{ urls }}
-  </div>
+  <archive-data-table />
 </template>
 
 <script>
+import ArchiveDataTable from '@/components/ArchiveDataTable.vue';
+
 export default {
   name: 'Home',
-  computed: {
-    urls: function() {
-      return this.$store.state.urls;
-    }
+  components: {
+    ArchiveDataTable
   }
 };
 </script>

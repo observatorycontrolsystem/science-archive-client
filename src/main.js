@@ -3,10 +3,12 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 import BootstrapVue from 'bootstrap-vue';
+import { OCSComponentLib } from 'ocs-component-lib';
 import '@/assets/scss/app.scss';
 import $ from 'jquery';
 
 Vue.use(BootstrapVue);
+Vue.use(OCSComponentLib);
 
 Vue.config.productionTip = false;
 
