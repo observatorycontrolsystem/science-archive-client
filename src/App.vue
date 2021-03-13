@@ -30,7 +30,7 @@
               <b-nav-item class="d-lg-none" @click="logout">Logout</b-nav-item>
             </template>
             <template v-else>
-              <b-nav-item class="d-lg-none" @click="login">Login</b-nav-item>
+              <b-nav-item class="d-lg-none" :to="{ name: 'Login' }">Login</b-nav-item>
             </template>
           </b-navbar-nav>
           <b-navbar-nav class="ml-auto">
@@ -44,27 +44,12 @@
               <b-dropdown-divider></b-dropdown-divider>
               <b-dropdown-item @click="logout">Logout</b-dropdown-item>
             </b-nav-item-dropdown>
-            <b-nav-item v-else class="d-none d-lg-block" @click="login">Login</b-nav-item>
+            <b-nav-item v-else class="d-none d-lg-block" :to="{ name: 'Login' }">Login</b-nav-item>
           </b-navbar-nav>
         </b-collapse>
       </b-navbar>
     </div>
     <b-container class="flex-shrink-0 p-1">
-      <b-row>
-        <b-col md="12">
-          <b-alert
-            v-for="message in messages"
-            :key="message.text"
-            :variant="message.variant"
-            class="m-1"
-            dismissible
-            show
-            @dismissed="deleteMessage(message.text)"
-          >
-            {{ message.text }}
-          </b-alert>
-        </b-col>
-      </b-row>
       <router-view class="my-3" />
     </b-container>
     <div class="footer text-center mt-auto pt-2">
@@ -99,32 +84,20 @@ export default {
   },
   computed: {
     scienceArchiveUrl: function() {
-      // TODO: Get from app configuration
-      return 'https://archive-api.lco.global/frames/';
+      return this.$store.state.urls.archiveApi;
     },
     profile: function() {
-      // TODO: Implement
-      return { username: 'me' };
+      return this.$store.state.profile;
     },
     userIsAuthenticated: function() {
-      // TODO: Implement
-      return true;
-    },
-    messages: function() {
-      return this.$store.state.messages;
+      return this.$store.state.userIsAuthenticated;
     }
   },
   methods: {
-    deleteMessage: function(messageText) {
-      this.$store.commit('deleteMessage', messageText);
-    },
     logout: function() {
-      // TODO: Implement
-      console.log('logging out');
-    },
-    login: function() {
-      // TODO: Implement
-      console.log('logging in');
+      this.$store.dispatch('removeArchiveToken').then(() => {
+        window.location.reload();
+      });
     }
   }
 };
