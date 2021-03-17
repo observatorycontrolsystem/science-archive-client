@@ -1,17 +1,29 @@
 <template>
   <b-row>
     <b-col md="10">
-      <b-dropdown split variant="primary" split-href="" text="Download" @click="downloadFiles">
+      <b-dropdown :disabled="!selected.length" split variant="primary" split-href="" @click="downloadFiles">
+        <template #button-content>Download {{ selected.length }}</template>
         <b-dropdown-form>
           <b-form-group v-slot="{ ariaDescribedby }">
-            <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="zip">zip download</b-form-radio>
+            <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="zip-compressed">
+              zip download (with compressed fits files)
+            </b-form-radio>
+            <b-dropdown-divider />
+            <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="zip-uncompressed">
+              zip download (with uncompressed fits files)
+            </b-form-radio>
             <b-dropdown-divider />
             <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="wget">wget script</b-form-radio>
           </b-form-group>
         </b-dropdown-form>
       </b-dropdown>
+      <b-button :disabled="!selected.length" variant="primary" class="mx-1" @click="clearSelected">
+        <template>X</template>
+      </b-button>
       <b-table
         id="archive-table"
+        ref="archivetable"
+        selected-variant=""
         :items="data.results"
         :fields="fields"
         :busy="isBusy"
@@ -21,6 +33,9 @@
         selectable
         @row-selected="onRowSelected"
       >
+        <template #cell(selected)="row">
+          <b-form-checkbox v-model="row.rowSelected" />
+        </template>
         <template #empty>
           return 'No matching records found.';
           <div v-if="!profile.username"></div>
@@ -54,9 +69,10 @@ export default {
   mixins: [OCSMixin.paginationAndFilteringMixin],
   data: function() {
     return {
-      dltype: 'zip',
-      selections: [],
+      dltype: 'zip-compressed',
+      selected: [],
       fields: [
+        'selected',
         {
           key: 'basename',
           label: 'Basename'
@@ -137,7 +153,6 @@ export default {
   },
   computed: {
     archiveApiUrl: function() {
-      console.log(this.$store.state.urls.archiveApi);
       return this.$store.state.urls.archiveApi;
     },
     profile: function() {
@@ -145,15 +160,20 @@ export default {
     }
   },
   methods: {
+    clearSelected: function() {
+      this.$refs.archivetable.clearSelected();
+      this.selected = [];
+    },
     initializeDataEndpoint: function() {
       return `${this.$store.state.urls.archiveApi}/frames/`;
     },
-    onRowSelected(items) {
+    onRowSelected: function(items) {
       this.selected = items;
     },
     downloadFiles: function() {
-      // TODO: disable download button if no selections
-      // TODO: add deselect all button
+      // TODO: add select all checkbox
+      // TODO: checkbox should select row
+      // TODO: fix clear selection button content
       let archiveToken = localStorage.getItem('archiveToken');
 
       let frameIds = [];
@@ -161,11 +181,11 @@ export default {
         frameIds[i] = value.id;
       });
 
-      console.log(this.dltype);
-      if (this.dltype === 'zip') {
-        // TODO: plumb through uncompress flag
-        downloadZip(frameIds, true, this.archiveApiUrl, archiveToken);
+      if (this.dltype === 'zip-compressed' || this.dltype === 'zip-uncompressed') {
+        let uncompress = this.dltype === 'zip-compressed' ? false : true;
+        downloadZip(frameIds, uncompress, this.archiveApiUrl, archiveToken);
       } else if (this.dltype === 'wget') {
+        // TODO: implement downloadWget
         downloadWget(frameIds, this.archiveApiUrl, archiveToken);
       }
     }
