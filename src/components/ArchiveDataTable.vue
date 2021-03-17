@@ -18,7 +18,7 @@
         </b-dropdown-form>
       </b-dropdown>
       <b-button :disabled="!selected.length" variant="primary" class="mx-1" @click="clearSelected">
-        <template>X</template>
+        <template><i class="fa fa-times" /></template>
       </b-button>
       <b-table
         id="archive-table"
@@ -173,7 +173,7 @@ export default {
     downloadFiles: function() {
       // TODO: add select all checkbox
       // TODO: checkbox should select row
-      // TODO: fix clear selection button content
+      // TODO: validate that fewer than 10 are selected for uncompressed download
       let archiveToken = localStorage.getItem('archiveToken');
 
       let frameIds = [];
