@@ -3,13 +3,11 @@
     <b-col md="2">
       <b-form @submit="onSubmit" @reset="onReset">
         <b-form-group id="input-group-daterange">
-          <!-- TODO: Do we need to allow people to copy/ paste dates in? The new version of the datepicker changed this -->
           <div id="date-range-picker" class="border p-1 w-100">
             <i class="far fa-calendar"></i>{{ queryParams.start }} <br />
             <i class="fas fa-caret-down"></i>{{ queryParams.end }}
           </div>
         </b-form-group>
-
         <aggregated-options-select
           id="proposals"
           v-model="queryParams.PROPID"
@@ -28,35 +26,18 @@
             </b-form-select-option-group>
           </template>
         </aggregated-options-select>
-
         <b-form-group id="input-group-public">
           <b-form-checkbox id="checkbox-public" v-model="queryParams.public" name="checkbox-public" value="true" unchecked-value="false">
             Include public data
           </b-form-checkbox>
         </b-form-group>
-
         <b-form-group id="input-group-basename">
           <template #label>
             Basename
           </template>
           <b-form-input v-model="queryParams.basename"></b-form-input>
         </b-form-group>
-
-        <b-form-group id="input-group-point">
-          <template #label>
-            Point<sup
-              v-b-tooltip.hover.right
-              title="Searching by point is usually the most effective method as it will find
-            all frames containing an RA/Dec independent of the name given in the OBJECT header. This will not work for solar
-            system objects. Sexagesimal or degrees. You may also click the magnification glass to fetch RA/Dec from online
-            sources (such as SIMBAD or NED) by object name."
-              >?</sup
-            >
-          </template>
-          <!-- TODO: Implement -->
-          <b-form-input v-model="queryParams.covers"></b-form-input>
-        </b-form-group>
-
+        <target-lookup v-model="queryParams.covers" />
         <b-form-group id="input-group-object">
           <template #label>
             Object<sup
@@ -67,14 +48,12 @@
           </template>
           <b-form-input v-model="queryParams.OBJECT"></b-form-input>
         </b-form-group>
-
         <aggregated-options-select
           id="obstypes"
           v-model="queryParams.OBSTYPE"
           label="Observation Type"
           :options="categorizedAggregatedOptions.obstypes"
-        ></aggregated-options-select>
-
+        />
         <b-form-group id="input-group-rlevel">
           <template #label>
             Reduction Level
@@ -93,42 +72,21 @@
             <b-form-select-option value="91">Reduced (BANZAI)</b-form-select-option>
           </b-form-select>
         </b-form-group>
-
-        <aggregated-options-select
-          id="sites"
-          v-model="queryParams.SITEID"
-          label="Site"
-          :options="categorizedAggregatedOptions.sites"
-        ></aggregated-options-select>
-
-        <aggregated-options-select
-          id="telescopes"
-          v-model="queryParams.TELID"
-          label="Telescope"
-          :options="categorizedAggregatedOptions.telescopes"
-        ></aggregated-options-select>
-
+        <aggregated-options-select id="sites" v-model="queryParams.SITEID" label="Site" :options="categorizedAggregatedOptions.sites" />
+        <aggregated-options-select id="telescopes" v-model="queryParams.TELID" label="Telescope" :options="categorizedAggregatedOptions.telescopes" />
         <aggregated-options-select
           id="instruments"
           v-model="queryParams.INSTRUME"
           label="Instrument"
           :options="categorizedAggregatedOptions.instruments"
-        ></aggregated-options-select>
-
-        <aggregated-options-select
-          id="filters"
-          v-model="queryParams.FILTER"
-          label="Filter"
-          :options="categorizedAggregatedOptions.filters"
-        ></aggregated-options-select>
-
+        />
+        <aggregated-options-select id="filters" v-model="queryParams.FILTER" label="Filter" :options="categorizedAggregatedOptions.filters" />
         <b-form-group id="input-group-exposure-time">
           <template #label>
             Exposure Time<sup v-b-tooltip.hover.right title="Exposure time in seconds. Filter results with a greater than or equal value">?</sup>
           </template>
           <b-form-input v-model="queryParams.EXPTIME" type="number"></b-form-input>
         </b-form-group>
-
         <b-button type="submit" variant="primary" :disabled="isBusy">Filter</b-button>
         <b-button type="reset" variant="secondary" :disabled="isBusy">Reset</b-button>
       </b-form>
@@ -209,11 +167,13 @@ import { OCSMixin, OCSUtil } from 'ocs-component-lib';
 import { downloadZip, downloadWget } from '@/download.js';
 
 import AggregatedOptionsSelect from '@/components/AggregatedOptionsSelect.vue';
+import TargetLookup from '@/components/TargetLookup.vue';
 
 export default {
   name: 'ArchiveDataTable',
   components: {
-    AggregatedOptionsSelect
+    AggregatedOptionsSelect,
+    TargetLookup
   },
   mixins: [OCSMixin.paginationAndFilteringMixin],
   props: {
