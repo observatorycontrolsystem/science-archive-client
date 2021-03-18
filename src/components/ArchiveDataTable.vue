@@ -579,44 +579,42 @@ export default {
       $.ajax({
         url: `${this.archiveApiUrl}/frames/aggregate/`,
         data: filters
-      })
-        .done(response => {
-          if (aggregateField === 'PROPID') {
-            this.setOptions('proposals', response.proposals);
-          } else if (aggregateField === 'OBSTYPE') {
-            this.setOptions('obstypes', response.obstypes);
-          } else if (aggregateField === 'SITEID') {
-            this.setOptions('sites', response.sites);
-          } else if (aggregateField === 'INSTRUME') {
-            this.setOptions('instruments', response.instruments);
-          } else if (aggregateField === 'FILTER') {
-            this.setOptions('filters', response.filters);
-          } else if (aggregateField === 'TELID') {
-            this.setOptions('telescopes', response.telescopes);
-          }
-        })
+      }).done(response => {
+        if (aggregateField === 'PROPID') {
+          this.setOptions('proposals', response.proposals);
+        } else if (aggregateField === 'OBSTYPE') {
+          this.setOptions('obstypes', response.obstypes);
+        } else if (aggregateField === 'SITEID') {
+          this.setOptions('sites', response.sites);
+        } else if (aggregateField === 'INSTRUME') {
+          this.setOptions('instruments', response.instruments);
+        } else if (aggregateField === 'FILTER') {
+          this.setOptions('filters', response.filters);
+        } else if (aggregateField === 'TELID') {
+          this.setOptions('telescopes', response.telescopes);
+        }
+      });
     },
     getAllFiltersAndUpdateOptions: function(aggregateField) {
       $.ajax({
         url: `${this.archiveApiUrl}/frames/aggregate/`,
         data: { aggregate_field: aggregateField }
-      })
-        .done(response => {
-          if (aggregateField === 'SITEID') {
-            this.allAggregatedOptions.sites = response.sites.sort();
-          } else if (aggregateField === 'FILTER') {
-            this.allAggregatedOptions.filters = response.filters.sort();
-          } else if (aggregateField === 'INSTRUME') {
-            this.allAggregatedOptions.instruments = response.instruments.sort();
-          } else if (aggregateField === 'TELID') {
-            this.allAggregatedOptions.telescopes = response.telescopes.sort();
-          } else if (aggregateField === 'OBSTYPE') {
-            this.allAggregatedOptions.obstypes = response.obstypes.sort();
-          } else if (aggregateField === 'PROPID') {
-            this.allAggregatedOptions.proposals = response.proposals.sort();
-          }
-          this.updateOptions(aggregateField);
-        })
+      }).done(response => {
+        if (aggregateField === 'SITEID') {
+          this.allAggregatedOptions.sites = response.sites.sort();
+        } else if (aggregateField === 'FILTER') {
+          this.allAggregatedOptions.filters = response.filters.sort();
+        } else if (aggregateField === 'INSTRUME') {
+          this.allAggregatedOptions.instruments = response.instruments.sort();
+        } else if (aggregateField === 'TELID') {
+          this.allAggregatedOptions.telescopes = response.telescopes.sort();
+        } else if (aggregateField === 'OBSTYPE') {
+          this.allAggregatedOptions.obstypes = response.obstypes.sort();
+        } else if (aggregateField === 'PROPID') {
+          this.allAggregatedOptions.proposals = response.proposals.sort();
+        }
+        this.updateOptions(aggregateField);
+      });
     },
     updateFilters: function() {
       // Populate all the dropdowns from the aggregate endpoint.
