@@ -33,6 +33,9 @@
         selectable
         @row-selected="onRowSelected"
       >
+        <template #head(selected)="">
+          <b-form-checkbox @change="onSelectAll" />
+        </template>
         <template #cell(selected)="row">
           <b-form-checkbox v-model="row.rowSelected" />
         </template>
@@ -167,11 +170,18 @@ export default {
     initializeDataEndpoint: function() {
       return `${this.$store.state.urls.archiveApi}/frames/`;
     },
+    onSelectAll: function(checked) {
+      console.log(checked);
+      if (checked) {
+        this.selected = this.$refs.archivetable.items;
+      } else {
+        this.selected = [];
+      }
+    },
     onRowSelected: function(items) {
       this.selected = items;
     },
     downloadFiles: function() {
-      // TODO: add select all checkbox
       // TODO: checkbox should select row
       // TODO: validate that fewer than 10 are selected for uncompressed download
       let archiveToken = localStorage.getItem('archiveToken');
