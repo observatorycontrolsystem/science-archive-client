@@ -6,7 +6,9 @@ Vue.use(Vuex);
 
 const EMPTY_PROFILE_DATA = {
   username: '',
-  proposals: []
+  profile: {
+    proposals: []
+  }
 };
 
 export default new Vuex.Store({
