@@ -3,36 +3,31 @@
     <b-col md="2">
       <b-form @submit="onSubmit" @reset="onReset">
         <b-form-group id="input-group-daterange">
-          <!-- TODO: Implement -->
-          <b-form-datepicker id="input-group-daterange-start" v-model="queryParams.start" class="mb-2"></b-form-datepicker>
-          <b-form-datepicker id="input-group-daterange-end" v-model="queryParams.end" class="mb-2"></b-form-datepicker>
+          <!-- TODO: Do we need to allow people to copy/ paste dates in? The new version of the datepicker changed this -->
+          <div id="date-range-picker" class="border p-1 w-100">
+            <i class="far fa-calendar"></i>{{ queryParams.start }} <br />
+            <i class="fas fa-caret-down"></i>{{ queryParams.end }}
+          </div>
         </b-form-group>
 
-        <b-form-group id="input-group-proposals">
+        <aggregated-options-select
+          id="proposals"
+          v-model="queryParams.PROPID"
+          :options="categorizedAggregatedOptions.proposals"
+          place-in-option-group
+          option-group-label="Public proposals"
+        >
           <template #label> Proposal<sup v-b-tooltip.hover.right title="Log in to view your proposals">?</sup> </template>
-          <b-form-select id="input-proposals" v-model="queryParams.PROPID">
-            <template #first>
-              <b-form-select-option :value="''">All</b-form-select-option>
-              <b-form-select-option :value="''" disabled>---</b-form-select-option>
-            </template>
+          <template #first>
+            <b-form-select-option :value="''">All</b-form-select-option>
+            <b-form-select-option :value="''" disabled>---</b-form-select-option>
             <b-form-select-option-group v-if="profileProposals.length > 0" label="My proposals">
               <b-form-select-option v-for="proposal in profileProposals" :key="proposal" :value="proposal">
                 {{ proposal }}
               </b-form-select-option>
             </b-form-select-option-group>
-            <b-form-select-option-group label="Public proposals">
-              <b-form-select-option v-for="proposal in categorizedAggregatedOptions.proposals.available" :key="proposal" :value="proposal">
-                {{ proposal }}
-              </b-form-select-option>
-              <b-form-select-option v-if="categorizedAggregatedOptions.proposals.unavailable.length > 0" :value="''" disabled
-                >---</b-form-select-option
-              >
-              <b-form-select-option v-for="proposal in categorizedAggregatedOptions.proposals.unavailable" :key="proposal" :value="proposal">
-                {{ proposal }}
-              </b-form-select-option>
-            </b-form-select-option-group>
-          </b-form-select>
-        </b-form-group>
+          </template>
+        </aggregated-options-select>
 
         <b-form-group id="input-group-public">
           <b-form-checkbox id="checkbox-public" v-model="queryParams.public" name="checkbox-public" value="true" unchecked-value="false">
@@ -73,23 +68,12 @@
           <b-form-input v-model="queryParams.OBJECT"></b-form-input>
         </b-form-group>
 
-        <b-form-group id="input-group-obstype">
-          <template #label>
-            Observation Type
-          </template>
-          <b-form-select id="input-obstype" v-model="queryParams.OBSTYPE">
-            <template #first>
-              <b-form-select-option :value="''">All</b-form-select-option>
-            </template>
-            <b-form-select-option v-for="obstype in categorizedAggregatedOptions.obstypes.available" :key="obstype" :value="obstype">
-              {{ obstype }}
-            </b-form-select-option>
-            <b-form-select-option v-if="categorizedAggregatedOptions.obstypes.unavailable.length > 0" :value="''" disabled>---</b-form-select-option>
-            <b-form-select-option v-for="obstype in categorizedAggregatedOptions.obstypes.unavailable" :key="obstype" :value="obstype">
-              {{ obstype }}
-            </b-form-select-option>
-          </b-form-select>
-        </b-form-group>
+        <aggregated-options-select
+          id="obstypes"
+          v-model="queryParams.OBSTYPE"
+          label="Observation Type"
+          :options="categorizedAggregatedOptions.obstypes"
+        ></aggregated-options-select>
 
         <b-form-group id="input-group-rlevel">
           <template #label>
@@ -110,91 +94,43 @@
           </b-form-select>
         </b-form-group>
 
-        <b-form-group id="input-group-site">
-          <template #label>
-            Site
-          </template>
-          <b-form-select id="input-site" v-model="queryParams.SITEID">
-            <template #first>
-              <b-form-select-option :value="''">All</b-form-select-option>
-            </template>
-            <b-form-select-option v-for="site in categorizedAggregatedOptions.sites.available" :key="site" :value="site">
-              {{ site }}
-            </b-form-select-option>
-            <b-form-select-option v-if="categorizedAggregatedOptions.sites.unavailable.length > 0" :value="''" disabled>---</b-form-select-option>
-            <b-form-select-option v-for="site in categorizedAggregatedOptions.sites.unavailable" :key="site" :value="site">
-              {{ site }}
-            </b-form-select-option>
-          </b-form-select>
-        </b-form-group>
+        <aggregated-options-select
+          id="sites"
+          v-model="queryParams.SITEID"
+          label="Site"
+          :options="categorizedAggregatedOptions.sites"
+        ></aggregated-options-select>
 
-        <b-form-group id="input-group-telescope">
-          <template #label>
-            Telescope
-          </template>
-          <b-form-select id="input-telescope" v-model="queryParams.TELID">
-            <template #first>
-              <b-form-select-option :value="''">All</b-form-select-option>
-            </template>
-            <b-form-select-option v-for="telescope in categorizedAggregatedOptions.telescopes.available" :key="telescope" :value="telescope">
-              {{ telescope }}
-            </b-form-select-option>
-            <b-form-select-option v-if="categorizedAggregatedOptions.telescopes.unavailable.length > 0" :value="''" disabled
-              >---</b-form-select-option
-            >
-            <b-form-select-option v-for="telescope in categorizedAggregatedOptions.telescopes.unavailable" :key="telescope" :value="telescope">
-              {{ telescope }}
-            </b-form-select-option>
-          </b-form-select>
-        </b-form-group>
+        <aggregated-options-select
+          id="telescopes"
+          v-model="queryParams.TELID"
+          label="Telescope"
+          :options="categorizedAggregatedOptions.telescopes"
+        ></aggregated-options-select>
 
-        <b-form-group id="input-group-instrument">
-          <template #label>
-            Instrument
-          </template>
-          <b-form-select id="input-instrument" v-model="queryParams.INSTRUME">
-            <template #first>
-              <b-form-select-option :value="''">All</b-form-select-option>
-            </template>
-            <b-form-select-option v-for="instrument in categorizedAggregatedOptions.instruments.available" :key="instrument" :value="instrument">
-              {{ instrument }}
-            </b-form-select-option>
-            <b-form-select-option v-if="categorizedAggregatedOptions.instruments.unavailable.length > 0" :value="''" disabled
-              >---</b-form-select-option
-            >
-            <b-form-select-option v-for="instrument in categorizedAggregatedOptions.instruments.unavailable" :key="instrument" :value="instrument">
-              {{ instrument }}
-            </b-form-select-option>
-          </b-form-select>
-        </b-form-group>
+        <aggregated-options-select
+          id="instruments"
+          v-model="queryParams.INSTRUME"
+          label="Instrument"
+          :options="categorizedAggregatedOptions.instruments"
+        ></aggregated-options-select>
 
-        <b-form-group id="input-group-filter">
-          <template #label>
-            Filter
-          </template>
-          <b-form-select id="input-filter" v-model="queryParams.FILTER">
-            <template #first>
-              <b-form-select-option :value="''">All</b-form-select-option>
-            </template>
-            <b-form-select-option v-for="filter in categorizedAggregatedOptions.filters.available" :key="filter" :value="filter">
-              {{ filter }}
-            </b-form-select-option>
-            <b-form-select-option v-if="categorizedAggregatedOptions.filters.unavailable.length > 0" :value="''" disabled>---</b-form-select-option>
-            <b-form-select-option v-for="filter in categorizedAggregatedOptions.filters.unavailable" :key="filter" :value="filter">
-              {{ filter }}
-            </b-form-select-option>
-          </b-form-select>
-        </b-form-group>
+        <aggregated-options-select
+          id="filters"
+          v-model="queryParams.FILTER"
+          label="Filter"
+          :options="categorizedAggregatedOptions.filters"
+        ></aggregated-options-select>
 
-        <b-form-group id="input-group-object">
+        <b-form-group id="input-group-exposure-time">
           <template #label>
             Exposure Time<sup v-b-tooltip.hover.right title="Exposure time in seconds. Filter results with a greater than or equal value">?</sup>
           </template>
           <b-form-input v-model="queryParams.EXPTIME" type="number"></b-form-input>
         </b-form-group>
 
-        <b-button type="submit" variant="primary" :disabled="isBusy">Submit</b-button>
-        <b-button type="reset" variant="danger" :disabled="isBusy">Reset</b-button>
+        <b-button type="submit" variant="primary" :disabled="isBusy">Filter</b-button>
+        <b-button type="reset" variant="secondary" :disabled="isBusy">Reset</b-button>
       </b-form>
     </b-col>
     <b-col md="10">
@@ -215,7 +151,7 @@
         </b-dropdown-form>
       </b-dropdown>
       <b-button :disabled="!selected.length" variant="primary" class="mx-1" @click="clearSelected">
-        <template><i class="fa fa-times" /></template>
+        <template><i class="fa fa-times"/></template>
       </b-button>
       <b-table
         id="archive-table"
@@ -265,13 +201,20 @@ import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
 const Terraformer = require('@terraformer/spatial');
+import 'bootstrap-daterangepicker';
+import 'bootstrap-daterangepicker/daterangepicker.css';
 
 import { OCSMixin, OCSUtil } from 'ocs-component-lib';
 
 import { downloadZip, downloadWget } from '@/download.js';
 
+import AggregatedOptionsSelect from '@/components/AggregatedOptionsSelect.vue';
+
 export default {
   name: 'ArchiveDataTable',
+  components: {
+    AggregatedOptionsSelect
+  },
   mixins: [OCSMixin.paginationAndFilteringMixin],
   props: {
     // List of semesters to be used to generate helpful time ranges for the time filter. The current semester is
@@ -285,48 +228,7 @@ export default {
     }
   },
   data: function() {
-    let filterDateRangeOptions = {
-      'All Time': [
-        moment('2000-01-01'),
-        moment
-          .utc()
-          .endOf('day')
-          .add(1, 'days')
-      ],
-      Today: [moment.utc().startOf('day'), moment.utc().endOf('day')],
-      Yesterday: [
-        moment
-          .utc()
-          .startOf('day')
-          .subtract(1, 'days'),
-        moment
-          .utc()
-          .endOf('day')
-          .subtract(1, 'days')
-      ],
-      'Last 7 Days': [
-        moment
-          .utc()
-          .startOf('day')
-          .subtract(6, 'days'),
-        moment.utc().endOf('day')
-      ],
-      'Last 30 Days': [
-        moment
-          .utc()
-          .startOf('day')
-          .subtract(29, 'days'),
-        moment.utc().endOf('day')
-      ]
-    };
-    if (this.currentSemester) {
-      filterDateRangeOptions['This Semester'] = [moment.utc(this.currentSemester.start), moment.utc(this.currentSemester.end)];
-    }
-    if (this.lastSemester) {
-      filterDateRangeOptions['Last Semester'] = [moment.utc(this.lastSemester.start), moment.utc(this.lastSemester.end)];
-    }
-    console.log('date ranges', filterDateRangeOptions);
-
+    let filterDateRangeOptions = this.getTimeRangeFilters();
     return {
       dltype: 'zip-compressed',
       selected: [],
@@ -457,15 +359,83 @@ export default {
     },
     profileProposals: function() {
       return _.get(this.profile, ['profile', 'proposals'], []).sort();
-    },
-    currentSemester: function() {
-      return _.get(this.semesters, 0, {});
-    },
-    lastSemester: function() {
-      return _.get(this.semesters, 1, {});
     }
   },
+  mounted: function() {
+    $('#date-range-picker').daterangepicker(
+      {
+        locale: {
+          format: this.getDateFormat()
+        },
+        opens: 'right',
+        timePicker: true,
+        timePicker24Hour: true,
+        timePickerIncrement: 10,
+        showDropdowns: true,
+        startDate: this.queryParams.start,
+        endDate: this.queryParams.end,
+        ranges: this.filterDateRangeOptions
+      },
+      (start, end) => {
+        this.queryParams.start = start.format(this.getDateFormat());
+        this.queryParams.end = end.format(this.getDateFormat());
+        this.updateFilters();
+      }
+    );
+  },
   methods: {
+    getDateFormat: function() {
+      return 'YYYY-MM-DD HH:mm';
+    },
+    getTimeRangeFilters: function() {
+      let filterDateRangeOptions = {
+        'All Time': [
+          moment('2000-01-01'),
+          moment
+            .utc()
+            .endOf('day')
+            .add(1, 'days')
+        ],
+        Today: [moment.utc().startOf('day'), moment.utc().endOf('day')],
+        Yesterday: [
+          moment
+            .utc()
+            .startOf('day')
+            .subtract(1, 'days'),
+          moment
+            .utc()
+            .endOf('day')
+            .subtract(1, 'days')
+        ],
+        'Last 7 Days': [
+          moment
+            .utc()
+            .startOf('day')
+            .subtract(6, 'days'),
+          moment.utc().endOf('day')
+        ],
+        'Last 30 Days': [
+          moment
+            .utc()
+            .startOf('day')
+            .subtract(29, 'days'),
+          moment.utc().endOf('day')
+        ]
+      };
+      let currentSemester = this.getCurrentOrLastSemester('current');
+      if (currentSemester.start && currentSemester.end) {
+        filterDateRangeOptions['This Semester'] = [moment.utc(currentSemester.start), moment.utc(currentSemester.end)];
+      }
+      let lastSemester = this.getCurrentOrLastSemester('last');
+      if (lastSemester.start && lastSemester.end) {
+        filterDateRangeOptions['Last Semester'] = [moment.utc(lastSemester.start), moment.utc(lastSemester.end)];
+      }
+      return filterDateRangeOptions;
+    },
+    getCurrentOrLastSemester: function(currentOrLast) {
+      let semesterIndex = currentOrLast === 'current' ? 0 : 1;
+      return _.get(this.semesters, semesterIndex, {});
+    },
     clearSelected: function() {
       this.$refs.archivetable.clearSelected();
       this.selected = [];
@@ -504,11 +474,14 @@ export default {
       }
     },
     initializeDefaultQueryParams: function() {
-      let defaultStart = '';
-      let defaultEnd = '';
-      if (this.currentSemester) {
-        defaultStart = moment.utc(this.currentSemester.start).format('YYYY-MM-DD HH:mm');
-        defaultEnd = moment.utc(this.currentSemester.end).format('YYYY-MM-DD HH:mm');
+      let timeRangeFilters = this.getTimeRangeFilters();
+      let defaultRange;
+      // If the semester is available, use that to set the default range. Otherwise set the default range to today,
+      // which is guaranteed to be in the time range filters.
+      if (timeRangeFilters['This Semester']) {
+        defaultRange = timeRangeFilters['This Semester'];
+      } else {
+        defaultRange = timeRangeFilters['Today'];
       }
       const defaultQueryParams = {
         RLEVEL: '',
@@ -523,8 +496,8 @@ export default {
         BLKUID: '',
         REQNUM: '',
         basename: '',
-        start: defaultStart,
-        end: defaultEnd,
+        start: defaultRange[0].format(this.getDateFormat()),
+        end: defaultRange[1].format(this.getDateFormat()),
         id: '',
         covers: '',
         public: 'true',
@@ -629,3 +602,8 @@ export default {
   }
 };
 </script>
+<style scoped>
+#date-range-picker {
+  cursor: pointer;
+}
+</style>
