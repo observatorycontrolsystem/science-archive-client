@@ -101,10 +101,8 @@ export default {
   },
   methods: {
     logout: function() {
-      // TODO: Clear filters on reload? Either that, or make sure if the propid is
-      // set to something not public, clear it, but probably in the archive table component
       this.$store.dispatch('removeArchiveToken').then(() => {
-        window.location.reload();
+        window.location = window.location.href.split('?')[0];
       });
     }
   }

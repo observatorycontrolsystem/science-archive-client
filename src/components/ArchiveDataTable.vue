@@ -1,5 +1,10 @@
 <template>
   <b-row>
+    <b-modal id="bv-modal-alert" hide-footer>
+      <div class="d-block text-center">
+        {{ alertModalMessage }}
+      </div>
+    </b-modal>
     <b-col md="2">
       <b-form @submit="onSubmit" @reset="onReset">
         <b-form-group id="input-group-daterange">
@@ -40,11 +45,14 @@
         <target-lookup v-model="queryParams.covers" />
         <b-form-group id="input-group-object">
           <template #label>
-            Object<sup
+            Object
+            <sup
               v-b-tooltip.hover.right
-              title="As written to FITS header. Not an exact match: returns all frames with the given text included in the OBJECT header."
-              >?</sup
+              title="As written to FITS header. Not an exact match: returns all frames
+              with the given text included in the OBJECT header."
             >
+              ?
+            </sup>
           </template>
           <b-form-input v-model="queryParams.OBJECT"></b-form-input>
         </b-form-group>
@@ -161,11 +169,9 @@ import moment from 'moment';
 const Terraformer = require('@terraformer/spatial');
 import 'bootstrap-daterangepicker';
 import 'bootstrap-daterangepicker/daterangepicker.css';
-
 import { OCSMixin, OCSUtil } from 'ocs-component-lib';
 
 import { downloadZip, downloadWget } from '@/download.js';
-
 import AggregatedOptionsSelect from '@/components/AggregatedOptionsSelect.vue';
 import TargetLookup from '@/components/TargetLookup.vue';
 
@@ -193,6 +199,7 @@ export default {
       dltype: 'zip-compressed',
       selected: [],
       filterDateRangeOptions: filterDateRangeOptions,
+      alertModalMessage: '',
       categorizedAggregatedOptions: {
         sites: {
           available: [],
@@ -322,6 +329,13 @@ export default {
     }
   },
   mounted: function() {
+    // Set up alert modal to clear message when it it hidden
+    this.$root.$on('bv::modal::hidden', (bvEvent, modalId) => {
+      if (modalId === 'bv-modal-alert') {
+        this.alertModalMessage = '';
+      }
+    });
+
     $('#date-range-picker').daterangepicker(
       {
         locale: {
@@ -471,13 +485,13 @@ export default {
       this.updateFilters();
     },
     onErrorRetrievingData: function(response) {
-      // TODO: Test
-      // TODO: Maybe don't use alerts - use maybe bootstrap alerts or a modal
       if (response.status == 429) {
-        alert('Your account has been throttled due to too many requests. Please see https://lco.global/documentation/archive-documentation/#limits');
+        this.alertModalMessage =
+          'Your account has been throttled due to too many requests. Please see https://lco.global/documentation/archive-documentation/#limits';
       } else {
-        alert('There was a problem with your request. Status: ' + response.status + ' Please contact support.');
+        this.alertModalMessage = `There was a problem with your request. Status: ${response.status}. Please contact support.`;
       }
+      this.$bvModal.show('bv-modal-alert');
     },
     setOptions: function(optionKey, availableOptions) {
       // optionKey must be (is expected to be) one of the keys inside allAggregatedOptions

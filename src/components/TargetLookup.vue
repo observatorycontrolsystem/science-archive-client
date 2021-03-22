@@ -8,24 +8,27 @@
         all frames containing an RA/Dec independent of the name given in the OBJECT header. This will not work for solar
         system objects. Sexagesimal or degrees. You may also click the magnification glass to fetch RA/Dec from online
         sources (such as SIMBAD or NED) by object name."
-        >
-          ?
-        </sup>
+      >
+        ?
+      </sup>
     </template>
     <b-input-group>
       <b-form-input v-model="objectName" placeholder="Search sources"></b-form-input>
       <b-input-group-append>
-        <b-button :disabled="!objectName" @click="lookupTarget"><i class="fas fa-search"></i></b-button>
+        <b-button :disabled="!objectName || lookup.isBusy" @click="lookupTarget"><i class="fas fa-search"></i></b-button>
       </b-input-group-append>
     </b-input-group>
+    <b-form-text v-if="lookup.status" id="text-lookup-status" class="my-1">{{ lookup.status }}</b-form-text>
     <b-input-group>
       <b-form-input v-model="point.x" placeholder="RA" @input="onPointUpdate"></b-form-input>
       <b-form-input v-model="point.y" placeholder="Dec" @input="onPointUpdate"></b-form-input>
     </b-input-group>
+    <b-form-text v-if="coordinatesFeedback" id="text-coordinates-feedback" class="my-1">{{ coordinatesFeedback }}</b-form-text>
   </b-form-group>
 </template>
 <script>
 import $ from 'jquery';
+import _ from 'lodash';
 import { wktToGeoJSON } from '@terraformer/wkt';
 import { OCSUtil } from 'ocs-component-lib';
 
@@ -41,51 +44,81 @@ export default {
   data: function() {
     return {
       objectName: '',
+      lookup: {
+        status: '',
+        isBusy: false
+      },
+      coordinatesFeedback: '',
       point: this.parsePoint()
     };
   },
   methods: {
     parsePoint: function() {
+      let point = { x: '', y: '' };
       if (this.value) {
-        let point = wktToGeoJSON(this.value);
-        return {
-          x: point.coordinates[0].toString(),
-          y: point.coordinates[1].toString()
-        };
+        try {
+          let geoJson = wktToGeoJSON(this.value);
+          point = {
+            x: geoJson.coordinates[0].toString(),
+            y: geoJson.coordinates[1].toString()
+          };
+        } catch {
+          console.log('Unable to parse GeoJSON from the WTK representation');
+        }
+        return point;
       } else {
-        return { x: '', y: '' };
+        return point;
       }
     },
     lookupTarget: function() {
+      this.setLookupStatus('');
       if (this.objectName) {
+        this.lookup.isBusy = true;
+        this.setLookupStatus(`Searching for target ${this.objectName}`);
         $.ajax({
           url: `${this.$store.state.urls.simbadService}/${this.objectName}`
         })
           .done(response => {
-            this.point.x = response.ra.replace(/ /g, ':');
-            this.point.y = response.dec.replace(/ /g, ':');
-            this.onPointUpdate();
+            if (response.error) {
+              this.setLookupStatus(response.error);
+            } else {
+              this.setLookupStatus('');
+              this.point.x = response.ra.replace(/ /g, ':');
+              this.point.y = response.dec.replace(/ /g, ':');
+              this.onPointUpdate();
+            }
           })
-          .fail(response => {
-            // TODO: Display that there was an error
-            console.log('Error getting result from simbad', response);
+          .fail(() => {
+            this.setLookupStatus('Unable to find target from lookup service');
+          })
+          .always(() => {
+            this.lookup.isBusy = false;
           });
       }
     },
     getPointAsDecimal: function() {
-      return {
-        x: OCSUtil.sexagesimalRaToDecimal(this.point.x),
-        y: OCSUtil.sexagesimalDecToDecimal(this.point.y)
-      };
+      let x = OCSUtil.sexagesimalRaToDecimal(this.point.x);
+      let y = OCSUtil.sexagesimalDecToDecimal(this.point.y);
+      // Do not run _.toNumber if empty string since empty strings are interpreted as zeros.
+      if (x !== '') x = _.toNumber(x);
+      if (y !== '') y = _.toNumber(y);
+      return { x: x, y: y };
     },
-    onPointUpdate: function() {
-      // TODO: Check that both points x and y are filled out, and that the decimal
-      // representations are valid numbers
-
-      // Emit a string that will go into the url for the covers param
+    setLookupStatus: _.debounce(function(status) {
+      // Use debouce to smooth out how often the displayed text is rendered
+      this.lookup.status = status;
+    }, 100),
+    onPointUpdate: _.debounce(function() {
+      // Emit a WTK POINT representation that will go into the url for the `covers` param
       let pointAsDecimal = this.getPointAsDecimal();
-      this.$emit('input', `POINT(${pointAsDecimal.x} ${pointAsDecimal.y})`);
-    }
+      // Both x and y must be valid numbers to make a valid WTK POINT representation.
+      if (!_.isNaN(pointAsDecimal.x) && !_.isNaN(pointAsDecimal.y) && _.isNumber(pointAsDecimal.x) && _.isNumber(pointAsDecimal.y)) {
+        this.coordinatesFeedback = '';
+        this.$emit('input', `POINT(${pointAsDecimal.x} ${pointAsDecimal.y})`);
+      } else {
+        this.coordinatesFeedback = 'Please enter valid coordinates to use a point search. Both RA and Dec must be set.';
+      }
+    }, 500)
   }
 };
 </script>
