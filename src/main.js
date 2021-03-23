@@ -20,7 +20,7 @@ $.ajax({
     observationPortalApi: process.env.VUE_APP_OBSERVATION_PORTAL_API_URL || data.observationPortalApiUrl,
     archiveApi: process.env.VUE_APP_ARCHIVE_API_URL || data.archiveApiUrl,
     simbadService: process.env.VUE_APP_SIMBAD_SERVICE_URL || data.simbadServiceUrl,
-    thumbnailService: process.env.VUE_APP_THUMBNAILS_SERVICE_URL || data.thumbnailServiceUrl
+    thumbnailService: process.env.VUE_APP_THUMBNAIL_SERVICE_URL || data.thumbnailServiceUrl
   });
 
   // Add the archive token to a request being sent to the archive api or the thumbservice
