@@ -9,8 +9,8 @@
       <b-form @submit="onSubmit" @reset="onReset">
         <b-form-group id="input-group-daterange">
           <div id="date-range-picker" class="border p-1 w-100">
-            <i class="far fa-calendar"></i>{{ queryParams.start }} <br />
-            <i class="fas fa-caret-down"></i>{{ queryParams.end }}
+            <i class="far fa-calendar"></i> {{ queryParams.start }} <br />
+            <i class="fas fa-caret-down"></i> {{ queryParams.end }}
           </div>
         </b-form-group>
         <aggregated-options-select
@@ -96,8 +96,8 @@
           <b-form-input v-model="queryParams.EXPTIME" type="number"></b-form-input>
         </b-form-group>
         <b-button-group class="w-100">
-          <b-button type="submit" variant="outline-primary" :disabled="isBusy">Filter</b-button>
-          <b-button type="reset" variant="outline-warning" :disabled="isBusy">Reset</b-button>
+          <b-button type="submit" variant="outline-secondary" :disabled="isBusy">Filter</b-button>
+          <b-button type="reset" variant="outline-secondary" :disabled="isBusy">Reset</b-button>
         </b-button-group>
       </b-form>
     </b-col>
@@ -126,8 +126,8 @@
         </b-col>
         <b-col class="text-right">
           <b-button-group>
-            <b-button @click="refreshData"><i class="fas fa-sync-alt"></i></b-button>
-            <b-dropdown right>
+            <b-button variant="outline-secondary" @click="refreshData"><i class="fas fa-sync-alt"></i></b-button>
+            <b-dropdown variant="outline-secondary" right>
               <template #button-content>
                 <i class="fas fa-table"></i>
               </template>
@@ -148,7 +148,7 @@
                 </div>
               </b-dropdown-form>
             </b-dropdown>
-            <b-dropdown right>
+            <b-dropdown variant="outline-secondary" right>
               <template #button-content>
                 <i class="fas fa-file-export"></i>
               </template>
@@ -210,14 +210,30 @@
           <frame-detail :frame-id="data.item.id" :obstype="data.item.OBSTYPE" class="p-3"></frame-detail>
         </template>
       </b-table>
-      <ocs-pagination
-        v-if="!isBusy"
-        table-id="archive-table"
-        :per-page="queryParams.limit"
-        :total-rows="data.count"
-        :current-page="currentPage"
-        @pageChange="onPageChange"
-      />
+      <template v-if="!isBusy">
+        <b-row>
+          <b-col>
+            <div class="text-right text-muted">
+              Showing {{ currentPageRange.start }} to {{ currentPageRange.end }} of {{ data.count }} row{{ data.count === 1 ? '' : 's' }}
+            </div>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            <ocs-pagination
+              table-id="archive-table"
+              :per-page="queryParams.limit"
+              :total-rows="data.count"
+              :current-page="currentPage"
+              :display-per-page-dropdown="true"
+              :pagination-attrs="{ 'first-number': true, 'last-number': true }"
+              :per-page-options="perPageOptions"
+              @limitChange="onLimitChange"
+              @pageChange="onPageChange"
+            />
+          </b-col>
+        </b-row>
+      </template>
     </b-col>
     <!-- This is included for downloading the table data -->
     <script src="https://cdn.lco.global/script/tableExport.min.js" type="application/javascript"></script>
@@ -264,6 +280,13 @@ export default {
       selected: [],
       filterDateRangeOptions: filterDateRangeOptions,
       alertModalMessage: '',
+      perPageOptions: [
+        { value: '10', text: '10 rows per page' },
+        { value: '50', text: '50 rows per page' },
+        { value: '100', text: '100 rows per page' },
+        { value: '500', text: '500 rows per page' },
+        { value: '1000', text: '1000 rows per page' }
+      ],
       categorizedAggregatedOptions: {
         sites: {
           available: [],
@@ -430,6 +453,14 @@ export default {
       return _.filter(this.fields, function(field) {
         return !field.hidden;
       });
+    },
+    currentPageRange: function() {
+      let limit = _.toNumber(this.queryParams.limit);
+      let offset = _.toNumber(this.queryParams.offset);
+      return {
+        start: offset + 1,
+        end: _.min([offset + limit, this.data.count])
+      };
     }
   },
   mounted: function() {

@@ -15,7 +15,7 @@
     <b-input-group>
       <b-form-input v-model="objectName" placeholder="Search sources"></b-form-input>
       <b-input-group-append>
-        <b-button :disabled="!objectName || lookup.isBusy" @click="lookupTarget"><i class="fas fa-search"></i></b-button>
+        <b-button :disabled="!objectName || lookup.isBusy" variant="outline-secondary" @click="lookupTarget"><i class="fas fa-search"></i></b-button>
       </b-input-group-append>
     </b-input-group>
     <b-form-text v-if="lookup.status" id="text-lookup-status" class="my-1">{{ lookup.status }}</b-form-text>

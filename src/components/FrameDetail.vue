@@ -5,7 +5,7 @@
       <related-frames-table :frame-id="frameId" />
     </b-col>
     <b-col md="4" cols="12">
-      <b-button v-b-modal="modalId" variant="outline-primary" class="my-1" block>View Headers</b-button>
+      <b-button v-b-modal="modalId" variant="outline-secondary" class="my-1" block>View Headers</b-button>
       <headers-modal :modal-id="modalId" :frame-id="frameId" />
       <thumbnail v-if="hasThumbnail" :frame-id="frameId"></thumbnail>
       <div v-else>No preview available for this filetype</div>
