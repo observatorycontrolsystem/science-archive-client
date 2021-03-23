@@ -1,38 +1,73 @@
 <template>
-  <b-form-group :id="'input-group-' + id">
-    <template #label>
-      <slot name="label">{{ label }}</slot>
-    </template>
-    <b-form-select :id="'input-' + id" :value="value" @input="onUpdate">
-      <template #first>
-        <slot name="first">
-          <b-form-select-option :value="''">All</b-form-select-option>
-        </slot>
+  <div>
+    <slot name="label">{{ label }}</slot>
+    <b-dropdown block class="my-2" menu-class="menu" boundary="viewport" variant="outline-secondary">
+      <template #button-content>
+        <span v-if="value">{{ value | truncate }}</span>
+        <span v-else>{{ allOptionText | truncate }}</span>
       </template>
-      <b-form-select-option-group v-if="placeInOptionGroup" :label="optionGroupLabel">
-        <b-form-select-option v-for="available in options.available" :key="available" :value="available">
+      <b-dropdown-form form-class="px-1">
+        <b-form-input v-model="filterOptionsBy"></b-form-input>
+      </b-dropdown-form>
+      <b-dropdown-item href="#" :active="value === allValue" @click="onUpdate(allValue)">{{ allOptionText }}</b-dropdown-item>
+      <slot name="first">
+        <b-dropdown-group v-if="placeFirstOptionsInGroup && filteredFirstOptions.length > 0" :header="firstOptionGroupLabel">
+          <b-dropdown-divider></b-dropdown-divider>
+          <b-dropdown-item v-for="option in filteredFirstOptions" :key="option" :active="value === option" @click="onUpdate(option)">
+            {{ option }}
+          </b-dropdown-item>
+        </b-dropdown-group>
+        <template v-else-if="filteredFirstOptions.length > 0">
+          <b-dropdown-divider></b-dropdown-divider>
+          <b-dropdown-item v-for="option in filteredFirstOptions" :key="option" :active="value === option" @click="onUpdate(option)">
+            {{ option }}
+          </b-dropdown-item>
+        </template>
+      </slot>
+      <b-dropdown-divider></b-dropdown-divider>
+      <b-dropdown-group v-if="placeInOptionGroup" :header="optionGroupLabel">
+        <b-dropdown-item v-for="available in filteredOptions.available" :key="available" :active="value === available" @click="onUpdate(available)">
           {{ available }}
-        </b-form-select-option>
-        <b-form-select-option v-if="options.unavailable.length > 0" :value="''" disabled>---</b-form-select-option>
-        <b-form-select-option v-for="unavailable in options.unavailable" :key="unavailable" :value="unavailable">
+        </b-dropdown-item>
+        <b-dropdown-divider></b-dropdown-divider>
+        <b-dropdown-item
+          v-for="unavailable in filteredOptions.unavailable"
+          :key="unavailable"
+          :active="value === unavailable"
+          link-class="text-muted"
+          @click="onUpdate(unavailable)"
+        >
           {{ unavailable }}
-        </b-form-select-option>
-      </b-form-select-option-group>
+        </b-dropdown-item>
+      </b-dropdown-group>
       <template v-else>
-        <b-form-select-option v-for="available in options.available" :key="available" :value="available">
+        <b-dropdown-item v-for="available in filteredOptions.available" :key="available" :active="value === available" @click="onUpdate(available)">
           {{ available }}
-        </b-form-select-option>
-        <b-form-select-option v-if="options.unavailable.length > 0" :value="''" disabled>---</b-form-select-option>
-        <b-form-select-option v-for="unavailable in options.unavailable" :key="unavailable" :value="unavailable">
+        </b-dropdown-item>
+        <b-dropdown-divider></b-dropdown-divider>
+        <b-dropdown-item
+          v-for="unavailable in filteredOptions.unavailable"
+          :key="unavailable"
+          :active="value === unavailable"
+          link-class="text-muted"
+          @click="onUpdate(unavailable)"
+        >
           {{ unavailable }}
-        </b-form-select-option>
+        </b-dropdown-item>
       </template>
-    </b-form-select>
-  </b-form-group>
+    </b-dropdown>
+  </div>
 </template>
 <script>
+import _ from 'lodash';
+
 export default {
   name: 'AggregatedOptionsSelect',
+  filters: {
+    truncate: function(value) {
+      return _.truncate(value, { length: 12 });
+    }
+  },
   props: {
     options: {
       type: Object,
@@ -56,12 +91,64 @@ export default {
     optionGroupLabel: {
       type: String,
       default: 'Options'
+    },
+    allOptionText: {
+      type: String,
+      default: 'All'
+    },
+    firstOptions: {
+      type: Array,
+      default: () => {
+        return [];
+      }
+    },
+    placeFirstOptionsInGroup: {
+      type: Boolean
+    },
+    firstOptionGroupLabel: {
+      type: String,
+      default: ''
+    }
+  },
+  data: function() {
+    return {
+      // Value used for the `All` option
+      allValue: '',
+      filterOptionsBy: ''
+    };
+  },
+  computed: {
+    filteredOptions: function() {
+      let options = { available: [], unavailable: [] };
+      for (let state of ['available', 'unavailable']) {
+        for (let opt of this.options[state]) {
+          if (_.includes(_.toUpper(opt), _.toUpper(this.filterOptionsBy))) {
+            options[state].push(opt);
+          }
+        }
+      }
+      return options;
+    },
+    filteredFirstOptions: function() {
+      let options = [];
+      for (let opt of this.firstOptions) {
+        if (_.includes(_.toUpper(opt), _.toUpper(this.filterOptionsBy))) {
+          options.push(opt);
+        }
+      }
+      return options;
     }
   },
   methods: {
-    onUpdate: function(event) {
-      this.$emit('input', event);
+    onUpdate: function(value) {
+      this.$emit('input', value);
     }
   }
 };
 </script>
+<style>
+.menu {
+  max-height: 200px;
+  overflow-y: scroll;
+}
+</style>

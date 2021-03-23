@@ -12,16 +12,16 @@
         ?
       </sup>
     </template>
-    <b-input-group>
-      <b-form-input v-model="objectName" placeholder="Search sources"></b-form-input>
+    <b-input-group class="mb-1">
+      <b-form-input v-model="objectName" placeholder="Search sources" class="border-secondary"></b-form-input>
       <b-input-group-append>
         <b-button :disabled="!objectName || lookup.isBusy" variant="outline-secondary" @click="lookupTarget"><i class="fas fa-search"></i></b-button>
       </b-input-group-append>
     </b-input-group>
     <b-form-text v-if="lookup.status" id="text-lookup-status" class="my-1">{{ lookup.status }}</b-form-text>
     <b-input-group>
-      <b-form-input v-model="point.x" placeholder="RA" @input="onPointUpdate"></b-form-input>
-      <b-form-input v-model="point.y" placeholder="Dec" @input="onPointUpdate"></b-form-input>
+      <b-form-input v-model="point.x" placeholder="RA" class="border-secondary" @input="onPointUpdate"></b-form-input>
+      <b-form-input v-model="point.y" placeholder="Dec" class="border-secondary" @input="onPointUpdate"></b-form-input>
     </b-input-group>
     <b-form-text v-if="coordinatesFeedback" id="text-coordinates-feedback" class="my-1">{{ coordinatesFeedback }}</b-form-text>
   </b-form-group>

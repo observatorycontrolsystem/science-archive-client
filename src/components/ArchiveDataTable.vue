@@ -8,7 +8,7 @@
     <b-col md="2">
       <b-form @submit="onSubmit" @reset="onReset">
         <b-form-group id="input-group-daterange">
-          <div id="date-range-picker" class="border p-1 w-100">
+          <div id="date-range-picker" class="border border-secondary rounded p-1 w-100">
             <i class="far fa-calendar"></i> {{ queryParams.start }} <br />
             <i class="fas fa-caret-down"></i> {{ queryParams.end }}
           </div>
@@ -19,17 +19,11 @@
           :options="categorizedAggregatedOptions.proposals"
           place-in-option-group
           option-group-label="Public proposals"
+          place-first-options-in-group
+          first-option-group-label="My proposals"
+          :first-options="profileProposals"
         >
           <template #label> Proposal<sup v-b-tooltip.hover.right title="Log in to view your proposals">?</sup> </template>
-          <template #first>
-            <b-form-select-option :value="''">All</b-form-select-option>
-            <b-form-select-option :value="''" disabled>---</b-form-select-option>
-            <b-form-select-option-group v-if="profileProposals.length > 0" label="My proposals">
-              <b-form-select-option v-for="proposal in profileProposals" :key="proposal" :value="proposal">
-                {{ proposal }}
-              </b-form-select-option>
-            </b-form-select-option-group>
-          </template>
         </aggregated-options-select>
         <b-form-group id="input-group-public">
           <b-form-checkbox id="checkbox-public" v-model="queryParams.public" name="checkbox-public" value="true" unchecked-value="false">
@@ -40,7 +34,7 @@
           <template #label>
             Basename
           </template>
-          <b-form-input v-model="queryParams.basename"></b-form-input>
+          <b-form-input v-model="queryParams.basename" class="border-secondary"></b-form-input>
         </b-form-group>
         <target-lookup v-model="queryParams.covers" />
         <b-form-group id="input-group-object">
@@ -54,7 +48,7 @@
               ?
             </sup>
           </template>
-          <b-form-input v-model="queryParams.OBJECT"></b-form-input>
+          <b-form-input v-model="queryParams.OBJECT" class="border-secondary"></b-form-input>
         </b-form-group>
         <aggregated-options-select
           id="obstypes"
@@ -69,16 +63,7 @@
           <template #description>
             See <a href="https://lco.global/documentation/archive-documentation/#products" target="blank">documentation on reduction levels</a>.
           </template>
-          <b-form-select id="input-rlevel" v-model="queryParams.RLEVEL">
-            <template #first>
-              <b-form-select-option :value="''">All</b-form-select-option>
-            </template>
-            <b-form-select-option value="0">Raw</b-form-select-option>
-            <b-form-select-option value="10">Quicklook (ORAC)</b-form-select-option>
-            <b-form-select-option value="11">Quicklook (BANZAI)</b-form-select-option>
-            <b-form-select-option value="90">Reduced (ORAC)</b-form-select-option>
-            <b-form-select-option value="91">Reduced (BANZAI)</b-form-select-option>
-          </b-form-select>
+          <simple-select id="input-rlevel" v-model="queryParams.RLEVEL" :options="reductionLevelOptions"></simple-select>
         </b-form-group>
         <aggregated-options-select id="sites" v-model="queryParams.SITEID" label="Site" :options="categorizedAggregatedOptions.sites" />
         <aggregated-options-select id="telescopes" v-model="queryParams.TELID" label="Telescope" :options="categorizedAggregatedOptions.telescopes" />
@@ -93,7 +78,7 @@
           <template #label>
             Exposure Time<sup v-b-tooltip.hover.right title="Exposure time in seconds. Filter results with a greater than or equal value">?</sup>
           </template>
-          <b-form-input v-model="queryParams.EXPTIME" type="number"></b-form-input>
+          <b-form-input v-model="queryParams.EXPTIME" type="number" class="border-secondary"></b-form-input>
         </b-form-group>
         <b-button-group class="w-100">
           <b-button type="submit" variant="outline-secondary" :disabled="isBusy">Filter</b-button>
@@ -210,7 +195,7 @@
           <frame-detail :frame-id="data.item.id" :obstype="data.item.OBSTYPE" class="p-3"></frame-detail>
         </template>
       </b-table>
-      <template v-if="!isBusy">
+      <template v-if="!isBusy && data.count > 0">
         <b-row>
           <b-col>
             <div class="text-right text-muted">
@@ -251,6 +236,7 @@ import { OCSMixin, OCSUtil } from 'ocs-component-lib';
 
 import { downloadZip, downloadWget } from '@/download.js';
 import AggregatedOptionsSelect from '@/components/AggregatedOptionsSelect.vue';
+import SimpleSelect from '@/components/SimpleSelect.vue';
 import TargetLookup from '@/components/TargetLookup.vue';
 import FrameDetail from '@/components/FrameDetail.vue';
 
@@ -258,6 +244,7 @@ export default {
   name: 'ArchiveDataTable',
   components: {
     AggregatedOptionsSelect,
+    SimpleSelect,
     TargetLookup,
     FrameDetail
   },
@@ -286,6 +273,14 @@ export default {
         { value: '100', text: '100 rows per page' },
         { value: '500', text: '500 rows per page' },
         { value: '1000', text: '1000 rows per page' }
+      ],
+      reductionLevelOptions: [
+        { value: '', text: 'All' },
+        { value: '0', text: 'Raw' },
+        { value: '10', text: 'Quicklook (ORAC)' },
+        { value: '11', text: 'Quicklook (BANZAI)' },
+        { value: '90', text: 'Reduced (ORAC)' },
+        { value: '91', text: 'Reduced (BANZAI)' }
       ],
       categorizedAggregatedOptions: {
         sites: {
@@ -458,7 +453,7 @@ export default {
       let limit = _.toNumber(this.queryParams.limit);
       let offset = _.toNumber(this.queryParams.offset);
       return {
-        start: offset + 1,
+        start: _.min([offset + 1, this.data.count]),
         end: _.min([offset + limit, this.data.count])
       };
     }
