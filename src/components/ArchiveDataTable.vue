@@ -102,37 +102,83 @@
       </b-form>
     </b-col>
     <b-col md="10">
-      <b-dropdown :disabled="!selected.length" split variant="primary" split-href="" @click="downloadFiles">
-        <template #button-content>Download {{ selected.length }}</template>
-        <b-dropdown-form>
-          <b-form-group v-slot="{ ariaDescribedby }">
-            <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="zip-compressed">
-              zip download (with compressed fits files)
-            </b-form-radio>
-            <b-dropdown-divider />
-            <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="zip-uncompressed">
-              zip download (with uncompressed fits files)
-            </b-form-radio>
-            <b-dropdown-divider />
-            <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="wget">wget script</b-form-radio>
-          </b-form-group>
-        </b-dropdown-form>
-      </b-dropdown>
-      <b-button :disabled="!selected.length" variant="primary" class="mx-1" @click="clearSelected">
-        <template><i class="fa fa-times"/></template>
-      </b-button>
+      <b-row class="mb-1">
+        <b-col>
+          <b-dropdown :disabled="!selected.length" split variant="primary" split-href="" @click="downloadFiles">
+            <template #button-content>Download {{ selected.length }}</template>
+            <b-dropdown-form>
+              <b-form-group v-slot="{ ariaDescribedby }">
+                <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="zip-compressed">
+                  zip download (with compressed fits files)
+                </b-form-radio>
+                <b-dropdown-divider />
+                <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="zip-uncompressed">
+                  zip download (with uncompressed fits files)
+                </b-form-radio>
+                <b-dropdown-divider />
+                <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="wget">wget script</b-form-radio>
+              </b-form-group>
+            </b-dropdown-form>
+          </b-dropdown>
+          <b-button :disabled="!selected.length" variant="primary" class="mx-1" @click="clearSelected">
+            <template><i class="fa fa-times"/></template>
+          </b-button>
+        </b-col>
+        <b-col class="text-right">
+          <b-button-group>
+            <b-button @click="refreshData"><i class="fas fa-sync-alt"></i></b-button>
+            <b-dropdown right>
+              <template #button-content>
+                <i class="fas fa-table"></i>
+              </template>
+              <b-dropdown-form>
+                <div v-for="(value, key) in fields" :key="key">
+                  <b-form-checkbox
+                    v-if="value.hideable"
+                    :id="'checkbox-' + value.key"
+                    :key="key"
+                    v-model="value.hidden"
+                    :name="'checkbox-' + value.key"
+                    :value="false"
+                    :unchecked-value="true"
+                  >
+                    <span v-if="value.label">{{ value.label }}</span>
+                    <span v-else>{{ value.key }}</span>
+                  </b-form-checkbox>
+                </div>
+              </b-dropdown-form>
+            </b-dropdown>
+            <b-dropdown right>
+              <template #button-content>
+                <i class="fas fa-file-export"></i>
+              </template>
+              <b-dropdown-item @click="exportTable('json')">JSON</b-dropdown-item>
+              <b-dropdown-item @click="exportTable('xml')">XML</b-dropdown-item>
+              <b-dropdown-item @click="exportTable('csv')">CSV</b-dropdown-item>
+              <b-dropdown-item @click="exportTable('txt')">TXT</b-dropdown-item>
+              <b-dropdown-item @click="exportTable('sql')">SQL</b-dropdown-item>
+              <b-dropdown-item @click="exportTable('excel')">MS-Excel</b-dropdown-item>
+            </b-dropdown>
+          </b-button-group>
+        </b-col>
+      </b-row>
       <b-table
         id="archive-table"
         ref="archivetable"
         selected-variant=""
         :items="data.results"
-        :fields="fields"
+        :fields="visibleFields"
         :busy="isBusy"
         small
         show-empty
         responsive
         selectable
         hover
+        sort-direction="desc"
+        :sort-by="getSortByFromOrdering()"
+        :sort-desc="getSortDescFromOrdering()"
+        no-local-sorting
+        @sort-changed="onSortingChanged"
         @row-selected="onRowSelected"
       >
         <template #head(selected)="">
@@ -173,6 +219,8 @@
         @pageChange="onPageChange"
       />
     </b-col>
+    <!-- This is included for downloading the table data -->
+    <script src="https://cdn.lco.global/script/tableExport.min.js" type="application/javascript"></script>
   </b-row>
 </template>
 
@@ -259,42 +307,66 @@ export default {
         'selected',
         {
           key: 'basename',
-          label: 'Basename'
+          label: 'Basename',
+          sortable: true,
+          hideable: true,
+          hidden: false
         },
         {
           key: 'DATE_OBS',
           label: 'Time',
+          sortable: true,
+          hideable: true,
+          hidden: false,
           formatter: value => {
             return OCSUtil.formatDate(value);
           }
         },
         {
           key: 'PROPID',
-          label: 'Proposal'
+          label: 'Proposal',
+          sortable: true,
+          hideable: true,
+          hidden: false
         },
         {
           key: 'OBJECT',
-          label: 'Object'
+          label: 'Object',
+          sortable: true,
+          hideable: true,
+          hidden: false
         },
         {
           key: 'FILTER',
-          label: 'Filter'
+          label: 'Filter',
+          sortable: true,
+          hideable: true,
+          hidden: false
         },
         {
           key: 'OBSTYPE',
-          label: 'Type'
+          label: 'Type',
+          sortable: true,
+          hideable: true,
+          hidden: false
         },
         {
           key: 'BLKUID',
-          label: 'Observation ID'
+          label: 'Observation ID',
+          hideable: true,
+          hidden: true
         },
         {
           key: 'REQNUM',
-          label: 'Request #'
+          label: 'Request #',
+          hideable: true,
+          hidden: true
         },
         {
           key: 'area',
           label: 'Centroid',
+          hideable: true,
+          hidden: true,
           formatter: value => {
             if (value) {
               let envelope = Terraformer.calculateEnvelope(value);
@@ -311,11 +383,17 @@ export default {
         },
         {
           key: 'EXPTIME',
-          label: 'Exp. Time'
+          label: 'Exp. Time',
+          sortable: true,
+          hideable: true,
+          hidden: false
         },
         {
           key: 'RLEVEL',
           label: 'R. level',
+          sortable: true,
+          hideable: true,
+          hidden: false,
           formatter: value => {
             switch (value) {
               case 0:
@@ -347,6 +425,11 @@ export default {
     },
     profileProposals: function() {
       return _.get(this.profile, ['profile', 'proposals'], []).sort();
+    },
+    visibleFields: function() {
+      return _.filter(this.fields, function(field) {
+        return !field.hidden;
+      });
     }
   },
   mounted: function() {
@@ -379,6 +462,19 @@ export default {
     );
   },
   methods: {
+    exportTable: function(type) {
+      $('#archive-table').tableExport({
+        type: type,
+        onCellHtmlData(cell, rowIndex, colIndex, htmlData) {
+          if (cell.is('th')) {
+            return cell.find('div').text();
+          }
+          return htmlData;
+        },
+        exportFooter: false,
+        tfootSelector: ''
+      });
+    },
     getDateFormat: function() {
       return 'YYYY-MM-DD HH:mm';
     },
@@ -514,6 +610,9 @@ export default {
       }
       this.$bvModal.show('bv-modal-alert');
     },
+    refreshData: function() {
+      this.update();
+    },
     setOptions: function(optionKey, availableOptions) {
       // optionKey must be (is expected to be) one of the keys inside allAggregatedOptions
       availableOptions.sort();
@@ -593,6 +692,28 @@ export default {
           this.updateOptions(filterName);
         }
       }
+    },
+    getSortByFromOrdering: function() {
+      // Return what field the data is currently sorted by given the `ordering` field in the query params
+      let splitOrdering = _.split(this.queryParams.ordering, '-');
+      return splitOrdering.pop();
+    },
+    getSortDescFromOrdering: function() {
+      // Return whether the current sort order set in the `ordering` query param is descending
+      return _.startsWith(this.queryParams.ordering, '-') ? true : false;
+    },
+    getOrderingFromSort: function(sortDesc, sortBy) {
+      // Return what the `ordering` value in the query params should be given the sort order and the sort field
+      let ordering = '';
+      if (sortBy) {
+        ordering = sortDesc ? `-${sortBy}` : sortBy;
+      }
+      return ordering;
+    },
+    onSortingChanged: function(event) {
+      this.queryParams.ordering = this.getOrderingFromSort(event.sortDesc, event.sortBy);
+      this.goToFirstPage();
+      this.update();
     }
   }
 };
