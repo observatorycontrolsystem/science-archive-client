@@ -95,8 +95,10 @@
           </template>
           <b-form-input v-model="queryParams.EXPTIME" type="number"></b-form-input>
         </b-form-group>
-        <b-button type="submit" variant="primary" :disabled="isBusy">Filter</b-button>
-        <b-button type="reset" variant="secondary" :disabled="isBusy">Reset</b-button>
+        <b-button-group class="w-100">
+          <b-button type="submit" variant="outline-primary" :disabled="isBusy">Filter</b-button>
+          <b-button type="reset" variant="outline-warning" :disabled="isBusy">Reset</b-button>
+        </b-button-group>
       </b-form>
     </b-col>
     <b-col md="10">
@@ -130,6 +132,7 @@
         show-empty
         responsive
         selectable
+        hover
         @row-selected="onRowSelected"
       >
         <template #head(selected)="">
@@ -148,6 +151,17 @@
         </template>
         <template #table-busy>
           <div class="text-center my-2"><i class="fa fa-spin fa-spinner" /> Loading data, please wait...</div>
+        </template>
+        <template #cell(showDetails)="row">
+          <b-link v-if="row.detailsShowing" @click="row.toggleDetails">
+            <i class="fas fa-minus"></i>
+          </b-link>
+          <b-link v-else @click="row.toggleDetails">
+            <i class="fas fa-plus"></i>
+          </b-link>
+        </template>
+        <template #row-details="data">
+          <frame-detail :frame-id="data.item.id" :obstype="data.item.OBSTYPE" class="p-3"></frame-detail>
         </template>
       </b-table>
       <ocs-pagination
@@ -174,12 +188,14 @@ import { OCSMixin, OCSUtil } from 'ocs-component-lib';
 import { downloadZip, downloadWget } from '@/download.js';
 import AggregatedOptionsSelect from '@/components/AggregatedOptionsSelect.vue';
 import TargetLookup from '@/components/TargetLookup.vue';
+import FrameDetail from '@/components/FrameDetail.vue';
 
 export default {
   name: 'ArchiveDataTable',
   components: {
     AggregatedOptionsSelect,
-    TargetLookup
+    TargetLookup,
+    FrameDetail
   },
   mixins: [OCSMixin.paginationAndFilteringMixin],
   props: {
@@ -235,6 +251,11 @@ export default {
         proposals: []
       },
       fields: [
+        {
+          key: 'showDetails',
+          label: '',
+          tdClass: 'pr-2'
+        },
         'selected',
         {
           key: 'basename',
