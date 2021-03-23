@@ -164,13 +164,13 @@
         :sort-desc="getSortDescFromOrdering()"
         no-local-sorting
         @sort-changed="onSortingChanged"
-        @row-selected="onRowSelected"
+        @row-clicked="onRowClicked"
       >
         <template #head(selected)="">
           <b-form-checkbox @change="onSelectAll" />
         </template>
         <template #cell(selected)="row">
-          <b-form-checkbox v-model="row.rowSelected" />
+          <b-form-checkbox v-model="row.rowSelected" @change="onRowChecked(row, ...arguments)" />
         </template>
         <template #empty>
           <div v-if="!userIsAuthenticated" class="text-center my-2">
@@ -561,19 +561,39 @@ export default {
       return `${this.$store.state.urls.archiveApi}/frames/`;
     },
     onSelectAll: function(checked) {
-      console.log(checked);
+      console.log(this.$refs.archivetable.items);
       if (checked) {
-        this.selected = this.$refs.archivetable.items;
+        // TODO: don't add duplicates
+        this.$refs.archivetable.selectAllRows();
+        this.selected.push(this.$refs.archivetable.items);
       } else {
+        this.$refs.archivetable.clearSelected();
         this.selected = [];
       }
+      console.log(this.selected.length);
     },
-    onRowSelected: function(items) {
-      this.selected = items;
+    onRowChecked: function(row, checked) {
+      if (checked) {
+        // TODO: don't add duplicates
+        this.selected.push(row.item);
+        this.$refs.archivetable.selectRow(row.index);
+      } else {
+        let rowToDeselect = this.selected.find(element => element == row.item);
+        this.selected.pop(rowToDeselect);
+        this.$refs.archivetable.unselectRow(row.index);
+      }
+    },
+    onRowClicked: function(item, index) {
+      if (!this.$refs.archivetable.isRowSelected(index)) {
+        // TODO: don't add duplicates
+        this.selected.push(item);
+      } else {
+        let rowToDeselect = this.selected.find(element => element == item);
+        this.selected.pop(rowToDeselect);
+      }
     },
     downloadFiles: function() {
-      // TODO: selections don't persist across pages
-      // TODO: checkbox should select row
+      // TODO: add more checkboxes to download related frames
       // TODO: validate that fewer than 10 are selected for uncompressed download
       let archiveToken = localStorage.getItem('archiveToken');
 
