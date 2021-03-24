@@ -563,7 +563,9 @@ export default {
     onSelectAll: function(checked) {
       console.log(this.$refs.archivetable.items);
       if (checked) {
+        // TODO: allow select all per page
         // TODO: don't add duplicates
+        // TODO: displayed length is incorrect
         this.$refs.archivetable.selectAllRows();
         this.selected.push(this.$refs.archivetable.items);
       } else {
@@ -574,21 +576,25 @@ export default {
     },
     onRowChecked: function(row, checked) {
       if (checked) {
-        // TODO: don't add duplicates
-        this.selected.push(row.item);
-        this.$refs.archivetable.selectRow(row.index);
+        if (this.selected.indexOf(row.item.id) < 0) {
+          this.selected.push(row.item.id);
+          this.$refs.archivetable.selectRow(row.index);
+        }
       } else {
-        let rowToDeselect = this.selected.find(element => element == row.item);
+        let rowToDeselect = this.selected.find(element => element == row.item.id);
         this.selected.pop(rowToDeselect);
         this.$refs.archivetable.unselectRow(row.index);
       }
     },
     onRowClicked: function(item, index) {
+      console.log(item);
+      // TODO: checkbox state doesn't persist across pages
       if (!this.$refs.archivetable.isRowSelected(index)) {
-        // TODO: don't add duplicates
-        this.selected.push(item);
+        if (this.selected.indexOf(item.id) < 0) {
+          this.selected.push(item.id);
+        }
       } else {
-        let rowToDeselect = this.selected.find(element => element == item);
+        let rowToDeselect = this.selected.find(element => element == item.id);
         this.selected.pop(rowToDeselect);
       }
     },
