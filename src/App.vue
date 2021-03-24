@@ -49,6 +49,9 @@
         </b-collapse>
       </b-navbar>
     </div>
+    <b-alert v-if="userIsAuthenticatedAndNotMemberOfProposals" variant="info" dismissible>
+      <div>You are not a member of any proposals. Only public data will be shown.</div>
+    </b-alert>
     <b-container class="flex-shrink-0 p-1">
       <router-view class="my-3" />
     </b-container>
@@ -91,12 +94,15 @@ export default {
     },
     userIsAuthenticated: function() {
       return this.$store.state.userIsAuthenticated;
+    },
+    userIsAuthenticatedAndNotMemberOfProposals: function() {
+      return this.userIsAuthenticated && this.profile.profile.proposals.length < 1;
     }
   },
   methods: {
     logout: function() {
       this.$store.dispatch('removeArchiveToken').then(() => {
-        window.location.reload();
+        window.location = window.location.href.split('?')[0];
       });
     }
   }
