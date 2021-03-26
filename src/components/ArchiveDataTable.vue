@@ -89,8 +89,8 @@
     <b-col md="10">
       <b-row class="mb-1">
         <b-col>
-          <b-dropdown :disabled="!selected.length" split variant="primary" split-href="" @click="downloadFiles">
-            <template #button-content>Download {{ selected.length }}</template>
+          <b-dropdown :disabled="selectedSize <= 0" split variant="primary" split-href="" @click="downloadFiles">
+            <template #button-content>Download {{ selectedSize }}</template>
             <b-dropdown-form>
               <b-form-group v-slot="{ ariaDescribedby }">
                 <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="zip-compressed">
@@ -105,7 +105,7 @@
               </b-form-group>
             </b-dropdown-form>
           </b-dropdown>
-          <b-button :disabled="!selected.length" variant="primary" class="mx-1" @click="clearSelected">
+          <b-button :disabled="selectedSize <= 0" variant="primary" class="mx-1" @click="clearSelected">
             <template><i class="fa fa-times"/></template>
           </b-button>
         </b-col>
@@ -150,7 +150,6 @@
       <b-table
         id="archive-table"
         ref="archivetable"
-        selected-variant=""
         :items="data.results"
         :fields="visibleFields"
         :busy="isBusy"
@@ -165,12 +164,13 @@
         no-local-sorting
         @sort-changed="onSortingChanged"
         @row-clicked="onRowClicked"
+        @context-changed="onContextChanged"
       >
         <template #head(selected)="">
           <b-form-checkbox @change="onSelectAll" />
         </template>
         <template #cell(selected)="row">
-          <b-form-checkbox v-model="row.rowSelected" @change="onRowChecked(row, ...arguments)" />
+          <b-form-checkbox :checked="selected.has(row.item.id)" @change="onRowChecked(row, ...arguments)" />
         </template>
         <template #empty>
           <div v-if="!userIsAuthenticated" class="text-center my-2">
@@ -264,7 +264,8 @@ export default {
     let filterDateRangeOptions = this.getTimeRangeFilters();
     return {
       dltype: 'zip-compressed',
-      selected: [],
+      selected: new Set(),
+      selectedSize: 0,  // Reactive Sets are not introduced until Vue 3. This is the solution until then.
       filterDateRangeOptions: filterDateRangeOptions,
       alertModalMessage: '',
       perPageOptions: [
@@ -322,7 +323,9 @@ export default {
           label: '',
           tdClass: 'pr-2'
         },
-        'selected',
+        {
+          key: 'selected'
+        },
         {
           key: 'basename',
           label: 'Basename',
@@ -555,48 +558,52 @@ export default {
     },
     clearSelected: function() {
       this.$refs.archivetable.clearSelected();
-      this.selected = [];
+      this.selected = new Set();
     },
     initializeDataEndpoint: function() {
       return `${this.$store.state.urls.archiveApi}/frames/`;
     },
     onSelectAll: function(checked) {
-      console.log(this.$refs.archivetable.items);
-      if (checked) {
-        // TODO: allow select all per page
-        // TODO: don't add duplicates
-        // TODO: displayed length is incorrect
-        this.$refs.archivetable.selectAllRows();
-        this.selected.push(this.$refs.archivetable.items);
-      } else {
-        this.$refs.archivetable.clearSelected();
-        this.selected = [];
-      }
-      console.log(this.selected.length);
+      // console.log(this.$refs.archivetable.items);
+      // if (checked) {
+      //   // TODO: allow select all per page
+      //   // TODO: don't add duplicates
+      //   // TODO: displayed length is incorrect
+      //   this.$refs.archivetable.selectAllRows();
+      //   this.selected.push(this.$refs.archivetable.items);
+      // } else {
+      //   this.$refs.archivetable.clearSelected();
+      //   this.selected = [];
+      // }
+      // console.log(this.selected.size);
     },
     onRowChecked: function(row, checked) {
+      console.log(row);
       if (checked) {
-        if (this.selected.indexOf(row.item.id) < 0) {
-          this.selected.push(row.item.id);
-          this.$refs.archivetable.selectRow(row.index);
-        }
+        this.selected.add(row.item.id);
+        this.$refs.archivetable.selectRow(row.index);
       } else {
-        let rowToDeselect = this.selected.find(element => element == row.item.id);
-        this.selected.pop(rowToDeselect);
+        this.selected.delete(row.item.id);
         this.$refs.archivetable.unselectRow(row.index);
       }
+      console.log(this.selected);
+      this.selectedSize = this.selected.size;
     },
     onRowClicked: function(item, index) {
       console.log(item);
       // TODO: checkbox state doesn't persist across pages
-      if (!this.$refs.archivetable.isRowSelected(index)) {
-        if (this.selected.indexOf(item.id) < 0) {
-          this.selected.push(item.id);
-        }
+      if (!this.selected.has(item.id)) {
+        this.selected.add(item.id);
       } else {
-        let rowToDeselect = this.selected.find(element => element == item.id);
-        this.selected.pop(rowToDeselect);
+        this.selected.delete(item.id);
       }
+      console.log(this.selected);
+      console.log(this.selected.size);
+      this.selectedSize = this.selected.size;
+    },
+    onContextChanged: function(ctx) {
+      console.log('context changed');
+      console.log(ctx);
     },
     downloadFiles: function() {
       // TODO: add more checkboxes to download related frames
