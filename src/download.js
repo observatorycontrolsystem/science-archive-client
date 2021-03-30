@@ -18,6 +18,23 @@ function downloadZip(frameIds, uncompress, archiveRoot, archiveToken) {
   });
 }
 
-function downloadWget() {
-  // TODO: this function
+function generateScript(frameIds, archiveToken, callback) {
+  $.get('scripts/dlscript.sh', function(data) {
+    var res = data.replace('FRAMELIST', frameIds.join(' '));
+    if (archiveToken != null) {
+      res = res.replace('AUTHTOKEN', archiveToken);
+    }
+    callback(res);
+  });
+}
+
+function downloadWget(frameIds, archiveToken) {
+  generateScript(frameIds, archiveToken, function(data) {
+    var a = window.document.createElement('a');
+    a.href = window.URL.createObjectURL(new Blob([data], {type: 'text/plain'}));
+    a.download = 'archivedownload.sh';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  });
 }

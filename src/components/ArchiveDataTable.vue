@@ -97,7 +97,7 @@
                   zip download (with compressed fits files)
                 </b-form-radio>
                 <b-dropdown-divider />
-                <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="zip-uncompressed">
+                <b-form-radio v-model="dltype" :disabled="selectedSize > 10" :aria-describedby="ariaDescribedby" name="dltype" value="zip-uncompressed">
                   zip download (with uncompressed fits files)
                 </b-form-radio>
                 <b-dropdown-divider />
@@ -164,10 +164,9 @@
         no-local-sorting
         @sort-changed="onSortingChanged"
         @row-clicked="onRowClicked"
-        @context-changed="onContextChanged"
       >
         <template #head(selected)="">
-          <b-form-checkbox @change="onSelectAll" />
+          <b-form-checkbox :checked="ifAllSelected()" @change="onSelectAll" />
         </template>
         <template #cell(selected)="row">
           <b-form-checkbox :checked="selected.has(row.item.id)" @change="onRowChecked(row, ...arguments)" />
@@ -192,7 +191,7 @@
           </b-link>
         </template>
         <template #row-details="data">
-          <frame-detail :frame-id="data.item.id" :obstype="data.item.OBSTYPE" class="p-3"></frame-detail>
+          <frame-detail :frame-id="data.item.id" :obstype="data.item.OBSTYPE" v-on:selected-related-frame="onRowChecked(...arguments)" class="p-3"></frame-detail>
         </template>
       </b-table>
       <template v-if="!isBusy && data.count > 0">
@@ -556,70 +555,61 @@ export default {
       let semesterIndex = currentOrLast === 'current' ? 0 : 1;
       return _.get(this.semesters, semesterIndex, {});
     },
-    clearSelected: function() {
-      this.$refs.archivetable.clearSelected();
-      this.selected = new Set();
-    },
     initializeDataEndpoint: function() {
       return `${this.$store.state.urls.archiveApi}/frames/`;
     },
+    clearSelected: function() {
+      this.$refs.archivetable.clearSelected();
+      this.selected = new Set();
+      this.selectedSize = 0;
+    },
+    ifAllSelected: function() {
+      for (const item of this.$refs.archivetable.items) {
+        if (!this.selected.has(item.id)) {
+          return false;
+        }
+      }
+      return true;
+    },
     onSelectAll: function(checked) {
-      // console.log(this.$refs.archivetable.items);
-      // if (checked) {
-      //   // TODO: allow select all per page
-      //   // TODO: don't add duplicates
-      //   // TODO: displayed length is incorrect
-      //   this.$refs.archivetable.selectAllRows();
-      //   this.selected.push(this.$refs.archivetable.items);
-      // } else {
-      //   this.$refs.archivetable.clearSelected();
-      //   this.selected = [];
-      // }
-      // console.log(this.selected.size);
+      if (checked) {
+        this.$refs.archivetable.items.forEach((item) => {
+          this.selected.add(item.id);
+        });
+        this.selectedSize = this.selectedSize + this.$refs.archivetable.items.length;
+      } else {
+        this.$refs.archivetable.items.forEach((item) => {
+          this.selected.delete(item.id);
+        });
+        this.selectedSize = this.selectedSize - this.$refs.archivetable.items.length;
+      }
     },
     onRowChecked: function(row, checked) {
-      console.log(row);
       if (checked) {
         this.selected.add(row.item.id);
-        this.$refs.archivetable.selectRow(row.index);
       } else {
         this.selected.delete(row.item.id);
-        this.$refs.archivetable.unselectRow(row.index);
       }
-      console.log(this.selected);
       this.selectedSize = this.selected.size;
     },
     onRowClicked: function(item, index) {
-      console.log(item);
-      // TODO: checkbox state doesn't persist across pages
       if (!this.selected.has(item.id)) {
         this.selected.add(item.id);
       } else {
         this.selected.delete(item.id);
       }
-      console.log(this.selected);
-      console.log(this.selected.size);
       this.selectedSize = this.selected.size;
-    },
-    onContextChanged: function(ctx) {
-      console.log('context changed');
-      console.log(ctx);
     },
     downloadFiles: function() {
       // TODO: add more checkboxes to download related frames
       // TODO: validate that fewer than 10 are selected for uncompressed download
       let archiveToken = localStorage.getItem('archiveToken');
-
-      let frameIds = [];
-      this.selected.forEach(function(value, i) {
-        frameIds[i] = value.id;
-      });
+      let frameIds = Array.from(this.selected);
 
       if (this.dltype === 'zip-compressed' || this.dltype === 'zip-uncompressed') {
         let uncompress = this.dltype === 'zip-compressed' ? false : true;
         downloadZip(frameIds, uncompress, this.archiveApiUrl, archiveToken);
       } else if (this.dltype === 'wget') {
-        // TODO: implement downloadWget
         downloadWget(frameIds, this.archiveApiUrl, archiveToken);
       }
     },
