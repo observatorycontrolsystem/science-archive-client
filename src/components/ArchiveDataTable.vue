@@ -568,6 +568,14 @@ export default {
     initializeDataEndpoint: function() {
       return `${this.$store.state.urls.archiveApi}/frames/`;
     },
+    selectItem: function(item) {
+      this.selected.add(item.id);
+      this.selectedSize = this.selected.size;
+    },
+    deselectItem: function(item) {
+      this.selected.delete(item.id);
+      this.selectedSize = this.selected.size;
+    },
     clearSelected: function() {
       this.$refs.archivetable.clearSelected();
       this.selected = new Set();
@@ -584,14 +592,12 @@ export default {
     onSelectAll: function(checked) {
       if (checked) {
         this.$refs.archivetable.items.forEach((item) => {
-          this.selected.add(item.id);
+          this.selectItem(item);
         });
-        this.selectedSize = this.selected.size;
       } else {
         this.$refs.archivetable.items.forEach((item) => {
-          this.selected.delete(item.id);
+          this.deselectItem(item);
         });
-        this.selectedSize = this.selected.size
       }
     },
     onRowChecked: function(row, checked) {
@@ -599,23 +605,20 @@ export default {
       console.log(row);
       console.log(checked);
       if (checked) {
-        this.selected.add(row.item.id);
+        this.selectItem(row.item);
       } else {
-        this.selected.delete(row.item.id);
+        this.deselectItem(row.item);
       }
-      this.selectedSize = this.selected.size;
     },
     onRowClicked: function(item, index) {
       if (!this.selected.has(item.id)) {
-        this.selected.add(item.id);
+        this.selectItem(item);
       } else {
-        this.selected.delete(item.id);
+        this.deselectItem(item);
       }
-      this.selectedSize = this.selected.size;
     },
     downloadFiles: function() {
       // TODO: add more checkboxes to download related frames
-      // TODO: validate that fewer than 10 are selected for uncompressed download
       let archiveToken = localStorage.getItem('archiveToken');
       let frameIds = Array.from(this.selected);
 
