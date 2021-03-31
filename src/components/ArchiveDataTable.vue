@@ -89,7 +89,7 @@
     <b-col md="10">
       <b-row class="mb-1">
         <b-col>
-          <b-dropdown :split-class="{ disabled: selectedSize <= 0 || (selectedSize > 10 && dltype === 'zip-uncompressed') }" split variant="primary" split-href="" @click="downloadFiles">
+          <b-dropdown :split-class="{ disabled: selectedSize <= 0 || preventDownloadUncompressed() }" split variant="primary" split-href="" @click="downloadFiles">
             <template #button-content>Download {{ selectedSize }}</template>
             <b-dropdown-form>
               <b-form-group v-slot="{ ariaDescribedby }">
@@ -149,7 +149,7 @@
       </b-row>
       <b-row>
         <b-col>
-          <span v-if="selectedSize > 10 && dltype === 'zip-uncompressed'">Uncompressed downloads are not permitted with more than 10 files.</span>
+          <span v-if="preventDownloadUncompressed()">Uncompressed downloads are not permitted with more than 10 files.</span>
         </b-col>
       </b-row>
       <b-table
@@ -567,6 +567,9 @@ export default {
     },
     initializeDataEndpoint: function() {
       return `${this.$store.state.urls.archiveApi}/frames/`;
+    },
+    preventDownloadUncompressed: function() {
+      return (this.selectedSize > 10 && this.dltype === 'zip-uncompressed');
     },
     selectItem: function(item) {
       this.selected.add(item.id);
