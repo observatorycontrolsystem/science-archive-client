@@ -7,9 +7,9 @@
     :busy="!dataLoaded"
     show-empty
     hover
-    @row-clicked="$emit('clicked-related-frame')" >
+    @row-clicked="$emit('clicked-related-frame', $event)" >
     <template #cell(selected)="row">
-      <b-form-checkbox @change="$emit('checked-related-frame', row, $event)" />
+      <b-form-checkbox :checked="selectedItems.has(row.item.id)" @change="$emit('checked-related-frame', row, $event)" />
     </template>
     <template #table-busy>
       <div class="text-center my-2"><i class="fa fa-spin fa-spinner" /> Loading data, please wait...</div>
@@ -29,6 +29,10 @@ export default {
     frameId: {
       type: [String, Number],
       required: true
+    },
+    selectedItems: {
+      type: Set,
+      required: false
     }
   },
   data: function() {

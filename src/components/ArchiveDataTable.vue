@@ -197,7 +197,13 @@
           </b-link>
         </template>
         <template #row-details="data">
-          <frame-detail :frame-id="data.item.id" :obstype="data.item.OBSTYPE" v-on:checked-related-frame="onRowChecked(...arguments)" class="p-3"></frame-detail>
+          <frame-detail 
+            :frame-id="data.item.id"
+            :obstype="data.item.OBSTYPE"
+            :selected-items="selected"
+            v-on:checked-related-frame="onRowChecked(...arguments)"
+            v-on:clicked-related-frame="onRowClicked(...arguments)"
+            class="p-3" />
         </template>
       </b-table>
       <template v-if="!isBusy && data.count > 0">
@@ -613,7 +619,8 @@ export default {
         this.deselectItem(row.item);
       }
     },
-    onRowClicked: function(item, index) {
+    onRowClicked: function(item) {
+      console.log(item);
       if (!this.selected.has(item.id)) {
         this.selectItem(item);
       } else {

@@ -4,6 +4,7 @@
       <h5>Calibration and Catalog Frames</h5>
       <related-frames-table 
         :frame-id="frameId"
+        :selected-items="selectedItems"
         v-on:clicked-related-frame="$emit('clicked-related-frame', $event)"
         v-on:checked-related-frame="$emit('checked-related-frame', $event)" />
     </b-col>
@@ -35,6 +36,10 @@ export default {
     obstype: {
       type: String,
       required: true
+    },
+    selectedItems: {
+      type: Set,
+      required: false
     }
   },
   computed: {
