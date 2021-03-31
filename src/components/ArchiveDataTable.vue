@@ -162,6 +162,7 @@
         show-empty
         responsive
         selectable
+        selected-variant=""
         hover
         sort-direction="desc"
         :sort-by="getSortByFromOrdering()"
@@ -196,7 +197,7 @@
           </b-link>
         </template>
         <template #row-details="data">
-          <frame-detail :frame-id="data.item.id" :obstype="data.item.OBSTYPE" v-on:selected-related-frame="onRowChecked(...arguments)" class="p-3"></frame-detail>
+          <frame-detail :frame-id="data.item.id" :obstype="data.item.OBSTYPE" v-on:checked-related-frame="onRowChecked(...arguments)" class="p-3"></frame-detail>
         </template>
       </b-table>
       <template v-if="!isBusy && data.count > 0">
@@ -325,10 +326,14 @@ export default {
         {
           key: 'showDetails',
           label: '',
-          tdClass: 'pr-2'
+          tdClass: 'pr-2',
+          sortable: false,
+          hidden: false
         },
         {
-          key: 'selected'
+          key: 'selected',
+          sortable: false,
+          hidden: false
         },
         {
           key: 'basename',
@@ -590,6 +595,9 @@ export default {
       }
     },
     onRowChecked: function(row, checked) {
+      console.log('onRowChecked');
+      console.log(row);
+      console.log(checked);
       if (checked) {
         this.selected.add(row.item.id);
       } else {

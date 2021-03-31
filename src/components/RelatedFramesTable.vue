@@ -1,5 +1,16 @@
 <template>
-  <b-table :items="data" :fields="fields" :busy="!dataLoaded" show-empty hover>
+  <b-table 
+    :items="data"
+    :fields="fields"
+    selectable
+    selected-variant=""
+    :busy="!dataLoaded"
+    show-empty
+    hover
+    @row-clicked="$emit('clicked-related-frame')" >
+    <template #cell(selected)="row">
+      <b-form-checkbox @change="$emit('checked-related-frame', row, $event)" />
+    </template>
     <template #table-busy>
       <div class="text-center my-2"><i class="fa fa-spin fa-spinner" /> Loading data, please wait...</div>
     </template>
@@ -23,6 +34,10 @@ export default {
   data: function() {
     return {
       fields: [
+        {
+          key: 'selected',
+          label: '',
+        },
         {
           key: 'basename',
           label: 'Basename'

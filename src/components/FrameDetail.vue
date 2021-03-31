@@ -2,7 +2,10 @@
   <b-row>
     <b-col md="8" cols="12">
       <h5>Calibration and Catalog Frames</h5>
-      <related-frames-table :frame-id="frameId" />
+      <related-frames-table 
+        :frame-id="frameId"
+        v-on:clicked-related-frame="$emit('clicked-related-frame', $event)"
+        v-on:checked-related-frame="$emit('checked-related-frame', $event)" />
     </b-col>
     <b-col md="4" cols="12">
       <b-button v-b-modal="modalId" variant="outline-secondary" class="my-1" block>View Headers</b-button>
@@ -40,7 +43,7 @@ export default {
     },
     modalId: function() {
       return `modal-id-${this.frameId}`;
-    }
+    },
   }
 };
 </script>
