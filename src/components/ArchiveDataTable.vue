@@ -610,9 +610,6 @@ export default {
       }
     },
     onRowChecked: function(row, checked) {
-      console.log('onRowChecked');
-      console.log(row);
-      console.log(checked);
       if (checked) {
         this.selectItem(row.item);
       } else {
@@ -620,7 +617,6 @@ export default {
       }
     },
     onRowClicked: function(item) {
-      console.log(item);
       if (!this.selected.has(item.id)) {
         this.selectItem(item);
       } else {

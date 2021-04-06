@@ -5,8 +5,7 @@
       <related-frames-table 
         :frame-id="frameId"
         :selected-items="selectedItems"
-        v-on:clicked-related-frame="$emit('clicked-related-frame', $event)"
-        v-on:checked-related-frame="$emit('checked-related-frame', $event)" />
+        v-on="$listeners" />
     </b-col>
     <b-col md="4" cols="12">
       <b-button v-b-modal="modalId" variant="outline-secondary" class="my-1" block>View Headers</b-button>
