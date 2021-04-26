@@ -21,5 +21,4 @@ then
     check_and_set_config "${VUE_APP_THUMBNAIL_SERVICE_URL}" "thumbnailServiceUrl" "${CONFIG_FILE_PATH}"
 fi
 
-mkdir /init
 exec nginx -g 'daemon off;'

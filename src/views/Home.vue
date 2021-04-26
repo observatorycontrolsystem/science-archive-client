@@ -1,11 +1,9 @@
 <template>
   <ocs-data-loader :data-loaded="dataLoaded" :data-load-error="dataLoadError" :data-not-found="dataNotFound">
     <template #data-load-error>
-      <!-- TODO: Test this -->
       <archive-data-table />
     </template>
     <template #not-found>
-      <!-- TODO: Test this -->
       <archive-data-table />
     </template>
     <archive-data-table :semesters="data.results" />
@@ -26,7 +24,6 @@ export default {
   mixins: [OCSMixin.getDataMixin],
   methods: {
     initializeDataEndpoint: function() {
-      // TODO: Update this to use ocs util?
       let now = moment.utc().format('YYYY-MM-DD HH:mm');
       return `${this.$store.state.urls.observationPortalApi}/api/semesters/?start_lte=${now}`;
     }
