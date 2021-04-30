@@ -37,7 +37,7 @@ export default {
       required: true
     },
     selectedItems: {
-      type: Set,
+      type: Array,
       required: false
     }
   },

@@ -9,7 +9,7 @@
     hover
     @row-clicked="$emit('clicked-related-frame', $event)" >
     <template #cell(selected)="row">
-      <b-form-checkbox :checked="selectedItems.has(row.item.id)" @change="$emit('checked-related-frame', row, $event)" />
+      <b-form-checkbox :checked="itemInSelected(row.item.id)" @change="$emit('checked-related-frame', row, $event)" />
     </template>
     <template #table-busy>
       <div class="text-center my-2"><i class="fa fa-spin fa-spinner" /> Loading data, please wait...</div>
@@ -31,7 +31,7 @@ export default {
       required: true
     },
     selectedItems: {
-      type: Set,
+      type: Array,
       required: false
     }
   },
@@ -56,6 +56,9 @@ export default {
   methods: {
     initializeDataEndpoint: function() {
       return `${this.$store.state.urls.archiveApi}/frames/${this.frameId}/related/`;
+    },
+    itemInSelected: function(item) {
+      return _.includes(this.selectedItems, item)
     }
   }
 };

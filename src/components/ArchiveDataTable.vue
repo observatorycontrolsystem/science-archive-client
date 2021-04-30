@@ -89,15 +89,15 @@
     <b-col md="10">
       <b-row class="mb-1">
         <b-col>
-          <b-dropdown :split-class="{ disabled: selectedSize <= 0 || preventDownloadUncompressed() }" split variant="primary" split-href="" @click="downloadFiles">
-            <template #button-content>Download {{ selectedSize }}</template>
+          <b-dropdown :split-class="{ disabled: selected.length <= 0 || preventDownloadUncompressed() }" split variant="primary" split-href="" @click="downloadFiles">
+            <template #button-content >Download {{ selected.length }}</template>
             <b-dropdown-form>
               <b-form-group v-slot="{ ariaDescribedby }">
                 <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="zip-compressed">
                   zip download (with compressed fits files)
                 </b-form-radio>
                 <b-dropdown-divider />
-                <b-form-radio v-model="dltype" :disabled="selectedSize > 10" :aria-describedby="ariaDescribedby" name="dltype" value="zip-uncompressed">
+                <b-form-radio v-model="dltype" :disabled="selected.length > 10" :aria-describedby="ariaDescribedby" name="dltype" value="zip-uncompressed">
                   zip download (with uncompressed fits files)
                 </b-form-radio>
                 <b-dropdown-divider />
@@ -105,7 +105,7 @@
               </b-form-group>
             </b-dropdown-form>
           </b-dropdown>
-          <b-button :disabled="selectedSize <= 0" variant="primary" class="mx-1" @click="clearSelected">
+          <b-button :disabled="selected.length <= 0" variant="primary" class="mx-1" @click="clearSelected">
             <template><i class="fa fa-times"/></template>
           </b-button>
         </b-col>
@@ -175,7 +175,7 @@
           <b-form-checkbox :checked="ifAllSelected()" @change="onSelectAll" />
         </template>
         <template #cell(selected)="row">
-          <b-form-checkbox :checked="selected.has(row.item.id)" @change="onRowChecked(row, ...arguments)" />
+          <b-form-checkbox :checked="itemInSelected(row.item.id)" @change="onRowChecked(row, ...arguments)" />
         </template>
         <template #empty>
           <div v-if="!userIsAuthenticated" class="text-center my-2">
@@ -275,8 +275,7 @@ export default {
     let filterDateRangeOptions = this.getTimeRangeFilters();
     return {
       dltype: 'zip-compressed',
-      selected: new Set(),
-      selectedSize: 0,  // Reactive Sets are not introduced until Vue 3. This is the solution until then.
+      selected: [],
       filterDateRangeOptions: filterDateRangeOptions,
       alertModalMessage: '',
       perPageOptions: [
@@ -575,28 +574,32 @@ export default {
       return `${this.$store.state.urls.archiveApi}/frames/`;
     },
     preventDownloadUncompressed: function() {
-      return (this.selectedSize > 10 && this.dltype === 'zip-uncompressed');
+      return (this.selected.length > 10 && this.dltype === 'zip-uncompressed');
     },
     selectItem: function(item) {
-      this.selected.add(item.id);
-      this.selectedSize = this.selected.size;
+      this.selected.push(item.id);
     },
     deselectItem: function(item) {
-      this.selected.delete(item.id);
-      this.selectedSize = this.selected.size;
+      // remove an item by value via filtering, since vue cannot detect changes made by lodash methods
+      this.selected = this.selected.filter(function(value){ 
+        return value != item.id;
+      });
     },
     clearSelected: function() {
       this.$refs.archivetable.clearSelected();
-      this.selected = new Set();
-      this.selectedSize = 0;
+      this.selected = [];
     },
     ifAllSelected: function() {
       for (const item of this.$refs.archivetable.items) {
-        if (!this.selected.has(item.id)) {
+        if (!this.itemInSelected(item.id)) {
           return false;
         }
       }
       return true;
+    },
+    // TODO: break this into a util
+    itemInSelected: function(item) {
+      return _.includes(this.selected, item)
     },
     onSelectAll: function(checked) {
       if (checked) {
@@ -617,7 +620,7 @@ export default {
       }
     },
     onRowClicked: function(item) {
-      if (!this.selected.has(item.id)) {
+      if (!this.itemInSelected(item.id)) {
         this.selectItem(item);
       } else {
         this.deselectItem(item);
@@ -626,8 +629,7 @@ export default {
     downloadFiles: function() {
       // TODO: add more checkboxes to download related frames
       let archiveToken = localStorage.getItem('archiveToken');
-      let frameIds = Array.from(this.selected);
-
+      let frameIds = this.selected;
       if (this.dltype === 'zip-compressed' || this.dltype === 'zip-uncompressed') {
         let uncompress = this.dltype === 'zip-compressed' ? false : true;
         downloadZip(frameIds, uncompress, this.archiveApiUrl, archiveToken);
