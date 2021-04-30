@@ -245,6 +245,7 @@ import 'bootstrap-daterangepicker';
 import 'bootstrap-daterangepicker/daterangepicker.css';
 import { OCSMixin, OCSUtil } from 'ocs-component-lib';
 
+import { itemInList, removeItemFromList } from '@/util.js';
 import { downloadZip, downloadWget } from '@/download.js';
 import AggregatedOptionsSelect from '@/components/AggregatedOptionsSelect.vue';
 import SimpleSelect from '@/components/SimpleSelect.vue';
@@ -581,9 +582,7 @@ export default {
     },
     deselectItem: function(item) {
       // remove an item by value via filtering, since vue cannot detect changes made by lodash methods
-      this.selected = this.selected.filter(function(value){ 
-        return value != item.id;
-      });
+      this.selected = removeItemFromList(this.selected, item.id);
     },
     clearSelected: function() {
       this.$refs.archivetable.clearSelected();
@@ -597,9 +596,8 @@ export default {
       }
       return true;
     },
-    // TODO: break this into a util
-    itemInSelected: function(item) {
-      return _.includes(this.selected, item)
+    itemInSelected (item) {
+      return itemInList(this.selected, item);
     },
     onSelectAll: function(checked) {
       if (checked) {

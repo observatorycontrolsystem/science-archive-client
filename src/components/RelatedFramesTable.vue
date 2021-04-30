@@ -9,7 +9,7 @@
     hover
     @row-clicked="$emit('clicked-related-frame', $event)" >
     <template #cell(selected)="row">
-      <b-form-checkbox :checked="itemInSelected(row.item.id)" @change="$emit('checked-related-frame', row, $event)" />
+      <b-form-checkbox :checked="itemInSelectedItems(row.item.id)" @change="$emit('checked-related-frame', row, $event)" />
     </template>
     <template #table-busy>
       <div class="text-center my-2"><i class="fa fa-spin fa-spinner" /> Loading data, please wait...</div>
@@ -20,6 +20,7 @@
   </b-table>
 </template>
 <script>
+import { itemInList } from '@/util.js';
 import { OCSMixin } from 'ocs-component-lib';
 
 export default {
@@ -57,8 +58,8 @@ export default {
     initializeDataEndpoint: function() {
       return `${this.$store.state.urls.archiveApi}/frames/${this.frameId}/related/`;
     },
-    itemInSelected: function(item) {
-      return _.includes(this.selectedItems, item)
+    itemInSelectedItems: function (item) {
+      return itemInList(this.selectedItems, item);
     }
   }
 };
