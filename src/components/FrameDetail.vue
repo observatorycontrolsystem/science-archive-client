@@ -47,7 +47,7 @@ export default {
     },
     modalId: function() {
       return `modal-id-${this.frameId}`;
-    },
+    }
   }
 };
 </script>
