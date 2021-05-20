@@ -578,10 +578,10 @@ export default {
       return (this.selected.length > 10 && this.dltype === 'zip-uncompressed');
     },
     selectItem: function(item) {
-      this.selected.push(item.id);
+        if (!_.includes(this.selected, item.id)) this.selected.push(item.id);
     },
     deselectItem: function(item) {
-      // remove an item by value via filtering, since vue cannot detect changes made by lodash methods
+      // remove an item by value via filtering, since vue cannot detect changes made by _.pull or _.remove lodash methods
       this.selected = removeItemFromList(this.selected, item.id);
     },
     clearSelected: function() {
