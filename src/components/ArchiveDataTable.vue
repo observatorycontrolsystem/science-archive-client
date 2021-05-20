@@ -97,7 +97,7 @@
                   zip download (with compressed fits files)
                 </b-form-radio>
                 <b-dropdown-divider />
-                <b-form-radio v-model="dltype" :disabled="selected.length > 10" :aria-describedby="ariaDescribedby" name="dltype" value="zip-uncompressed">
+                <b-form-radio v-model="dltype" :disabled="selected.length > maxFunpackedFrames" :aria-describedby="ariaDescribedby" name="dltype" value="zip-uncompressed">
                   zip download (with uncompressed fits files)
                 </b-form-radio>
                 <b-dropdown-divider />
@@ -149,7 +149,7 @@
       </b-row>
       <b-row>
         <b-col>
-          <span v-if="preventDownloadUncompressed()">Uncompressed downloads are not permitted with more than 10 files.</span>
+          <span v-if="preventDownloadUncompressed()">Uncompressed downloads are not permitted with more than {{ this.maxFunpackedFrames }} files.</span>
         </b-col>
       </b-row>
       <b-table
@@ -276,6 +276,7 @@ export default {
     let filterDateRangeOptions = this.getTimeRangeFilters();
     return {
       dltype: 'zip-compressed',
+      maxFunpackedFrames: 10,
       selected: [],
       filterDateRangeOptions: filterDateRangeOptions,
       alertModalMessage: '',
@@ -575,7 +576,7 @@ export default {
       return `${this.$store.state.urls.archiveApi}/frames/`;
     },
     preventDownloadUncompressed: function() {
-      return (this.selected.length > 10 && this.dltype === 'zip-uncompressed');
+      return (this.selected.length > this.maxFunpackedFrames && this.dltype === 'zip-uncompressed');
     },
     selectItem: function(item) {
         if (!_.includes(this.selected, item.id)) this.selected.push(item.id);
