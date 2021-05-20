@@ -626,7 +626,6 @@ export default {
       }
     },
     downloadFiles: function() {
-      // TODO: add more checkboxes to download related frames
       let archiveToken = localStorage.getItem('archiveToken');
       let frameIds = this.selected;
       if (this.dltype === 'zip-compressed' || this.dltype === 'zip-uncompressed') {
