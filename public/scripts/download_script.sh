@@ -5,7 +5,7 @@ function getJsonVal () {
 
 frames=(FRAMELIST)
 authtoken="AUTHTOKEN"
-frame_url="https://archive-api.lco.global/frames/"
+frame_url="ARCHIVEFRAMEURL"
 
 echo "Downloading ${#frames[@]} frames to the current directory"
 for f in ${frames[@]}; do

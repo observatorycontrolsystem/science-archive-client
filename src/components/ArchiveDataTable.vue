@@ -632,7 +632,7 @@ export default {
         let uncompress = this.dltype === 'zip-compressed' ? false : true;
         downloadZip(frameIds, uncompress, this.archiveApiUrl, archiveToken);
       } else if (this.dltype === 'wget') {
-        downloadWget(frameIds, archiveToken);
+        downloadWget(frameIds, archiveToken, this.archiveApiUrl);
       }
     },
     initializeDefaultQueryParams: function() {
