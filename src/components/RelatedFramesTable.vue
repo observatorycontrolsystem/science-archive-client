@@ -1,5 +1,16 @@
 <template>
-  <b-table :items="data" :fields="fields" :busy="!dataLoaded" show-empty hover>
+  <b-table 
+    :items="data"
+    :fields="fields"
+    selectable
+    selected-variant=""
+    :busy="!dataLoaded"
+    show-empty
+    hover
+    @row-clicked="$emit('clicked-related-frame', $event)" >
+    <template #cell(selected)="row">
+      <b-form-checkbox :checked="itemInSelectedItems(row.item.id)" @change="$emit('checked-related-frame', row, $event)" />
+    </template>
     <template #table-busy>
       <div class="text-center my-2"><i class="fa fa-spin fa-spinner" /> Loading data, please wait...</div>
     </template>
@@ -9,6 +20,7 @@
   </b-table>
 </template>
 <script>
+import { itemInList } from '@/util.js';
 import { OCSMixin } from 'ocs-component-lib';
 
 export default {
@@ -18,11 +30,19 @@ export default {
     frameId: {
       type: [String, Number],
       required: true
+    },
+    selectedItems: {
+      type: Array,
+      required: false
     }
   },
   data: function() {
     return {
       fields: [
+        {
+          key: 'selected',
+          label: '',
+        },
         {
           key: 'basename',
           label: 'Basename'
@@ -37,6 +57,9 @@ export default {
   methods: {
     initializeDataEndpoint: function() {
       return `${this.$store.state.urls.archiveApi}/frames/${this.frameId}/related/`;
+    },
+    itemInSelectedItems: function (item) {
+      return itemInList(this.selectedItems, item);
     }
   }
 };

@@ -89,15 +89,15 @@
     <b-col md="10">
       <b-row class="mb-1">
         <b-col>
-          <b-dropdown :disabled="!selected.length" split variant="primary" split-href="" @click="downloadFiles">
-            <template #button-content>Download {{ selected.length }}</template>
+          <b-dropdown :split-class="{ disabled: selected.length <= 0 || preventDownloadUncompressed() }" split variant="primary" split-href="" @click="downloadFiles">
+            <template #button-content >Download {{ selected.length }}</template>
             <b-dropdown-form>
               <b-form-group v-slot="{ ariaDescribedby }">
                 <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="zip-compressed">
                   zip download (with compressed fits files)
                 </b-form-radio>
                 <b-dropdown-divider />
-                <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="zip-uncompressed">
+                <b-form-radio v-model="dltype" :disabled="selected.length > maxFunpackedFrames" :aria-describedby="ariaDescribedby" name="dltype" value="zip-uncompressed">
                   zip download (with uncompressed fits files)
                 </b-form-radio>
                 <b-dropdown-divider />
@@ -105,7 +105,7 @@
               </b-form-group>
             </b-dropdown-form>
           </b-dropdown>
-          <b-button :disabled="!selected.length" variant="primary" class="mx-1" @click="clearSelected">
+          <b-button :disabled="selected.length <= 0" variant="primary" class="mx-1" @click="clearSelected">
             <template><i class="fa fa-times"/></template>
           </b-button>
         </b-col>
@@ -147,10 +147,14 @@
           </b-button-group>
         </b-col>
       </b-row>
+      <b-row>
+        <b-col>
+          <span v-if="preventDownloadUncompressed()">Uncompressed downloads are not permitted with more than {{ this.maxFunpackedFrames }} files.</span>
+        </b-col>
+      </b-row>
       <b-table
         id="archive-table"
         ref="archivetable"
-        selected-variant=""
         :items="data.results"
         :fields="visibleFields"
         :busy="isBusy"
@@ -158,19 +162,20 @@
         show-empty
         responsive
         selectable
+        selected-variant=""
         hover
         sort-direction="desc"
         :sort-by="getSortByFromOrdering()"
         :sort-desc="getSortDescFromOrdering()"
         no-local-sorting
         @sort-changed="onSortingChanged"
-        @row-selected="onRowSelected"
+        @row-clicked="onRowClicked"
       >
         <template #head(selected)="">
-          <b-form-checkbox @change="onSelectAll" />
+          <b-form-checkbox :checked="ifAllSelected()" @change="onSelectAll" />
         </template>
         <template #cell(selected)="row">
-          <b-form-checkbox v-model="row.rowSelected" />
+          <b-form-checkbox :checked="itemInSelected(row.item.id)" @change="onRowChecked(row, ...arguments)" />
         </template>
         <template #empty>
           <div v-if="!userIsAuthenticated" class="text-center my-2">
@@ -192,7 +197,13 @@
           </b-link>
         </template>
         <template #row-details="data">
-          <frame-detail :frame-id="data.item.id" :obstype="data.item.OBSTYPE" class="p-3"></frame-detail>
+          <frame-detail 
+            :frame-id="data.item.id"
+            :obstype="data.item.OBSTYPE"
+            :selected-items="selected"
+            v-on:checked-related-frame="onRowChecked(...arguments)"
+            v-on:clicked-related-frame="onRowClicked(...arguments)"
+            class="p-3" />
         </template>
       </b-table>
       <template v-if="!isBusy && data.count > 0">
@@ -234,6 +245,7 @@ import 'bootstrap-daterangepicker';
 import 'bootstrap-daterangepicker/daterangepicker.css';
 import { OCSMixin, OCSUtil } from 'ocs-component-lib';
 
+import { itemInList, removeItemFromList } from '@/util.js';
 import { downloadZip, downloadWget } from '@/download.js';
 import AggregatedOptionsSelect from '@/components/AggregatedOptionsSelect.vue';
 import SimpleSelect from '@/components/SimpleSelect.vue';
@@ -264,6 +276,7 @@ export default {
     let filterDateRangeOptions = this.getTimeRangeFilters();
     return {
       dltype: 'zip-compressed',
+      maxFunpackedFrames: 10,
       selected: [],
       filterDateRangeOptions: filterDateRangeOptions,
       alertModalMessage: '',
@@ -277,10 +290,9 @@ export default {
       reductionLevelOptions: [
         { value: '', text: 'All' },
         { value: '0', text: 'Raw' },
-        { value: '10', text: 'Quicklook (ORAC)' },
-        { value: '11', text: 'Quicklook (BANZAI)' },
         { value: '90', text: 'Reduced (ORAC)' },
-        { value: '91', text: 'Reduced (BANZAI)' }
+        { value: '91', text: 'Reduced (BANZAI)' },
+        { value: '92', text: 'Reduced (BANZAI-NRES)' }
       ],
       categorizedAggregatedOptions: {
         sites: {
@@ -320,9 +332,15 @@ export default {
         {
           key: 'showDetails',
           label: '',
-          tdClass: 'pr-2'
+          tdClass: 'pr-2',
+          sortable: false,
+          hidden: false
         },
-        'selected',
+        {
+          key: 'selected',
+          sortable: false,
+          hidden: false
+        },
         {
           key: 'basename',
           label: 'Basename',
@@ -416,14 +434,12 @@ export default {
             switch (value) {
               case 0:
                 return 'Raw';
-              case 10:
-                return 'QuickLook (ORAC)';
-              case 11:
-                return 'QuickLook (BANZAI)';
               case 90:
                 return 'Reduced (ORAC)';
               case 91:
                 return 'Reduced (BANZAI)';
+              case 92:
+                return 'Reduced (BANZAI-NRES)'
             }
             return '';
           }
@@ -553,41 +569,69 @@ export default {
       let semesterIndex = currentOrLast === 'current' ? 0 : 1;
       return _.get(this.semesters, semesterIndex, {});
     },
+    initializeDataEndpoint: function() {
+      return `${this.$store.state.urls.archiveApi}/frames/`;
+    },
+    preventDownloadUncompressed: function() {
+      return (this.selected.length > this.maxFunpackedFrames && this.dltype === 'zip-uncompressed');
+    },
+    selectItem: function(item) {
+        if (!_.includes(this.selected, item.id)) this.selected.push(item.id);
+    },
+    deselectItem: function(item) {
+      // remove an item by value via filtering, since vue cannot detect changes made by _.pull or _.remove lodash methods
+      this.selected = removeItemFromList(this.selected, item.id);
+    },
     clearSelected: function() {
       this.$refs.archivetable.clearSelected();
       this.selected = [];
     },
-    initializeDataEndpoint: function() {
-      return `${this.$store.state.urls.archiveApi}/frames/`;
+    ifAllSelected: function() {
+      // don't attempt to access the archive table before it has been mounted
+      if (typeof(this.$refs.archivetable) === 'undefined') return;
+      for (const item of this.$refs.archivetable.items) {
+        if (!this.itemInSelected(item.id)) {
+          return false;
+        }
+      }
+      return true;
+    },
+    itemInSelected (item) {
+      return itemInList(this.selected, item);
     },
     onSelectAll: function(checked) {
-      console.log(checked);
       if (checked) {
-        this.selected = this.$refs.archivetable.items;
+        this.$refs.archivetable.items.forEach((item) => {
+          this.selectItem(item);
+        });
       } else {
-        this.selected = [];
+        this.$refs.archivetable.items.forEach((item) => {
+          this.deselectItem(item);
+        });
       }
     },
-    onRowSelected: function(items) {
-      this.selected = items;
+    onRowChecked: function(row, checked) {
+      if (checked) {
+        this.selectItem(row.item);
+      } else {
+        this.deselectItem(row.item);
+      }
+    },
+    onRowClicked: function(item) {
+      if (!this.itemInSelected(item.id)) {
+        this.selectItem(item);
+      } else {
+        this.deselectItem(item);
+      }
     },
     downloadFiles: function() {
-      // TODO: selections don't persist across pages
-      // TODO: checkbox should select row
-      // TODO: validate that fewer than 10 are selected for uncompressed download
       let archiveToken = localStorage.getItem('archiveToken');
-
-      let frameIds = [];
-      this.selected.forEach(function(value, i) {
-        frameIds[i] = value.id;
-      });
-
+      let frameIds = this.selected;
       if (this.dltype === 'zip-compressed' || this.dltype === 'zip-uncompressed') {
         let uncompress = this.dltype === 'zip-compressed' ? false : true;
         downloadZip(frameIds, uncompress, this.archiveApiUrl, archiveToken);
       } else if (this.dltype === 'wget') {
-        // TODO: implement downloadWget
-        downloadWget(frameIds, this.archiveApiUrl, archiveToken);
+        downloadWget(frameIds, archiveToken, this.archiveApiUrl);
       }
     },
     initializeDefaultQueryParams: function() {
