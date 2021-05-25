@@ -290,10 +290,9 @@ export default {
       reductionLevelOptions: [
         { value: '', text: 'All' },
         { value: '0', text: 'Raw' },
-        { value: '10', text: 'Quicklook (ORAC)' },
-        { value: '11', text: 'Quicklook (BANZAI)' },
         { value: '90', text: 'Reduced (ORAC)' },
-        { value: '91', text: 'Reduced (BANZAI)' }
+        { value: '91', text: 'Reduced (BANZAI)' },
+        { value: '92', text: 'Reduced (BANZAI-NRES)' }
       ],
       categorizedAggregatedOptions: {
         sites: {
@@ -435,14 +434,12 @@ export default {
             switch (value) {
               case 0:
                 return 'Raw';
-              case 10:
-                return 'QuickLook (ORAC)';
-              case 11:
-                return 'QuickLook (BANZAI)';
               case 90:
                 return 'Reduced (ORAC)';
               case 91:
                 return 'Reduced (BANZAI)';
+              case 92:
+                return 'Reduced (BANZAI-NRES)'
             }
             return '';
           }
@@ -590,6 +587,8 @@ export default {
       this.selected = [];
     },
     ifAllSelected: function() {
+      // don't attempt to access the archive table before it has been mounted
+      if (typeof(this.$refs.archivetable) === 'undefined') return;
       for (const item of this.$refs.archivetable.items) {
         if (!this.itemInSelected(item.id)) {
           return false;
