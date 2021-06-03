@@ -65,7 +65,7 @@
           <template #description>
             See <a href="https://lco.global/documentation/archive-documentation/#products" target="blank">documentation on reduction levels</a>.
           </template>
-          <simple-select id="input-rlevel" v-model="queryParams.RLEVEL" @input="refreshData" :options="reductionLevelOptions"></simple-select>
+          <simple-select id="input-rlevel" v-model="queryParams.RLEVEL" @input="onReductionLevelChange" :options="reductionLevelOptions"></simple-select>
         </b-form-group>
         <aggregated-options-select id="sites" v-model="queryParams.SITEID" @input="refreshData" label="Site" :options="categorizedAggregatedOptions.sites" />
         <aggregated-options-select id="telescopes" v-model="queryParams.TELID" @input="refreshData" label="Telescope" :options="categorizedAggregatedOptions.telescopes" />
@@ -295,10 +295,11 @@ export default {
       ],
       reductionLevelOptions: [
         { value: '', text: 'All' },
-        { value: '0', text: 'Raw' },
-        { value: '90', text: 'Reduced (ORAC)' },
-        { value: '91', text: 'Reduced (BANZAI)' },
-        { value: '92', text: 'Reduced (BANZAI-NRES)' }
+        { value: 'Raw', text: 'Raw' },
+        { value: 'Reduced (ORAC)', text: 'Reduced (ORAC)' },
+        { value: 'Reduced (NRES Commissioning)', text: 'Reduced (NRES Commissioning)' },
+        { value: 'Reduced (BANZAI)', text: 'Reduced (BANZAI)' },
+        { value: 'Reduced (BANZAI-NRES)', text: 'Reduced (BANZAI-NRES)' }
       ],
       categorizedAggregatedOptions: {
         sites: {
@@ -436,14 +437,20 @@ export default {
           sortable: true,
           hideable: true,
           hidden: false,
-          formatter: value => {
+          formatter: (value, item) => {
             switch (value) {
               case 0:
                 return 'Raw';
               case 90:
                 return 'Reduced (ORAC)';
               case 91:
-                return 'Reduced (BANZAI)';
+                // because BANZAI-Imaging and NRES Commissioning pipeline share the same RLEVEL, we must distinguish by TELID
+                if (item.TELID === 'igla') {
+                  return 'Reduced (NRES Commissioning)';
+                } 
+                else {
+                  return 'Reduced (BANZAI)';
+                }
               case 92:
                 return 'Reduced (BANZAI-NRES)'
             }
@@ -511,6 +518,31 @@ export default {
     );
   },
   methods: {
+    onReductionLevelChange: function(reductionLevel) {
+    if (this.queryParams.TELID === 'igla') this.queryParams.TELID = '';
+    switch(reductionLevel){
+      case 'All':
+        this.queryParams.RLEVEL = '';
+        break;
+      case 'Raw':
+        this.queryParams.RLEVEL = '0';
+        break;
+      case 'Reduced (ORAC)':
+        this.queryParams.RLEVEL = '90';
+        break;
+      case 'Reduced (BANZAI)':
+        this.queryParams.RLEVEL = '91';
+        break;
+      case 'Reduced (NRES Commissioning)':
+        this.queryParams.RLEVEL = '91';
+        this.queryParams.TELID = 'igla'
+        break;
+      case 'Reduced (BANZAI-NRES)':
+        this.queryParams.RLEVEL = '92';
+        break;
+    }
+    this.refreshData();
+    },
     exportTable: function(type) {
       $('#archive-table').tableExport({
         type: type,
