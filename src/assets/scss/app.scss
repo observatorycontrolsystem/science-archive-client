@@ -60,6 +60,11 @@ a.navbar-brand:hover {
 }
 
 // General styling
+.form-control-inline {
+  min-width: 0;
+  width: auto;
+  display: inline;
+}
 
 html {
   position: relative;

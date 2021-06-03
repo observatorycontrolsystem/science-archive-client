@@ -26,15 +26,16 @@
           <template #label> Proposal<sup v-b-tooltip.hover.right title="Log in to view your proposals">?</sup> </template>
         </aggregated-options-select>
         <b-form-group id="input-group-public">
-          <b-form-checkbox id="checkbox-public" v-model="queryParams.public" name="checkbox-public" value="true" unchecked-value="false">
+          <b-form-checkbox id="checkbox-public" v-model="queryParams.public" @input="refreshData" name="checkbox-public" value="true" unchecked-value="false">
             Include public data
           </b-form-checkbox>
         </b-form-group>
         <b-form-group id="input-group-basename">
           <template #label>
-            Basename
+            Image Name
           </template>
-          <b-form-input v-model="queryParams.basename" class="border-secondary"></b-form-input>
+          <!-- TODO: somehow debounce this input? -->
+          <b-form-input v-model="queryParams.basename" class="border-secondary form-control-inline"></b-form-input>
         </b-form-group>
         <target-lookup v-model="queryParams.covers" />
         <b-form-group id="input-group-object">
@@ -48,11 +49,12 @@
               ?
             </sup>
           </template>
-          <b-form-input v-model="queryParams.OBJECT" class="border-secondary"></b-form-input>
+          <b-form-input v-model="queryParams.OBJECT" @input="refreshData" class="border-secondary"></b-form-input>
         </b-form-group>
         <aggregated-options-select
           id="obstypes"
           v-model="queryParams.OBSTYPE"
+          @input="refreshData"
           label="Observation Type"
           :options="categorizedAggregatedOptions.obstypes"
         />
@@ -63,22 +65,24 @@
           <template #description>
             See <a href="https://lco.global/documentation/archive-documentation/#products" target="blank">documentation on reduction levels</a>.
           </template>
-          <simple-select id="input-rlevel" v-model="queryParams.RLEVEL" :options="reductionLevelOptions"></simple-select>
+          <simple-select id="input-rlevel" v-model="queryParams.RLEVEL" @input="refreshData" :options="reductionLevelOptions"></simple-select>
         </b-form-group>
-        <aggregated-options-select id="sites" v-model="queryParams.SITEID" label="Site" :options="categorizedAggregatedOptions.sites" />
-        <aggregated-options-select id="telescopes" v-model="queryParams.TELID" label="Telescope" :options="categorizedAggregatedOptions.telescopes" />
+        <aggregated-options-select id="sites" v-model="queryParams.SITEID" @input="refreshData" label="Site" :options="categorizedAggregatedOptions.sites" />
+        <aggregated-options-select id="telescopes" v-model="queryParams.TELID" @input="refreshData" label="Telescope" :options="categorizedAggregatedOptions.telescopes" />
         <aggregated-options-select
           id="instruments"
           v-model="queryParams.INSTRUME"
+          @input="refreshData"
           label="Instrument"
           :options="categorizedAggregatedOptions.instruments"
         />
-        <aggregated-options-select id="filters" v-model="queryParams.FILTER" label="Filter" :options="categorizedAggregatedOptions.filters" />
+        <aggregated-options-select id="filters" v-model="queryParams.FILTER" @input="refreshData" label="Filter" :options="categorizedAggregatedOptions.filters" />
         <b-form-group id="input-group-exposure-time">
           <template #label>
             Exposure Time<sup v-b-tooltip.hover.right title="Exposure time in seconds. Filter results with a greater than or equal value">?</sup>
           </template>
-          <b-form-input v-model="queryParams.EXPTIME" type="number" class="border-secondary"></b-form-input>
+          <!-- TODO: Debounce this? -->
+          <b-form-input v-model="queryParams.EXPTIME" @input="refreshData" type="number" class="border-secondary"></b-form-input>
         </b-form-group>
         <b-button-group class="w-100">
           <b-button type="submit" variant="outline-secondary" :disabled="isBusy">Filter</b-button>
@@ -89,7 +93,7 @@
     <b-col md="10">
       <b-row class="mb-1">
         <b-col>
-          <b-dropdown :split-class="{ disabled: selected.length <= 0 || preventDownloadUncompressed() }" split variant="primary" split-href="" @click="downloadFiles">
+          <b-dropdown :split-class="{ disabled: selected.length <= 0 || preventDownloadUncompressed() }" class="ml-5" split variant="primary" split-href="" @click="downloadFiles">
             <template #button-content >Download {{ selected.length }}</template>
             <b-dropdown-form>
               <b-form-group v-slot="{ ariaDescribedby }">
@@ -158,6 +162,7 @@
         :items="data.results"
         :fields="visibleFields"
         :busy="isBusy"
+        class="ml-5"
         small
         show-empty
         responsive
@@ -218,6 +223,7 @@
           <b-col>
             <ocs-pagination
               table-id="archive-table"
+              class="ml-5"
               :per-page="queryParams.limit"
               :total-rows="data.count"
               :current-page="currentPage"
@@ -343,7 +349,7 @@ export default {
         },
         {
           key: 'basename',
-          label: 'Basename',
+          label: 'Image Name',
           sortable: true,
           hideable: true,
           hidden: false
@@ -500,6 +506,7 @@ export default {
         this.queryParams.start = start.format(this.getDateFormat());
         this.queryParams.end = end.format(this.getDateFormat());
         this.updateFilters();
+        this.refreshData();
       }
     );
   },
