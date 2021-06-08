@@ -16,6 +16,7 @@
         <aggregated-options-select
           id="proposals"
           v-model="queryParams.PROPID"
+          @input="refreshData"
           :options="categorizedAggregatedOptions.proposals"
           place-in-option-group
           option-group-label="Public proposals"
@@ -36,7 +37,7 @@
           </template>
           <b-form-input v-model="imageName" class="border-secondary"></b-form-input>
         </b-form-group>
-        <target-lookup v-model="queryParams.covers" />
+        <target-lookup v-model="queryParams.covers" @input="refreshData" />
         <b-form-group id="input-group-object">
           <template #label>
             Object
