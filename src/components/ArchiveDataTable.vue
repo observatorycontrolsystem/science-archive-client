@@ -34,6 +34,12 @@
         <b-form-group id="input-group-basename">
           <template #label>
             Image Name
+            <sup
+              v-b-tooltip.hover.right
+              title="Image name does not include file extension"
+            >
+              ?
+            </sup>
           </template>
           <b-form-input v-model="imageName" class="border-secondary"></b-form-input>
         </b-form-group>
