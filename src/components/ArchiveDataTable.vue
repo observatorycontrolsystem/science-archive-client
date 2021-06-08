@@ -435,24 +435,8 @@ export default {
           sortable: true,
           hideable: true,
           hidden: false,
-          formatter: (value, item) => {
-            switch (value) {
-              case 0:
-                return 'Raw';
-              case 90:
-                return 'Reduced (ORAC)';
-              case 91:
-                // because BANZAI-Imaging and NRES Commissioning pipeline share the same RLEVEL, we must distinguish by TELID
-                if (item.TELID === 'igla') {
-                  return 'Reduced (NRES Commissioning)';
-                } 
-                else {
-                  return 'Reduced (BANZAI)';
-                }
-              case 92:
-                return 'Reduced (BANZAI-NRES)'
-            }
-            return '';
+          formatter: (value, key, item) => {
+            return this.getReductionLevelText(value.toString(), item.TELID);
           }
         }
       ]
@@ -462,23 +446,7 @@ export default {
     selectedReductionLevel: {
       // Return the correct human-readable representation of the selected reduction level
       get: function () {
-        switch(this.queryParams.RLEVEL){
-          case '':
-            return '';
-          case '0':
-            return 'Raw';
-          case '90':
-            return 'Reduced (ORAC)';
-          case '91':
-            if (this.queryParams.TELID === 'igla') {
-              return 'Reduced (NRES Commissioning)';
-            }
-            else {
-              return 'Reduced (BANZAI)';
-            }
-          case '92':
-            return 'Reduced (BANZAI-NRES)';
-        }
+        return this.getReductionLevelText(this.queryParams.RLEVEL, this.queryParams.TELID);
       },
       // Based on the reduction level selected, set the query parameters accordingly.
       set: function (reductionLevel) {
@@ -692,6 +660,29 @@ export default {
         downloadZip(frameIds, uncompress, this.archiveApiUrl, archiveToken);
       } else if (this.dltype === 'wget') {
         downloadWget(frameIds, archiveToken, this.archiveApiUrl);
+      }
+    },
+    getReductionLevelText: function(numericReductionLevel, telescopeId) {
+      // Given the numeric reduction level and telescope ID, get a human readable representation of the reduction level.
+      switch(numericReductionLevel){
+        case '':
+          return '';
+        case '0':
+          return 'Raw';
+        case '90':
+          return 'Reduced (ORAC)';
+        // Due to BANZAI-Imaging and NRES Commissioning sharing the numeric rlevel 91, we must differentiate them by TELID
+        case '91':
+          if (telescopeId === 'igla') {
+            return 'Reduced (NRES Commissioning)';
+          }
+          else {
+            return 'Reduced (BANZAI)';
+          }
+        case '92':
+          return 'Reduced (BANZAI-NRES)';
+        default:
+          return '';
       }
     },
     initializeDefaultQueryParams: function() {
