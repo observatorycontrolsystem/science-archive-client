@@ -19,8 +19,8 @@
       </b-input-group-append>
     </b-input-group>
     <b-form-text v-if="lookup.status" id="text-lookup-status" class="my-1">{{ lookup.status }}</b-form-text>
-      <b-form-input v-model="point.x" placeholder="RA" class="border-secondary form-control-inline" @input="onPointUpdate"></b-form-input>
-      <b-form-input v-model="point.y" placeholder="Dec" class="border-secondary form-control-inline" @input="onPointUpdate"></b-form-input>
+      <b-form-input v-model="point.x" placeholder="RA" class="border-secondary" @input="onPointUpdate"></b-form-input>
+      <b-form-input v-model="point.y" placeholder="Dec" class="border-secondary" @input="onPointUpdate"></b-form-input>
     <b-form-text v-if="coordinatesFeedback" id="text-coordinates-feedback" class="my-1">{{ coordinatesFeedback }}</b-form-text>
   </b-form-group>
 </template>

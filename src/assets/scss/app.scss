@@ -60,15 +60,12 @@ a.navbar-brand:hover {
 }
 
 // General styling
-.form-control-inline {
-  min-width: 0;
-  width: auto;
-  display: inline;
-}
 
 html {
   position: relative;
   background-color: $white;
+  font-size: 0.75em;
+  line-height: 0.5em;
 }
 
 p {

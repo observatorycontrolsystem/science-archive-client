@@ -5,7 +5,7 @@
         {{ alertModalMessage }}
       </div>
     </b-modal>
-    <b-col md="2">
+    <b-col md="3">
       <b-form @submit="onSubmit" @reset="onReset">
         <b-form-group id="input-group-daterange">
           <div id="date-range-picker" class="border border-secondary rounded p-1 w-100">
@@ -35,7 +35,7 @@
             Image Name
           </template>
           <!-- TODO: somehow debounce this input? -->
-          <b-form-input v-model="queryParams.basename" class="border-secondary form-control-inline"></b-form-input>
+          <b-form-input v-model="queryParams.basename" class="border-secondary"></b-form-input>
         </b-form-group>
         <target-lookup v-model="queryParams.covers" />
         <b-form-group id="input-group-object">
@@ -90,10 +90,10 @@
         </b-button-group>
       </b-form>
     </b-col>
-    <b-col md="10">
+    <b-col md="9">
       <b-row class="mb-1">
         <b-col>
-          <b-dropdown :split-class="{ disabled: selected.length <= 0 || preventDownloadUncompressed() }" class="ml-5" split variant="primary" split-href="" @click="downloadFiles">
+          <b-dropdown :split-class="{ disabled: selected.length <= 0 || preventDownloadUncompressed() }" split variant="primary" split-href="" @click="downloadFiles">
             <template #button-content >Download {{ selected.length }}</template>
             <b-dropdown-form>
               <b-form-group v-slot="{ ariaDescribedby }">
@@ -162,7 +162,6 @@
         :items="data.results"
         :fields="visibleFields"
         :busy="isBusy"
-        class="ml-5"
         small
         show-empty
         responsive
@@ -223,7 +222,6 @@
           <b-col>
             <ocs-pagination
               table-id="archive-table"
-              class="ml-5"
               :per-page="queryParams.limit"
               :total-rows="data.count"
               :current-page="currentPage"
