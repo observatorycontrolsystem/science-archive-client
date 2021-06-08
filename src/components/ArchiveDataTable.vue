@@ -8,7 +8,7 @@
     <b-col md="3">
       <b-form @submit="onSubmit" @reset="onReset">
         <b-form-group id="input-group-daterange">
-          <div id="date-range-picker" class="border border-secondary rounded p-1 w-100">
+          <div id="date-range-picker" class="border border-secondary rounded p-1 w-100 text-center">
             <i class="far fa-calendar"></i> {{ queryParams.start }} <br />
             <i class="fas fa-caret-down"></i> {{ queryParams.end }}
           </div>
@@ -65,7 +65,7 @@
           <template #description>
             See <a href="https://lco.global/documentation/archive-documentation/#products" target="blank">documentation on reduction levels</a>.
           </template>
-          <simple-select id="input-rlevel" v-model="queryParams.RLEVEL" @input="onReductionLevelChange" :options="reductionLevelOptions"></simple-select>
+          <simple-select id="input-rlevel" v-model="selectedReductionLevel" @input="refreshData" :options="reductionLevelOptions"></simple-select>
         </b-form-group>
         <aggregated-options-select id="sites" v-model="queryParams.SITEID" @input="refreshData" label="Site" :options="categorizedAggregatedOptions.sites" />
         <aggregated-options-select id="telescopes" v-model="queryParams.TELID" @input="refreshData" label="Telescope" :options="categorizedAggregatedOptions.telescopes" />
@@ -459,6 +459,54 @@ export default {
     };
   },
   computed: {
+    selectedReductionLevel: {
+      // Return the correct human-readable representation of the selected reduction level
+      get: function () {
+        switch(this.queryParams.RLEVEL){
+          case '':
+            return '';
+          case '0':
+            return 'Raw';
+          case '90':
+            return 'Reduced (ORAC)';
+          case '91':
+            if (this.queryParams.TELID === 'igla') {
+              return 'Reduced (NRES Commissioning)';
+            }
+            else {
+              return 'Reduced (BANZAI)';
+            }
+          case '92':
+            return 'Reduced (BANZAI-NRES)';
+        }
+      },
+      // Based on the reduction level selected, set the query parameters accordingly.
+      set: function (reductionLevel) {
+        if (this.queryParams.TELID === 'igla') this.queryParams.TELID = '';
+        switch(reductionLevel){
+          case 'All':
+            this.queryParams.RLEVEL = '';
+            break;
+          case 'Raw':
+            this.queryParams.RLEVEL = '0';
+            break;
+          case 'Reduced (ORAC)':
+            this.queryParams.RLEVEL = '90';
+            break;
+          case 'Reduced (BANZAI)':
+            this.queryParams.RLEVEL = '91';
+            break;
+          // NRES Commissioning and BANZAI-Imaging share the same RLEVEL, so they must be differentiated by TELID
+          case 'Reduced (NRES Commissioning)':
+            this.queryParams.RLEVEL = '91';
+            this.queryParams.TELID = 'igla'
+            break;
+          case 'Reduced (BANZAI-NRES)':
+            this.queryParams.RLEVEL = '92';
+            break;
+        }
+      }
+    },
     archiveApiUrl: function() {
       return this.$store.state.urls.archiveApi;
     },
@@ -516,31 +564,6 @@ export default {
     );
   },
   methods: {
-    onReductionLevelChange: function(reductionLevel) {
-    if (this.queryParams.TELID === 'igla') this.queryParams.TELID = '';
-    switch(reductionLevel){
-      case 'All':
-        this.queryParams.RLEVEL = '';
-        break;
-      case 'Raw':
-        this.queryParams.RLEVEL = '0';
-        break;
-      case 'Reduced (ORAC)':
-        this.queryParams.RLEVEL = '90';
-        break;
-      case 'Reduced (BANZAI)':
-        this.queryParams.RLEVEL = '91';
-        break;
-      case 'Reduced (NRES Commissioning)':
-        this.queryParams.RLEVEL = '91';
-        this.queryParams.TELID = 'igla'
-        break;
-      case 'Reduced (BANZAI-NRES)':
-        this.queryParams.RLEVEL = '92';
-        break;
-    }
-    this.refreshData();
-    },
     exportTable: function(type) {
       $('#archive-table').tableExport({
         type: type,
