@@ -34,8 +34,7 @@
           <template #label>
             Image Name
           </template>
-          <!-- TODO: somehow debounce this input? -->
-          <b-form-input v-model="queryParams.basename" class="border-secondary"></b-form-input>
+          <b-form-input v-model="imageName" class="border-secondary"></b-form-input>
         </b-form-group>
         <target-lookup v-model="queryParams.covers" />
         <b-form-group id="input-group-object">
@@ -49,7 +48,7 @@
               ?
             </sup>
           </template>
-          <b-form-input v-model="queryParams.OBJECT" @input="refreshData" class="border-secondary"></b-form-input>
+          <b-form-input v-model="objectName" class="border-secondary"></b-form-input>
         </b-form-group>
         <aggregated-options-select
           id="obstypes"
@@ -81,8 +80,7 @@
           <template #label>
             Exposure Time<sup v-b-tooltip.hover.right title="Exposure time in seconds. Filter results with a greater than or equal value">?</sup>
           </template>
-          <!-- TODO: Debounce this? -->
-          <b-form-input v-model="queryParams.EXPTIME" @input="refreshData" type="number" class="border-secondary"></b-form-input>
+          <b-form-input v-model="exposureTime" type="number" class="border-secondary"></b-form-input>
         </b-form-group>
         <b-button-group class="w-100">
           <b-button type="submit" variant="outline-secondary" :disabled="isBusy">Filter</b-button>
@@ -443,6 +441,33 @@ export default {
     };
   },
   computed: {
+    imageName : {
+      get: function() {
+        return this.queryParams.basename
+      },
+      set: _.debounce(function(newImageName) {
+        this.queryParams.basename = newImageName;
+        this.refreshData();
+      }, 500)
+    },
+    objectName : {
+      get: function() {
+        return this.queryParams.OBJECT
+      },
+      set: _.debounce(function(newObjectName) {
+        this.queryParams.OBJECT = newObjectName;
+        this.refreshData();
+      }, 500)
+    },
+    exposureTime: {
+      get: function() {
+        return this.queryParams.EXPTIME
+      },
+      set: _.debounce(function(newExposureTime) {
+        this.queryParams.EXPTIME = newExposureTime;
+        this.refreshData();
+      }, 500)
+    },
     selectedReductionLevel: {
       // Return the correct human-readable representation of the selected reduction level
       get: function () {
