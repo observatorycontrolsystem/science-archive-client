@@ -7,7 +7,7 @@
     </b-modal>
     <b-col md="2">
       <b-form @submit="onSubmit" @reset="onReset">
-        <b-form-group id="input-group-daterange">
+        <b-form-group id="input-group-daterange" class="my-1">
           <div id="date-range-picker" class="border border-secondary rounded p-1 w-100 text-center">
             <i class="far fa-calendar"></i> {{ queryParams.start }} <br />
             <i class="fas fa-caret-down"></i> {{ queryParams.end }}
@@ -24,16 +24,16 @@
           first-option-group-label="My proposals"
           :first-options="profileProposals"
         >
-          <template #label> Proposal <sup class="blue" v-b-tooltip.hover.right title="Log in to view your proposals">?</sup> </template>
+          <template #label><b> Proposal </b><sup class="blue" v-b-tooltip.hover.right title="Log in to view your proposals">?</sup> </template>
         </aggregated-options-select>
-        <b-form-group id="input-group-public">
+        <b-form-group id="input-group-public" class="my-0">
           <b-form-checkbox id="checkbox-public" v-model="queryParams.public" @input="refreshData" name="checkbox-public" value="true" unchecked-value="false">
             Include public data
           </b-form-checkbox>
         </b-form-group>
-        <b-form-group id="input-group-basename">
+        <b-form-group id="input-group-basename" class="my-1">
           <template #label>
-            Image Name
+            <b>Image Name</b>
             <sup
               class="blue"
               v-b-tooltip.hover.right
@@ -42,12 +42,12 @@
               ?
             </sup>
           </template>
-          <b-form-input v-model="imageName" class="border-secondary"></b-form-input>
+          <b-form-input v-model="imageName" class="border-secondary my-0"></b-form-input>
         </b-form-group>
         <target-lookup v-model="queryParams.covers" @input="refreshData" />
-        <b-form-group id="input-group-object">
+        <b-form-group id="input-group-object" class="my-1">
           <template #label>
-            Object
+            <b>Object</b>
             <sup
               class="blue"
               v-b-tooltip.hover.right
@@ -57,7 +57,7 @@
               ?
             </sup>
           </template>
-          <b-form-input v-model="objectName" class="border-secondary"></b-form-input>
+          <b-form-input v-model="objectName" class="border-secondary my-0"></b-form-input>
         </b-form-group>
         <aggregated-options-select
           id="obstypes"
@@ -66,9 +66,9 @@
           label="Observation Type"
           :options="categorizedAggregatedOptions.obstypes"
         />
-        <b-form-group id="input-group-rlevel">
+        <b-form-group id="input-group-rlevel" class="my-1">
           <template #label>
-            Reduction Level
+            <b>Reduction Level</b>
           </template>
           <template #description>
             See <a href="https://lco.global/documentation/archive-documentation/#products" target="blank">documentation on reduction levels</a>.
@@ -87,9 +87,9 @@
         <aggregated-options-select id="filters" v-model="queryParams.FILTER" @input="refreshData" label="Filter" :options="categorizedAggregatedOptions.filters" />
         <b-form-group id="input-group-exposure-time">
           <template #label>
-            Exposure Time<sup class="blue" v-b-tooltip.hover.right title="Exposure time in seconds. Filter results with a greater than or equal value">?</sup>
+            <b>Exposure Time</b><sup class="blue" v-b-tooltip.hover.right title="Exposure time in seconds. Filter results with a greater than or equal value">?</sup>
           </template>
-          <b-form-input v-model="exposureTime" type="number" class="border-secondary"></b-form-input>
+          <b-form-input v-model="exposureTime" type="number" class="border-secondary my-0"></b-form-input>
         </b-form-group>
         <b-button-group class="w-100">
           <b-button type="reset" variant="outline-secondary" :disabled="isBusy">Reset</b-button>
@@ -169,6 +169,7 @@
         :fields="visibleFields"
         :busy="isBusy"
         small
+        bordered
         show-empty
         responsive
         selectable
@@ -291,7 +292,7 @@ export default {
       filterDateRangeOptions: filterDateRangeOptions,
       alertModalMessage: '',
       perPageOptions: [
-        { value: '10', text: '10 rows per page' },
+        { value: '20', text: '20 rows per page' },
         { value: '50', text: '50 rows per page' },
         { value: '100', text: '100 rows per page' },
         { value: '500', text: '500 rows per page' },
@@ -300,10 +301,10 @@ export default {
       reductionLevelOptions: [
         { value: 'All', text: 'All' },
         { value: 'Raw', text: 'Raw' },
-        { value: 'Reduced (ORAC)', text: 'Reduced (ORAC)' },
-        { value: 'Reduced (NRES Commissioning)', text: 'Reduced (NRES Commissioning)' },
-        { value: 'Reduced (BANZAI)', text: 'Reduced (BANZAI)' },
-        { value: 'Reduced (BANZAI-NRES)', text: 'Reduced (BANZAI-NRES)' }
+        { value: 'ORAC', text: 'ORAC' },
+        { value: 'NRES Commissioning', text: 'NRES Commissioning' },
+        { value: 'BANZAI', text: 'BANZAI' },
+        { value: 'BANZAI-NRES', text: 'BANZAI-NRES' }
       ],
       categorizedAggregatedOptions: {
         sites: {
@@ -433,7 +434,11 @@ export default {
           label: 'Exp. Time',
           sortable: true,
           hideable: true,
-          hidden: false
+          hidden: false,
+          formatter: value => {
+            // Only display 1 decimal point of precision in exposure time
+            return _.round(parseFloat(value), 1).toFixed(1);
+          }
         },
         {
           key: 'RLEVEL',
@@ -491,18 +496,18 @@ export default {
           case 'Raw':
             this.queryParams.RLEVEL = '0';
             break;
-          case 'Reduced (ORAC)':
+          case 'ORAC':
             this.queryParams.RLEVEL = '90';
             break;
-          case 'Reduced (BANZAI)':
+          case 'BANZAI':
             this.queryParams.RLEVEL = '91';
             break;
           // NRES Commissioning and BANZAI-Imaging share the same RLEVEL, so they must be differentiated by TELID
-          case 'Reduced (NRES Commissioning)':
+          case 'NRES Commissioning':
             this.queryParams.RLEVEL = '91';
             this.queryParams.TELID = 'igla'
             break;
-          case 'Reduced (BANZAI-NRES)':
+          case 'BANZAI-NRES':
             this.queryParams.RLEVEL = '92';
             break;
           default:
@@ -705,17 +710,17 @@ export default {
         case '0':
           return 'Raw';
         case '90':
-          return 'Reduced (ORAC)';
+          return 'ORAC';
         // Due to BANZAI-Imaging and NRES Commissioning sharing the numeric rlevel 91, we must differentiate them by TELID
         case '91':
           if (telescopeId === 'igla') {
-            return 'Reduced (NRES Commissioning)';
+            return 'NRES Commissioning';
           }
           else {
-            return 'Reduced (BANZAI)';
+            return 'BANZAI';
           }
         case '92':
-          return 'Reduced (BANZAI-NRES)';
+          return 'BANZAI-NRES';
         default:
           return '';
       }
@@ -749,7 +754,7 @@ export default {
         covers: '',
         public: 'true',
         ordering: '',
-        limit: 10,
+        limit: 20,
         offset: 0
       };
       return defaultQueryParams;

@@ -1,7 +1,7 @@
 <template>
   <div>
-    <slot name="label">{{ label }}</slot>
-    <b-dropdown block class="my-2" menu-class="menu" boundary="viewport" variant="outline-secondary">
+    <slot name="label"><b>{{ label }}</b></slot>
+    <b-dropdown block class="my-1" menu-class="menu" boundary="viewport" variant="outline-secondary">
       <template #button-content>
         <span v-if="value">{{ value | truncate }}</span>
         <span v-else>{{ allOptionText | truncate }}</span>
