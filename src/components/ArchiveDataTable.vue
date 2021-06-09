@@ -5,7 +5,7 @@
         {{ alertModalMessage }}
       </div>
     </b-modal>
-    <b-col md="3">
+    <b-col md="2">
       <b-form @submit="onSubmit" @reset="onReset">
         <b-form-group id="input-group-daterange">
           <div id="date-range-picker" class="border border-secondary rounded p-1 w-100 text-center">
@@ -24,7 +24,7 @@
           first-option-group-label="My proposals"
           :first-options="profileProposals"
         >
-          <template #label> Proposal<sup v-b-tooltip.hover.right title="Log in to view your proposals">?</sup> </template>
+          <template #label> Proposal <sup class="blue" v-b-tooltip.hover.right title="Log in to view your proposals">?</sup> </template>
         </aggregated-options-select>
         <b-form-group id="input-group-public">
           <b-form-checkbox id="checkbox-public" v-model="queryParams.public" @input="refreshData" name="checkbox-public" value="true" unchecked-value="false">
@@ -35,6 +35,7 @@
           <template #label>
             Image Name
             <sup
+              class="blue"
               v-b-tooltip.hover.right
               title="Image name does not include file extension"
             >
@@ -48,6 +49,7 @@
           <template #label>
             Object
             <sup
+              class="blue"
               v-b-tooltip.hover.right
               title="As written to FITS header. Not an exact match: returns all frames
               with the given text included in the OBJECT header."
@@ -85,17 +87,16 @@
         <aggregated-options-select id="filters" v-model="queryParams.FILTER" @input="refreshData" label="Filter" :options="categorizedAggregatedOptions.filters" />
         <b-form-group id="input-group-exposure-time">
           <template #label>
-            Exposure Time<sup v-b-tooltip.hover.right title="Exposure time in seconds. Filter results with a greater than or equal value">?</sup>
+            Exposure Time<sup class="blue" v-b-tooltip.hover.right title="Exposure time in seconds. Filter results with a greater than or equal value">?</sup>
           </template>
           <b-form-input v-model="exposureTime" type="number" class="border-secondary"></b-form-input>
         </b-form-group>
         <b-button-group class="w-100">
-          <b-button type="submit" variant="outline-secondary" :disabled="isBusy">Filter</b-button>
           <b-button type="reset" variant="outline-secondary" :disabled="isBusy">Reset</b-button>
         </b-button-group>
       </b-form>
     </b-col>
-    <b-col md="9">
+    <b-col md="10">
       <b-row class="mb-1">
         <b-col>
           <b-dropdown :split-class="{ disabled: selected.length <= 0 || preventDownloadUncompressed() }" split variant="primary" split-href="" @click="downloadFiles">
