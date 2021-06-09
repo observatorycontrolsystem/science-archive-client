@@ -18,7 +18,7 @@ export default {
   name: 'AggregatedOptionsSelect',
   filters: {
     truncate: function(value) {
-      return _.truncate(value, { length: 30 });
+      return _.truncate(value, { length: 12 });
     }
   },
   props: {
