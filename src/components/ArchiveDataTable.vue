@@ -298,7 +298,7 @@ export default {
         { value: '1000', text: '1000 rows per page' }
       ],
       reductionLevelOptions: [
-        { value: '', text: 'All' },
+        { value: 'All', text: 'All' },
         { value: 'Raw', text: 'Raw' },
         { value: 'Reduced (ORAC)', text: 'Reduced (ORAC)' },
         { value: 'Reduced (NRES Commissioning)', text: 'Reduced (NRES Commissioning)' },
@@ -505,6 +505,8 @@ export default {
           case 'Reduced (BANZAI-NRES)':
             this.queryParams.RLEVEL = '92';
             break;
+          default:
+            this.queryParams.RLEVEL = '';
         }
       }
     },
@@ -699,7 +701,7 @@ export default {
       // Given the numeric reduction level and telescope ID, get a human readable representation of the reduction level.
       switch(numericReductionLevel){
         case '':
-          return '';
+          return 'All';
         case '0':
           return 'Raw';
         case '90':
