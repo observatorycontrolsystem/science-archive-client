@@ -169,7 +169,6 @@
         :fields="visibleFields"
         :busy="isBusy"
         small
-        bordered
         show-empty
         responsive
         selectable
@@ -882,5 +881,15 @@ export default {
 <style scoped>
 #date-range-picker {
   cursor: pointer;
+}
+</style>
+<!-- 
+Make table header position relative to avoid horizontal overflow. 
+Should be fixed in boostrap-vue 2.22.0
+https://github.com/bootstrap-vue/bootstrap-vue/issues/6326
+-->
+<style>
+th {
+  position: relative
 }
 </style>
