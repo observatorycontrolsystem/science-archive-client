@@ -1,10 +1,10 @@
 <template>
-  <b-form-group class="my-0" id="input-group-point">
+  <b-form-group id="input-group-point" class="my-0">
     <template #label>
       <b>Point</b>
       <sup
-        class="blue"
         v-b-tooltip.hover.right
+        class="blue"
         title="Searching by point is usually the most effective method as it will find
         all frames containing an RA/Dec independent of the name given in the OBJECT header. This will not work for solar
         system objects. Sexagesimal or degrees. You may also click the magnification glass to fetch RA/Dec from online
@@ -20,8 +20,8 @@
       </b-input-group-append>
     </b-input-group>
     <b-form-text v-if="lookup.status" id="text-lookup-status" class="my-0">{{ lookup.status }}</b-form-text>
-      <b-form-input v-model="point.x" placeholder="RA" class="border-secondary my-1" @input="onPointUpdate"></b-form-input>
-      <b-form-input v-model="point.y" placeholder="Dec" class="border-secondary my-1" @input="onPointUpdate"></b-form-input>
+    <b-form-input v-model="point.x" placeholder="RA" class="border-secondary my-1" @input="onPointUpdate"></b-form-input>
+    <b-form-input v-model="point.y" placeholder="Dec" class="border-secondary my-1" @input="onPointUpdate"></b-form-input>
     <b-form-text v-if="coordinatesFeedback" id="text-coordinates-feedback" class="my-1">{{ coordinatesFeedback }}</b-form-text>
   </b-form-group>
 </template>

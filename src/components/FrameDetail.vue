@@ -2,10 +2,7 @@
   <b-row>
     <b-col md="8" cols="12">
       <h5>Calibration and Catalog Frames</h5>
-      <related-frames-table 
-        :frame-id="frameId"
-        :selected-items="selectedItems"
-        v-on="$listeners" />
+      <related-frames-table :frame-id="frameId" :selected-items="selectedItems" v-on="$listeners" />
     </b-col>
     <b-col md="4" cols="12">
       <b-button v-b-modal="modalId" variant="outline-secondary" class="my-1" block>View Headers</b-button>
@@ -38,7 +35,10 @@ export default {
     },
     selectedItems: {
       type: Array,
-      required: false
+      required: false,
+      default: () => {
+        return [];
+      }
     }
   },
   computed: {

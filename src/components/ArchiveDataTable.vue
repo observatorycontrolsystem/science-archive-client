@@ -16,29 +16,32 @@
         <aggregated-options-select
           id="proposals"
           v-model="queryParams.PROPID"
-          @input="refreshData"
           :options="categorizedAggregatedOptions.proposals"
           place-in-option-group
           option-group-label="Public proposals"
           place-first-options-in-group
           first-option-group-label="My proposals"
           :first-options="profileProposals"
+          @input="refreshData"
         >
-          <template #label><b> Proposal </b><sup class="blue" v-b-tooltip.hover.right title="Log in to view your proposals">?</sup> </template>
+          <template #label><b> Proposal </b><sup v-b-tooltip.hover.right class="blue" title="Log in to view your proposals">?</sup> </template>
         </aggregated-options-select>
         <b-form-group id="input-group-public" class="my-0">
-          <b-form-checkbox id="checkbox-public" v-model="queryParams.public" @input="refreshData" name="checkbox-public" value="true" unchecked-value="false">
+          <b-form-checkbox
+            id="checkbox-public"
+            v-model="queryParams.public"
+            name="checkbox-public"
+            value="true"
+            unchecked-value="false"
+            @input="refreshData"
+          >
             Include public data
           </b-form-checkbox>
         </b-form-group>
         <b-form-group id="input-group-basename" class="my-1">
           <template #label>
             <b>Image Name</b>
-            <sup
-              class="blue"
-              v-b-tooltip.hover.right
-              title="Image name does not include file extension"
-            >
+            <sup v-b-tooltip.hover.right class="blue" title="Image name does not include file extension">
               ?
             </sup>
           </template>
@@ -49,8 +52,8 @@
           <template #label>
             <b>Object</b>
             <sup
-              class="blue"
               v-b-tooltip.hover.right
+              class="blue"
               title="As written to FITS header. Not an exact match: returns all frames
               with the given text included in the OBJECT header."
             >
@@ -62,9 +65,9 @@
         <aggregated-options-select
           id="obstypes"
           v-model="queryParams.OBSTYPE"
-          @input="refreshData"
           label="Observation Type"
           :options="categorizedAggregatedOptions.obstypes"
+          @input="refreshData"
         />
         <b-form-group id="input-group-rlevel" class="my-1">
           <template #label>
@@ -73,21 +76,40 @@
           <template #description>
             See <a href="https://lco.global/documentation/archive-documentation/#products" target="blank">documentation on reduction levels</a>.
           </template>
-          <simple-select id="input-rlevel" v-model="selectedReductionLevel" @input="refreshData" :options="reductionLevelOptions"></simple-select>
+          <simple-select id="input-rlevel" v-model="selectedReductionLevel" :options="reductionLevelOptions" @input="refreshData"></simple-select>
         </b-form-group>
-        <aggregated-options-select id="sites" v-model="queryParams.SITEID" @input="refreshData" label="Site" :options="categorizedAggregatedOptions.sites" />
-        <aggregated-options-select id="telescopes" v-model="queryParams.TELID" @input="refreshData" label="Telescope" :options="categorizedAggregatedOptions.telescopes" />
+        <aggregated-options-select
+          id="sites"
+          v-model="queryParams.SITEID"
+          label="Site"
+          :options="categorizedAggregatedOptions.sites"
+          @input="refreshData"
+        />
+        <aggregated-options-select
+          id="telescopes"
+          v-model="queryParams.TELID"
+          label="Telescope"
+          :options="categorizedAggregatedOptions.telescopes"
+          @input="refreshData"
+        />
         <aggregated-options-select
           id="instruments"
           v-model="queryParams.INSTRUME"
-          @input="refreshData"
           label="Instrument"
           :options="categorizedAggregatedOptions.instruments"
+          @input="refreshData"
         />
-        <aggregated-options-select id="filters" v-model="queryParams.FILTER" @input="refreshData" label="Filter" :options="categorizedAggregatedOptions.filters" />
+        <aggregated-options-select
+          id="filters"
+          v-model="queryParams.FILTER"
+          label="Filter"
+          :options="categorizedAggregatedOptions.filters"
+          @input="refreshData"
+        />
         <b-form-group id="input-group-exposure-time">
           <template #label>
-            <b>Exposure Time</b><sup class="blue" v-b-tooltip.hover.right title="Exposure time in seconds. Filter results with a greater than or equal value">?</sup>
+            <b>Exposure Time</b
+            ><sup v-b-tooltip.hover.right class="blue" title="Exposure time in seconds. Filter results with a greater than or equal value">?</sup>
           </template>
           <b-form-input v-model="exposureTime" type="number" class="border-secondary my-0"></b-form-input>
         </b-form-group>
@@ -99,15 +121,27 @@
     <b-col md="10">
       <b-row class="mb-1">
         <b-col>
-          <b-dropdown :split-class="{ disabled: selected.length <= 0 || preventDownloadUncompressed() }" split variant="primary" split-href="" @click="downloadFiles">
-            <template #button-content >Download {{ selected.length }}</template>
+          <b-dropdown
+            :split-class="{ disabled: selected.length <= 0 || preventDownloadUncompressed() }"
+            split
+            variant="primary"
+            split-href=""
+            @click="downloadFiles"
+          >
+            <template #button-content>Download {{ selected.length }}</template>
             <b-dropdown-form>
               <b-form-group v-slot="{ ariaDescribedby }">
                 <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="zip-compressed">
                   zip download (with compressed fits files)
                 </b-form-radio>
                 <b-dropdown-divider />
-                <b-form-radio v-model="dltype" :disabled="selected.length > maxFunpackedFrames" :aria-describedby="ariaDescribedby" name="dltype" value="zip-uncompressed">
+                <b-form-radio
+                  v-model="dltype"
+                  :disabled="selected.length > maxFunpackedFrames"
+                  :aria-describedby="ariaDescribedby"
+                  name="dltype"
+                  value="zip-uncompressed"
+                >
                   zip download (with uncompressed fits files)
                 </b-form-radio>
                 <b-dropdown-divider />
@@ -159,7 +193,7 @@
       </b-row>
       <b-row>
         <b-col>
-          <span v-if="preventDownloadUncompressed()">Uncompressed downloads are not permitted with more than {{ this.maxFunpackedFrames }} files.</span>
+          <span v-if="preventDownloadUncompressed()">Uncompressed downloads are not permitted with more than {{ maxFunpackedFrames }} files.</span>
         </b-col>
       </b-row>
       <b-table
@@ -207,13 +241,14 @@
           </b-link>
         </template>
         <template #row-details="data">
-          <frame-detail 
+          <frame-detail
             :frame-id="data.item.id"
             :obstype="data.item.OBSTYPE"
             :selected-items="selected"
-            v-on:checked-related-frame="onRowChecked(...arguments)"
-            v-on:clicked-related-frame="onRowClicked(...arguments)"
-            class="p-3" />
+            class="p-3"
+            @checked-related-frame="onRowChecked(...arguments)"
+            @clicked-related-frame="onRowClicked(...arguments)"
+          />
         </template>
       </b-table>
       <template v-if="!isBusy && data.count > 0">
@@ -453,18 +488,18 @@ export default {
     };
   },
   computed: {
-    imageName : {
+    imageName: {
       get: function() {
-        return this.queryParams.basename
+        return this.queryParams.basename;
       },
       set: _.debounce(function(newImageName) {
         this.queryParams.basename = newImageName;
         this.refreshData();
       }, 500)
     },
-    objectName : {
+    objectName: {
       get: function() {
-        return this.queryParams.OBJECT
+        return this.queryParams.OBJECT;
       },
       set: _.debounce(function(newObjectName) {
         this.queryParams.OBJECT = newObjectName;
@@ -473,7 +508,7 @@ export default {
     },
     exposureTime: {
       get: function() {
-        return this.queryParams.EXPTIME
+        return this.queryParams.EXPTIME;
       },
       set: _.debounce(function(newExposureTime) {
         this.queryParams.EXPTIME = newExposureTime;
@@ -482,13 +517,13 @@ export default {
     },
     selectedReductionLevel: {
       // Return the correct human-readable representation of the selected reduction level
-      get: function () {
+      get: function() {
         return this.getReductionLevelText(this.queryParams.RLEVEL, this.queryParams.TELID);
       },
       // Based on the reduction level selected, set the query parameters accordingly.
-      set: function (reductionLevel) {
+      set: function(reductionLevel) {
         if (this.queryParams.TELID === 'igla') this.queryParams.TELID = '';
-        switch(reductionLevel){
+        switch (reductionLevel) {
           case 'All':
             this.queryParams.RLEVEL = '';
             break;
@@ -504,7 +539,7 @@ export default {
           // NRES Commissioning and BANZAI-Imaging share the same RLEVEL, so they must be differentiated by TELID
           case 'NRES Commissioning':
             this.queryParams.RLEVEL = '91';
-            this.queryParams.TELID = 'igla'
+            this.queryParams.TELID = 'igla';
             break;
           case 'BANZAI-NRES':
             this.queryParams.RLEVEL = '92';
@@ -640,10 +675,10 @@ export default {
       return `${this.$store.state.urls.archiveApi}/frames/`;
     },
     preventDownloadUncompressed: function() {
-      return (this.selected.length > this.maxFunpackedFrames && this.dltype === 'zip-uncompressed');
+      return this.selected.length > this.maxFunpackedFrames && this.dltype === 'zip-uncompressed';
     },
     selectItem: function(item) {
-        if (!_.includes(this.selected, item.id)) this.selected.push(item.id);
+      if (!_.includes(this.selected, item.id)) this.selected.push(item.id);
     },
     deselectItem: function(item) {
       // remove an item by value via filtering, since vue cannot detect changes made by _.pull or _.remove lodash methods
@@ -655,7 +690,7 @@ export default {
     },
     ifAllSelected: function() {
       // don't attempt to access the archive table before it has been mounted
-      if (typeof(this.$refs.archivetable) === 'undefined') return;
+      if (typeof this.$refs.archivetable === 'undefined') return;
       for (const item of this.$refs.archivetable.items) {
         if (!this.itemInSelected(item.id)) {
           return false;
@@ -663,16 +698,16 @@ export default {
       }
       return true;
     },
-    itemInSelected (item) {
+    itemInSelected(item) {
       return itemInList(this.selected, item);
     },
     onSelectAll: function(checked) {
       if (checked) {
-        this.$refs.archivetable.items.forEach((item) => {
+        this.$refs.archivetable.items.forEach(item => {
           this.selectItem(item);
         });
       } else {
-        this.$refs.archivetable.items.forEach((item) => {
+        this.$refs.archivetable.items.forEach(item => {
           this.deselectItem(item);
         });
       }
@@ -703,7 +738,7 @@ export default {
     },
     getReductionLevelText: function(numericReductionLevel, telescopeId) {
       // Given the numeric reduction level and telescope ID, get a human readable representation of the reduction level.
-      switch(numericReductionLevel){
+      switch (numericReductionLevel) {
         case '':
           return 'All';
         case '0':
@@ -714,8 +749,7 @@ export default {
         case '91':
           if (telescopeId === 'igla') {
             return 'NRES Commissioning';
-          }
-          else {
+          } else {
             return 'BANZAI';
           }
         case '92':
@@ -890,6 +924,6 @@ https://github.com/bootstrap-vue/bootstrap-vue/issues/6326
 -->
 <style>
 th {
-  position: relative
+  position: relative;
 }
 </style>

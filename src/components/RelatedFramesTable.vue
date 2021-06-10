@@ -1,5 +1,5 @@
 <template>
-  <b-table 
+  <b-table
     :items="data"
     :fields="fields"
     selectable
@@ -7,7 +7,8 @@
     :busy="!dataLoaded"
     show-empty
     hover
-    @row-clicked="$emit('clicked-related-frame', $event)" >
+    @row-clicked="$emit('clicked-related-frame', $event)"
+  >
     <template #cell(selected)="row">
       <b-form-checkbox :checked="itemInSelectedItems(row.item.id)" @change="$emit('checked-related-frame', row, $event)" />
     </template>
@@ -29,11 +30,17 @@ export default {
   props: {
     frameId: {
       type: [String, Number],
-      required: true
+      required: true,
+      default: () => {
+        return '';
+      }
     },
     selectedItems: {
       type: Array,
-      required: false
+      required: false,
+      default: () => {
+        return [];
+      }
     }
   },
   data: function() {
@@ -41,7 +48,7 @@ export default {
       fields: [
         {
           key: 'selected',
-          label: '',
+          label: ''
         },
         {
           key: 'basename',
@@ -58,7 +65,7 @@ export default {
     initializeDataEndpoint: function() {
       return `${this.$store.state.urls.archiveApi}/frames/${this.frameId}/related/`;
     },
-    itemInSelectedItems: function (item) {
+    itemInSelectedItems: function(item) {
       return itemInList(this.selectedItems, item);
     }
   }
