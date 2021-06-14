@@ -1,7 +1,7 @@
 <template>
   <div>
     <slot name="label">{{ label }}</slot>
-    <b-dropdown block class="my-2" menu-class="menu" boundary="viewport" variant="outline-secondary">
+    <b-dropdown block class="my-0" menu-class="menu" boundary="viewport" variant="outline-secondary">
       <template #button-content>
         <span>{{ currentOptionLabel | truncate }}</span>
       </template>
@@ -18,7 +18,7 @@ export default {
   name: 'AggregatedOptionsSelect',
   filters: {
     truncate: function(value) {
-      return _.truncate(value, { length: 12 });
+      return _.truncate(value, { length: 18 });
     }
   },
   props: {

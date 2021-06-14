@@ -1,9 +1,10 @@
 <template>
-  <b-form-group id="input-group-point">
+  <b-form-group id="input-group-point" class="my-0">
     <template #label>
-      Point
+      <b>Point</b>
       <sup
         v-b-tooltip.hover.right
+        class="blue"
         title="Searching by point is usually the most effective method as it will find
         all frames containing an RA/Dec independent of the name given in the OBJECT header. This will not work for solar
         system objects. Sexagesimal or degrees. You may also click the magnification glass to fetch RA/Dec from online
@@ -12,17 +13,15 @@
         ?
       </sup>
     </template>
-    <b-input-group class="mb-1">
-      <b-form-input v-model="objectName" placeholder="Search sources" class="border-secondary"></b-form-input>
+    <b-input-group>
+      <b-form-input v-model="objectName" placeholder="Search sources" class="border-secondary my-0"></b-form-input>
       <b-input-group-append>
         <b-button :disabled="!objectName || lookup.isBusy" variant="outline-secondary" @click="lookupTarget"><i class="fas fa-search"></i></b-button>
       </b-input-group-append>
     </b-input-group>
-    <b-form-text v-if="lookup.status" id="text-lookup-status" class="my-1">{{ lookup.status }}</b-form-text>
-    <b-input-group>
-      <b-form-input v-model="point.x" placeholder="RA" class="border-secondary" @input="onPointUpdate"></b-form-input>
-      <b-form-input v-model="point.y" placeholder="Dec" class="border-secondary" @input="onPointUpdate"></b-form-input>
-    </b-input-group>
+    <b-form-text v-if="lookup.status" id="text-lookup-status" class="my-0">{{ lookup.status }}</b-form-text>
+    <b-form-input v-model="point.x" placeholder="RA" class="border-secondary my-1" @input="onPointUpdate"></b-form-input>
+    <b-form-input v-model="point.y" placeholder="Dec" class="border-secondary my-1" @input="onPointUpdate"></b-form-input>
     <b-form-text v-if="coordinatesFeedback" id="text-coordinates-feedback" class="my-1">{{ coordinatesFeedback }}</b-form-text>
   </b-form-group>
 </template>
@@ -117,6 +116,8 @@ export default {
         this.$emit('input', `POINT(${pointAsDecimal.x} ${pointAsDecimal.y})`);
       } else {
         this.coordinatesFeedback = 'Please enter valid coordinates to use a point search. Both RA and Dec must be set.';
+        // If coordinates are invalid, do not add a WTK POINT to the URL param
+        this.$emit('input', null);
       }
     }, 500)
   }

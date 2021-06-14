@@ -1,7 +1,7 @@
 @import '@/assets/scss/custom-colors.scss';
 
 // Override boostrap sass variables
-
+$secondary: #ced4da !default;
 $font-family-sans-serif: 'Libre Franklin', sans-serif !default;
 $link-hover-decoration: none;
 
@@ -34,6 +34,9 @@ a.navbar-brand:hover {
   background-color: rgba(0, 0, 0, 0);
 }
 
+a.nav-link{
+  font-size: 1.25em;
+}
 // Custom button styling
 
 .btn-outline-warning {
@@ -64,6 +67,7 @@ a.navbar-brand:hover {
 html {
   position: relative;
   background-color: $white;
+  font-size: 0.85em;
 }
 
 p {
