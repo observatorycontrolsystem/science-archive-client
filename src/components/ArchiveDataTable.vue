@@ -805,6 +805,8 @@ export default {
       this.$bvModal.show('bv-modal-alert');
     },
     refreshData: function() {
+      // when refreshing data to display, set offset in query to be zero so that we start at the beginning of the results.
+      this.queryParams.offset = 0;
       this.update();
     },
     setOptions: function(optionKey, availableOptions) {
