@@ -109,7 +109,12 @@
         <b-form-group id="input-group-exposure-time">
           <template #label>
             <b>Exposure Time</b
-            ><sup v-b-tooltip.hover.right class="blue" title="Exposure time in seconds. Filter results with a greater than or equal value">?</sup>
+            ><sup
+              v-b-tooltip.hover.right
+              class="blue"
+              title="Actual exposure time in seconds. Filter results with a greater than or equal value. Value may differ slightly from requested exposure time"
+              >?</sup
+            >
           </template>
           <b-form-input v-model="exposureTime" type="number" class="border-secondary my-0"></b-form-input>
         </b-form-group>
