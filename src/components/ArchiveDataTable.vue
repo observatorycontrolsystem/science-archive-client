@@ -587,6 +587,7 @@ export default {
         this.alertModalMessage = '';
       }
     });
+    this.updateFilters();
 
     $('#date-range-picker').daterangepicker(
       {
@@ -797,9 +798,6 @@ export default {
       };
       return defaultQueryParams;
     },
-    onSuccessfulDataRetrieval: function() {
-      this.updateFilters();
-    },
     onErrorRetrievingData: function(response) {
       if (response.status == 429) {
         this.alertModalMessage =
@@ -813,6 +811,8 @@ export default {
       // when refreshing data to display, go to the first page of results.
       this.goToFirstPage();
       this.update();
+      // update the available based on the selected params
+      this.updateFilters();
     },
     setOptions: function(optionKey, availableOptions) {
       // optionKey must be (is expected to be) one of the keys inside allAggregatedOptions
