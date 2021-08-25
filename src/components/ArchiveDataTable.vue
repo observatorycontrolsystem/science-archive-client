@@ -811,7 +811,7 @@ export default {
       // when refreshing data to display, go to the first page of results.
       this.goToFirstPage();
       this.update();
-      // update the available based on the selected params
+      // update the available selections based on the newly-selected params
       this.updateFilters();
     },
     setOptions: function(optionKey, availableOptions) {
