@@ -580,6 +580,9 @@ export default {
       };
     }
   },
+  created: function() {
+    this.updateFilters();
+  },
   mounted: function() {
     // Set up alert modal to clear message when it it hidden
     this.$root.$on('bv::modal::hidden', (bvEvent, modalId) => {
@@ -797,9 +800,6 @@ export default {
       };
       return defaultQueryParams;
     },
-    onSuccessfulDataRetrieval: function() {
-      this.updateFilters();
-    },
     onErrorRetrievingData: function(response) {
       if (response.status == 429) {
         this.alertModalMessage =
@@ -813,6 +813,8 @@ export default {
       // when refreshing data to display, go to the first page of results.
       this.goToFirstPage();
       this.update();
+      // update the available selections based on the newly-selected params
+      this.updateFilters();
     },
     setOptions: function(optionKey, availableOptions) {
       // optionKey must be (is expected to be) one of the keys inside allAggregatedOptions
