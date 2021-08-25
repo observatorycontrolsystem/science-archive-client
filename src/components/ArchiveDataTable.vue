@@ -580,6 +580,9 @@ export default {
       };
     }
   },
+  created: function() {
+    this.updateFilters();
+  },
   mounted: function() {
     // Set up alert modal to clear message when it it hidden
     this.$root.$on('bv::modal::hidden', (bvEvent, modalId) => {
@@ -587,7 +590,6 @@ export default {
         this.alertModalMessage = '';
       }
     });
-    this.updateFilters();
 
     $('#date-range-picker').daterangepicker(
       {
