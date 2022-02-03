@@ -15,7 +15,7 @@
         </b-form-group>
         <aggregated-options-select
           id="proposals"
-          v-model="queryParams.PROPID"
+          v-model="queryParams.proposal_id"
           :options="categorizedAggregatedOptions.proposals"
           place-in-option-group
           option-group-label="Public proposals"
@@ -64,7 +64,7 @@
         </b-form-group>
         <aggregated-options-select
           id="obstypes"
-          v-model="queryParams.OBSTYPE"
+          v-model="queryParams.configuration_type"
           label="Observation Type"
           :options="categorizedAggregatedOptions.obstypes"
           @input="refreshData"
@@ -80,28 +80,28 @@
         </b-form-group>
         <aggregated-options-select
           id="sites"
-          v-model="queryParams.SITEID"
+          v-model="queryParams.site_id"
           label="Site"
           :options="categorizedAggregatedOptions.sites"
           @input="refreshData"
         />
         <aggregated-options-select
           id="telescopes"
-          v-model="queryParams.TELID"
+          v-model="queryParams.telescope_id"
           label="Telescope"
           :options="categorizedAggregatedOptions.telescopes"
           @input="refreshData"
         />
         <aggregated-options-select
           id="instruments"
-          v-model="queryParams.INSTRUME"
+          v-model="queryParams.instrument_id"
           label="Instrument"
           :options="categorizedAggregatedOptions.instruments"
           @input="refreshData"
         />
         <aggregated-options-select
           id="filters"
-          v-model="queryParams.FILTER"
+          v-model="queryParams.primary_optical_element"
           label="Filter"
           :options="categorizedAggregatedOptions.filters"
           @input="refreshData"
@@ -248,7 +248,7 @@
         <template #row-details="data">
           <frame-detail
             :frame-id="data.item.id"
-            :obstype="data.item.OBSTYPE"
+            :obstype="data.item.configuration_type"
             :selected-items="selected"
             class="p-3"
             @checked-related-frame="onRowChecked(...arguments)"
@@ -400,7 +400,7 @@ export default {
           hidden: false
         },
         {
-          key: 'DATE_OBS',
+          key: 'observation_date',
           label: 'Time',
           sortable: true,
           hideable: true,
@@ -410,41 +410,41 @@ export default {
           }
         },
         {
-          key: 'PROPID',
+          key: 'proposal_id',
           label: 'Proposal',
           sortable: true,
           hideable: true,
           hidden: false
         },
         {
-          key: 'OBJECT',
+          key: 'target_name',
           label: 'Object',
           sortable: true,
           hideable: true,
           hidden: false
         },
         {
-          key: 'FILTER',
+          key: 'primary_optical_element',
           label: 'Filter',
           sortable: true,
           hideable: true,
           hidden: false
         },
         {
-          key: 'OBSTYPE',
+          key: 'configuration_type',
           label: 'Type',
           sortable: true,
           hideable: true,
           hidden: false
         },
         {
-          key: 'BLKUID',
+          key: 'observation_id',
           label: 'Observation ID',
           hideable: true,
           hidden: true
         },
         {
-          key: 'REQNUM',
+          key: 'request_id',
           label: 'Request #',
           hideable: true,
           hidden: true
@@ -469,7 +469,7 @@ export default {
           }
         },
         {
-          key: 'EXPTIME',
+          key: 'exposure_time',
           label: 'Exp. Time',
           sortable: true,
           hideable: true,
@@ -480,13 +480,13 @@ export default {
           }
         },
         {
-          key: 'RLEVEL',
+          key: 'reduction_level',
           label: 'R. level',
           sortable: true,
           hideable: true,
           hidden: false,
           formatter: (value, key, item) => {
-            return this.getReductionLevelText(value.toString(), item.TELID);
+            return this.getReductionLevelText(value.toString(), item.telescope_id);
           }
         }
       ]
@@ -504,53 +504,53 @@ export default {
     },
     objectName: {
       get: function() {
-        return this.queryParams.OBJECT;
+        return this.queryParams.target_name;
       },
       set: _.debounce(function(newObjectName) {
-        this.queryParams.OBJECT = newObjectName;
+        this.queryParams.target_name = newObjectName;
         this.refreshData();
       }, 500)
     },
     exposureTime: {
       get: function() {
-        return this.queryParams.EXPTIME;
+        return this.queryParams.exposure_time;
       },
       set: _.debounce(function(newExposureTime) {
-        this.queryParams.EXPTIME = newExposureTime;
+        this.queryParams.exposure_time = newExposureTime;
         this.refreshData();
       }, 500)
     },
     selectedReductionLevel: {
       // Return the correct human-readable representation of the selected reduction level
       get: function() {
-        return this.getReductionLevelText(this.queryParams.RLEVEL, this.queryParams.TELID);
+        return this.getReductionLevelText(this.queryParams.reduction_level, this.queryParams.telescope_id);
       },
       // Based on the reduction level selected, set the query parameters accordingly.
       set: function(reductionLevel) {
-        if (this.queryParams.TELID === 'igla') this.queryParams.TELID = '';
+        if (this.queryParams.telescope_id === 'igla') this.queryParams.telescope_id = '';
         switch (reductionLevel) {
           case 'All':
-            this.queryParams.RLEVEL = '';
+            this.queryParams.reduction_level = '';
             break;
           case 'Raw':
-            this.queryParams.RLEVEL = '0';
+            this.queryParams.reduction_level = '0';
             break;
           case 'ORAC':
-            this.queryParams.RLEVEL = '90';
+            this.queryParams.reduction_level = '90';
             break;
           case 'BANZAI':
-            this.queryParams.RLEVEL = '91';
+            this.queryParams.reduction_level = '91';
             break;
-          // NRES Commissioning and BANZAI-Imaging share the same RLEVEL, so they must be differentiated by TELID
+          // NRES Commissioning and BANZAI-Imaging share the same reduction_level, so they must be differentiated by telescope_id
           case 'NRES Commissioning':
-            this.queryParams.RLEVEL = '91';
-            this.queryParams.TELID = 'igla';
+            this.queryParams.reduction_level = '91';
+            this.queryParams.telescope_id = 'igla';
             break;
           case 'BANZAI-NRES':
-            this.queryParams.RLEVEL = '92';
+            this.queryParams.reduction_level = '92';
             break;
           default:
-            this.queryParams.RLEVEL = '';
+            this.queryParams.reduction_level = '';
         }
       }
     },
@@ -753,7 +753,7 @@ export default {
           return 'Raw';
         case '90':
           return 'ORAC';
-        // Due to BANZAI-Imaging and NRES Commissioning sharing the numeric rlevel 91, we must differentiate them by TELID
+        // Due to BANZAI-Imaging and NRES Commissioning sharing the numeric reduction_level 91, we must differentiate them by telescope_id
         case '91':
           if (telescopeId === 'igla') {
             return 'NRES Commissioning';
@@ -777,17 +777,17 @@ export default {
         defaultRange = timeRangeFilters['Today'];
       }
       const defaultQueryParams = {
-        RLEVEL: '',
-        PROPID: '',
-        INSTRUME: '',
-        OBJECT: '',
-        SITEID: '',
-        TELID: '',
-        FILTER: '',
-        OBSTYPE: '',
-        EXPTIME: '',
-        BLKUID: '',
-        REQNUM: '',
+        reduction_level: '',
+        proposal_id: '',
+        instrument_id: '',
+        target_name: '',
+        site_id: '',
+        telescope_id: '',
+        primary_optical_element: '',
+        configuration_type: '',
+        exposure_time: '',
+        observation_id: '',
+        request_id: '',
         basename: '',
         start: defaultRange[0].format(this.getDateFormat()),
         end: defaultRange[1].format(this.getDateFormat()),
@@ -837,10 +837,10 @@ export default {
       };
       for (let p in this.queryParams) {
         if (this.queryParams[p]) {
-          isParamForFilter = ['SITEID', 'TELID', 'INSTRUME', 'FILTER', 'OBSTYPE', 'start', 'end'].indexOf(p) >= 0;
+          isParamForFilter = ['site_id', 'telescope_id', 'instrument_id', 'primary_optical_element', 'configuration_type', 'start', 'end'].indexOf(p) >= 0;
           // Only add the proposal to the filters if the chosen proposal is a public one as those are the ones that are
           // populated by the aggregate endpoint. Profile proposals are handled differently.
-          isProposalForFilter = p === 'PROPID' && this.allAggregatedOptions.proposals.indexOf(this.queryParams[p]) >= 0;
+          isProposalForFilter = p === 'proposal_id' && this.allAggregatedOptions.proposals.indexOf(this.queryParams[p]) >= 0;
           if (isParamForFilter || isProposalForFilter) {
             filters[p] = this.queryParams[p];
           }
@@ -850,17 +850,17 @@ export default {
         url: `${this.archiveApiUrl}/frames/aggregate/`,
         data: filters
       }).done(response => {
-        if (aggregateField === 'PROPID') {
+        if (aggregateField === 'proposal_id') {
           this.setOptions('proposals', response.proposals);
-        } else if (aggregateField === 'OBSTYPE') {
+        } else if (aggregateField === 'configuration_type') {
           this.setOptions('obstypes', response.obstypes);
-        } else if (aggregateField === 'SITEID') {
+        } else if (aggregateField === 'site_id') {
           this.setOptions('sites', response.sites);
-        } else if (aggregateField === 'INSTRUME') {
+        } else if (aggregateField === 'instrument_id') {
           this.setOptions('instruments', response.instruments);
-        } else if (aggregateField === 'FILTER') {
+        } else if (aggregateField === 'primary_optical_element') {
           this.setOptions('filters', response.filters);
-        } else if (aggregateField === 'TELID') {
+        } else if (aggregateField === 'telescope_id') {
           this.setOptions('telescopes', response.telescopes);
         }
       });
@@ -870,17 +870,17 @@ export default {
         url: `${this.archiveApiUrl}/frames/aggregate/`,
         data: { aggregate_field: aggregateField }
       }).done(response => {
-        if (aggregateField === 'SITEID') {
+        if (aggregateField === 'site_id') {
           this.allAggregatedOptions.sites = response.sites.sort();
-        } else if (aggregateField === 'FILTER') {
+        } else if (aggregateField === 'primary_optical_element') {
           this.allAggregatedOptions.filters = response.filters.sort();
-        } else if (aggregateField === 'INSTRUME') {
+        } else if (aggregateField === 'instrument_id') {
           this.allAggregatedOptions.instruments = response.instruments.sort();
-        } else if (aggregateField === 'TELID') {
+        } else if (aggregateField === 'telescope_id') {
           this.allAggregatedOptions.telescopes = response.telescopes.sort();
-        } else if (aggregateField === 'OBSTYPE') {
+        } else if (aggregateField === 'configuration_type') {
           this.allAggregatedOptions.obstypes = response.obstypes.sort();
-        } else if (aggregateField === 'PROPID') {
+        } else if (aggregateField === 'proposal_id') {
           this.allAggregatedOptions.proposals = response.proposals.sort();
         }
         this.updateOptions(aggregateField);
@@ -888,7 +888,7 @@ export default {
     },
     updateFilters: function() {
       // Populate all the dropdowns from the aggregate endpoint.
-      for (let filterName of ['SITEID', 'TELID', 'OBSTYPE', 'FILTER', 'INSTRUME', 'PROPID']) {
+      for (let filterName of ['site_id', 'telescope_id', 'configuration_type', 'primary_optical_element', 'instrument_id', 'proposal_id']) {
         if (this.allAggregatedOptions.sites.length < 1) {
           this.getAllFiltersAndUpdateOptions(filterName);
         } else {
