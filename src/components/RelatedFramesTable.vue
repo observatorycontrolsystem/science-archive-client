@@ -55,7 +55,7 @@ export default {
           label: 'Basename'
         },
         {
-          key: 'OBSTYPE',
+          key: 'configuration_type',
           label: 'Type'
         }
       ]
