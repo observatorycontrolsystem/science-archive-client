@@ -1,6 +1,16 @@
 # Science Archive Client
 
+A user-friendly frontend interface to an OCS Science Archive.
+
+## Prerequesites:
+* An OCS [Science Archive](https://github.com/observatorycontrolsystem/science-archive/)
+* An OCS [Observation Portal](https://github.com/observatorycontrolsystem/observation-portal/)
+* An OCS [Simbad2k Service](https://github.com/observatorycontrolsystem/simbad2k) for catalog lookups
+* An OCS [Thumbnail Service](https://github.com/observatorycontrolsystem/thumbnail-service) to generate JPEG thumbnails from data products
+
 ## Environment variables
+
+The following environment variables can be used to configure your specific science-archive client instance.
 
 | Variable                              | Description                           | Default                 |
 | ------------------------------------- | ------------------------------------- | ----------------------- |

@@ -2,5 +2,14 @@
   "observationPortalApiUrl": "http://127.0.0.1:8000",
   "archiveApiUrl": "http://127.0.0.1:8000",
   "simbadServiceUrl": "http://127.0.0.1:8000",
-  "thumbnailServiceUrl": "http://127.0.0.1:8000"
+  "thumbnailServiceUrl": "http://127.0.0.1:8000",
+  "navbarBrandUrl": "http://127.0.0.1:8000",
+  "brandImageLarge": "http://127.0.0.1:8000",
+  "brandImageSmall": "http://127.0.0.1:8000",
+  "brandImageAltText": "Brand Image",
+  "documentationUrl": "http://127.0.01:8000",
+  "organizationHomepageLink": "http://127.0.0.1:8000",
+  "organizationHomepageText": "Organization Homepage",
+  "copyrightOrganization": "Organization",
+  "termsOfServiceUrl": "http://127.0.0.1:8000"
 }
