@@ -12,7 +12,8 @@
 
 <script>
 import moment from 'moment';
-import { OCSMixin, ArchiveDataTable } from 'ocs-component-lib';
+import { OCSMixin } from 'ocs-component-lib';
+import ArchiveDataTable from '@/components/ArchiveDataTable.vue';
 
 export default {
   name: 'Home',

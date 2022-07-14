@@ -11,5 +11,9 @@
   "organizationHomepageLink": "http://127.0.0.1:8000",
   "organizationHomepageText": "Organization Homepage",
   "copyrightOrganization": "Organization",
-  "termsOfServiceUrl": "http://127.0.0.1:8000"
+  "termsOfServiceUrl": "mailto:foo@bar.com",
+  "feedbackEmail": "http://127.0.0.1:8000",
+  "githubApiUrl": "http://127.0.0.1:8000",
+  "apiDocumentationUrl": "http://127.0.0.1:8000",
+  "generalDocumentationUrl": "http://127.0.0.1:8000"
 }

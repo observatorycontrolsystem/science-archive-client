@@ -29,7 +29,11 @@ $.ajax({
     organizationHomepageLink: process.env.VUE_APP_ORGANIZATION_HOMEPAGE_LINK || data.organizationHomepageLink,
     organizationHomepageText: process.env.VUE_APP_ORGANIZATION_HOMEPAGE_TEXT || data.organizationHomepageText,
     copyrightOrganization: process.env.VUE_APP_COPYRIGHT_ORGANIZATION || data.copyrightOrganization,
-    termsOfServiceUrl: process.env.VUE_APP_TERMS_OF_SERVICE_URL || data.termsOfServiceUrl
+    termsOfServiceUrl: process.env.VUE_APP_TERMS_OF_SERVICE_URL || data.termsOfServiceUrl,
+    feedbackEmail: process.env.VUE_APP_FEEDBACK_EMAIL || data.feedbackEmail,
+    githubApiUrl: process.env.VUE_APP_GITHUB_API_URL || data.githubApiUrl,
+    apiDocumentationUrl: process.env.VUE_APP_API_DOCUMENTATION_URL || data.apiDocumentationUrl,
+    generalDocumentationUrl: process.env.VUE_APP_GENERAL_DOCUMENTATION_URL || data.generalDocumentationUrl
   });
 
   // Add the archive token to a request being sent to the archive api or the thumbservice

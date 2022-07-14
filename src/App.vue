@@ -20,7 +20,7 @@
         <b-collapse id="nav-collapse" is-nav>
           <b-navbar-nav>
             <b-nav-item :href="documentationUrl">Documentation</b-nav-item>
-            <b-nav-item :href="scienceArchiveUrl">API</b-nav-item>
+            <b-nav-item :href="scienceArchiveApiUrl">API</b-nav-item>
             <b-nav-item :href="organizationHomepage.link">{{ organizationHomepage.text }}</b-nav-item>
             <template v-if="userIsAuthenticated">
               <hr class="w-100 d-lg-none border-light" />
@@ -59,6 +59,11 @@
       :copyright-organization="copyrightOrganization"
       :terms-of-service-url="termsOfServiceUrl"
       :privacy-policy-url="privacyPolicyUrl"
+      :feedback-email="feedbackEmail"
+      :github-api-url="githubApiUrl"
+      :science-archive-api-url="scienceArchiveApiUrl"
+      :api-documentation-url="apiDocumentationUrl"
+      :general-documentation-url="generalDocumentationUrl"
     />
   </div>
 </template>
@@ -71,7 +76,7 @@ export default {
     ArchiveFooter
   },
   computed: {
-    scienceArchiveUrl: function() {
+    scienceArchiveApiUrl: function() {
       return this.$store.state.urls.archiveApi;
     },
     profile: function() {
@@ -96,10 +101,23 @@ export default {
       return this.$store.state.urls.copyrightOrganization;
     },
     termsOfServiceUrl: function() {
+      console.log(this.$store.state.urls.termsOfServiceUrl);
       return this.$store.state.urls.termsOfServiceUrl;
     },
     privacyPolicyUrl: function() {
       return this.$store.state.urls.termsOfServiceUrl;
+    },
+    feedbackEmail: function() {
+      return this.$store.state.urls.feedbackEmail;
+    },
+    githubApiUrl: function() {
+      return this.$store.state.urls.githubApiUrl;
+    },
+    apiDocumentationUrl: function() {
+      return this.$store.state.urls.apiDocumentationUrl;
+    },
+    generalDocumentationUrl: function() {
+      return this.$store.state.urls.generalDocumentationUrl;
     },
     userIsAuthenticated: function() {
       return this.$store.state.userIsAuthenticated;
