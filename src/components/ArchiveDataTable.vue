@@ -335,7 +335,6 @@ export default {
         { value: '50', text: '50 rows per page' },
         { value: '100', text: '100 rows per page' },
         { value: '500', text: '500 rows per page' },
-        { value: '1000', text: '1000 rows per page' }
       ],
       reductionLevelOptions: [
         { value: 'All', text: 'All' },
