@@ -31,6 +31,7 @@ $.ajax({
     copyrightOrganization: process.env.VUE_APP_COPYRIGHT_ORGANIZATION || data.copyrightOrganization,
     termsOfServiceUrl: process.env.VUE_APP_TERMS_OF_SERVICE_URL || data.termsOfServiceUrl,
     feedbackEmail: process.env.VUE_APP_FEEDBACK_EMAIL || data.feedbackEmail,
+    privacyPolicyUrl: process.env.VUE_APP_PRIVACY_POLICY_URL || data.privacyPolicyUrl,
     githubApiUrl: process.env.VUE_APP_GITHUB_API_URL || data.githubApiUrl,
     apiDocumentationUrl: process.env.VUE_APP_API_DOCUMENTATION_URL || data.apiDocumentationUrl,
     generalDocumentationUrl: process.env.VUE_APP_GENERAL_DOCUMENTATION_URL || data.generalDocumentationUrl

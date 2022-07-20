@@ -3,25 +3,21 @@
     <div>
       <b-navbar toggleable="lg" variant="dark-blue" type="dark">
         <b-navbar-brand :href="navbarBrandUrl">
-          <b-img
-            class="brand-image-small d-inline-block align-top d-lg-none"
-            :src="brandImage.small"
-            :alt="brandImage.altText"
-          />
-          <b-img
-            class="brand-image-large align-top d-none d-lg-inline-block"
-            :src="brandImage.large"
-            :alt="brandImage.altText"
-          />
+          <b-img class="brand-image-small d-inline-block align-top d-lg-none"
+            :src="this.$store.state.urls.brandImageSmall"
+            :alt="this.$store.state.urls.brandImageAltText" />
+          <b-img class="brand-image-large align-top d-none d-lg-inline-block"
+            :src="this.$store.state.urls.brandImageLarge"
+            :alt="this.$store.state.urls.brandImageAltText" />
           <div id="name-large" class="name text-left pl-2 align-top d-none d-lg-inline-block">Science<br />Archive</div>
           <div id="name-small" class="name text-left pl-2 align-top d-inline-block d-lg-none">Science<br />Archive</div>
         </b-navbar-brand>
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
         <b-collapse id="nav-collapse" is-nav>
           <b-navbar-nav>
-            <b-nav-item :href="documentationUrl">Documentation</b-nav-item>
-            <b-nav-item :href="scienceArchiveApiUrl">API</b-nav-item>
-            <b-nav-item :href="organizationHomepage.link">{{ organizationHomepage.text }}</b-nav-item>
+            <b-nav-item :href="this.$store.state.urls.apiDocumentationUrl">Documentation</b-nav-item>
+            <b-nav-item :href="this.$store.state.urls.archiveApi">API</b-nav-item>
+            <b-nav-item :href="this.$store.state.urls.organizationHomepageLink">{{ this.$store.state.urls.organizationHomepageText }}</b-nav-item>
             <template v-if="userIsAuthenticated">
               <hr class="w-100 d-lg-none border-light" />
               <b-nav-text class="d-lg-none">
@@ -56,15 +52,14 @@
       <router-view class="my-3" />
     </b-container>
     <ArchiveFooter
-      :copyright-organization="copyrightOrganization"
-      :terms-of-service-url="termsOfServiceUrl"
-      :privacy-policy-url="privacyPolicyUrl"
-      :feedback-email="feedbackEmail"
-      :github-api-url="githubApiUrl"
-      :science-archive-api-url="scienceArchiveApiUrl"
-      :api-documentation-url="apiDocumentationUrl"
-      :general-documentation-url="generalDocumentationUrl"
-    />
+      :copyright-organization="this.$store.state.urls.copyrightOrganization"
+      :terms-of-service-url="this.$store.state.urls.termsOfServiceUrl"
+      :privacy-policy-url="this.$store.state.urls.privacyPolicyUrl"
+      :feedback-email="this.$store.state.urls.feedbackEmail"
+      :github-api-url="this.$store.state.urls.githubApiUrl"
+      :science-archive-api-url="this.$store.state.urls.archiveApi"
+      :api-documentation-url="this.$store.state.urls.apiDocumentationUrl"
+      :general-documentation-url="this.$store.state.urls.generalDocumentationUrl" />
   </div>
 </template>
 <script>
@@ -76,48 +71,8 @@ export default {
     ArchiveFooter
   },
   computed: {
-    scienceArchiveApiUrl: function() {
-      return this.$store.state.urls.archiveApi;
-    },
     profile: function() {
       return this.$store.state.profile;
-    },
-    navbarBrandUrl: function() {
-      return this.$store.state.urls.navbarBrandUrl;
-    },
-    brandImage: function () {
-      return {"small": this.$store.state.urls.brandImageSmall,
-              "large": this.$store.state.urls.brandImageLarge,
-              "altText": this.$store.state.urls.brandImageAltText};
-    },
-    documentationUrl: function() {
-      return this.$store.state.urls.documentationUrl;
-    },
-    organizationHomepage: function() {
-      return {"link": this.$store.state.urls.organizationHomepageLink,
-              "text": this.$store.state.urls.organizationHomepageText}
-    },
-    copyrightOrganization: function() {
-      return this.$store.state.urls.copyrightOrganization;
-    },
-    termsOfServiceUrl: function() {
-      console.log(this.$store.state.urls.termsOfServiceUrl);
-      return this.$store.state.urls.termsOfServiceUrl;
-    },
-    privacyPolicyUrl: function() {
-      return this.$store.state.urls.termsOfServiceUrl;
-    },
-    feedbackEmail: function() {
-      return this.$store.state.urls.feedbackEmail;
-    },
-    githubApiUrl: function() {
-      return this.$store.state.urls.githubApiUrl;
-    },
-    apiDocumentationUrl: function() {
-      return this.$store.state.urls.apiDocumentationUrl;
-    },
-    generalDocumentationUrl: function() {
-      return this.$store.state.urls.generalDocumentationUrl;
     },
     userIsAuthenticated: function() {
       return this.$store.state.userIsAuthenticated;
