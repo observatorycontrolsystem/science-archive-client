@@ -16,5 +16,5 @@
   "githubApiUrl": "https://github.com/observatorycontrolsystem/science-archive",
   "apiDocumentationUrl": "http://127.0.0.1:8000",
   "generalDocumentationUrl": "http://127.0.0.1:8000",
-  "reductionLevelOptions": "[0]"
+  "reductionLevelOptions": "[0,1,2,3]"
 }

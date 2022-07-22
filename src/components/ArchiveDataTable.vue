@@ -506,7 +506,7 @@ export default {
       }, 500)
     },
     reductionLevelOptions: function() {
-      let options = this.$store.state.urls.reductionLevelOptions;
+      let options = JSON.parse(this.$store.state.urls.reductionLevelOptions);
       let dropdownOptions = [];
       // add default "All" option when reduction_level isn't specified
       dropdownOptions.push({ "value": "", "text": "All" });
