@@ -34,7 +34,8 @@ $.ajax({
     privacyPolicyUrl: process.env.VUE_APP_PRIVACY_POLICY_URL || data.privacyPolicyUrl,
     githubApiUrl: process.env.VUE_APP_GITHUB_API_URL || data.githubApiUrl,
     apiDocumentationUrl: process.env.VUE_APP_API_DOCUMENTATION_URL || data.apiDocumentationUrl,
-    generalDocumentationUrl: process.env.VUE_APP_GENERAL_DOCUMENTATION_URL || data.generalDocumentationUrl
+    generalDocumentationUrl: process.env.VUE_APP_GENERAL_DOCUMENTATION_URL || data.generalDocumentationUrl,
+    reductionLevelOptions: JSON.parse(process.env.VUE_APP_REDUCTION_LEVEL_OPTIONS) || JSON.parse(data.reductionLevelOptions)
   });
 
   // Add the archive token to a request being sent to the archive api or the thumbservice

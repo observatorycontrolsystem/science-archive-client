@@ -2,7 +2,7 @@
   <div id="app" class="d-flex flex-column h-100">
     <div>
       <b-navbar toggleable="lg" variant="dark-blue" type="dark">
-        <b-navbar-brand :href="navbarBrandUrl">
+        <b-navbar-brand :href="this.$store.state.urls.navbarBrandUrl">
           <b-img class="brand-image-small d-inline-block align-top d-lg-none"
             :src="this.$store.state.urls.brandImageSmall"
             :alt="this.$store.state.urls.brandImageAltText" />
