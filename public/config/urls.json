@@ -11,9 +11,10 @@
   "organizationHomepageLink": "http://127.0.0.1:8000",
   "organizationHomepageText": "Organization Homepage",
   "copyrightOrganization": "Organization",
-  "termsOfServiceUrl": "mailto:foo@bar.com",
+  "termsOfServiceUrl": "mailto:support@organization.com",
   "feedbackEmail": "http://127.0.0.1:8000",
-  "githubApiUrl": "http://127.0.0.1:8000",
+  "githubApiUrl": "https://github.com/observatorycontrolsystem/science-archive",
   "apiDocumentationUrl": "http://127.0.0.1:8000",
-  "generalDocumentationUrl": "http://127.0.0.1:8000"
+  "generalDocumentationUrl": "http://127.0.0.1:8000",
+  "reductionLevelOptions": "[0]"
 }
