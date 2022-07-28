@@ -15,9 +15,9 @@
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
         <b-collapse id="nav-collapse" is-nav>
           <b-navbar-nav>
-            <b-nav-item :href="this.$store.state.urls.apiDocumentationUrl">Documentation</b-nav-item>
-            <b-nav-item :href="this.$store.state.urls.archiveApi">API</b-nav-item>
-            <b-nav-item :href="this.$store.state.urls.organizationHomepageLink">{{ this.$store.state.urls.organizationHomepageText }}</b-nav-item>
+            <b-nav-item :href="this.$store.state.urls.documentationUrl">Documentation</b-nav-item>
+            <b-nav-item :href="this.$store.state.urls.archiveApiUrl">API</b-nav-item>
+            <b-nav-item :href="this.$store.state.urls.organizationHomepageUrl">{{ this.$store.state.urls.organizationHomepageText }}</b-nav-item>
             <template v-if="userIsAuthenticated">
               <hr class="w-100 d-lg-none border-light" />
               <b-nav-text class="d-lg-none">
@@ -57,7 +57,7 @@
       :privacy-policy-url="this.$store.state.urls.privacyPolicyUrl"
       :feedback-email="this.$store.state.urls.feedbackEmail"
       :github-api-url="this.$store.state.urls.githubApiUrl"
-      :science-archive-api-url="this.$store.state.urls.archiveApi"
+      :science-archive-api-url="this.$store.state.urls.archiveApiUrl"
       :api-documentation-url="this.$store.state.urls.apiDocumentationUrl"
       :general-documentation-url="this.$store.state.urls.generalDocumentationUrl" />
   </div>

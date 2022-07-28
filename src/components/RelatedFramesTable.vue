@@ -63,7 +63,7 @@ export default {
   },
   methods: {
     initializeDataEndpoint: function() {
-      return `${this.$store.state.urls.archiveApi}/frames/${this.frameId}/related/`;
+      return `${this.$store.state.urls.archiveApiUrl}/frames/${this.frameId}/related/`;
     },
     itemInSelectedItems: function(item) {
       return itemInList(this.selectedItems, item);

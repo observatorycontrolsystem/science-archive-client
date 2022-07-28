@@ -47,7 +47,7 @@ export default new Vuex.Store({
     getArchiveToken(context, credentials) {
       return new Promise((resolve, reject) => {
         $.ajax({
-          url: context.state.urls.archiveApi + '/api-token-auth/',
+          url: context.state.urls.archiveApiUrl + '/api-token-auth/',
           method: 'POST',
           contentType: 'application/json',
           data: JSON.stringify({
@@ -70,7 +70,7 @@ export default new Vuex.Store({
     getProfileData(context) {
       return new Promise((resolve, reject) => {
         $.ajax({
-          url: context.state.urls.archiveApi + '/profile/',
+          url: context.state.urls.archiveApiUrl + '/profile/',
           success: function(response) {
             context.commit('setProfileData', response);
             resolve(response);

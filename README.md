@@ -22,26 +22,26 @@ The following environment variables can be used to configure your specific scien
 | Variable                              | Description                           | Default                 |
 | ------------------------------------- | ------------------------------------- | ----------------------- |
 | `VUE_APP_OBSERVATION_PORTAL_API_URL`  | Observation portal API URL            | `http://127.0.0.1:8000` |
-| `VUE_APP_ARCHIVE_API_URL`             | Archive API URL                       | `http://127.0.0.1:8000` |
-| `VUE_APP_SIMBAD_SERVICE_URL`          | Simbad service URL                    | `http://127.0.0.1:8000` |
-| `VUE_APP_THUMBNAIL_SERVICE_URL`       | Thumbnail service URL                 | `http://127.0.0.1:8000` |
+| `VUE_APP_ARCHIVE_API_URL`             | Archive API URL                       | `http://127.0.0.1:9500` |
+| `VUE_APP_SIMBAD_SERVICE_URL`          | Simbad service URL                    | `http://127.0.0.1:9800` |
+| `VUE_APP_THUMBNAIL_SERVICE_URL`       | Thumbnail service URL                 | `http://127.0.0.1:8500` |
 ### Links and frontend Customizations
 | Variable                              | Description                           | Default                 |
 | ------------------------------------- | ------------------------------------- | ----------------------- |
-| `VUE_APP_NAVBAR_BRAND_URL`            | URL link embedded in navbar brand image | `http://127.0.0.1:8000` |
-| `VUE_APP_BRAND_IMAGE_LARGE`           | Image URL for brand image (large version) | `http://127.0.0.1:8000` |
-| `VUE_APP_BRAND_IMAGE_SMALL`           | Image URL for brand image (small version) | `http://127.0.0.1:8000` |
+| `VUE_APP_NAVBAR_BRAND_URL`            | URL link embedded in navbar brand image | _empty string_ |
+| `VUE_APP_BRAND_IMAGE_LARGE`           | Image URL for brand image (large version) | _empty string_ |
+| `VUE_APP_BRAND_IMAGE_SMALL`           | Image URL for brand image (small version) | _empty string_ |
 | `VUE_APP_BRAND_IMAGE_ALT_TEXT`        | Alt text for brand image | "Brand Image"  |
-| `VUE_APP_DOCUMENTATION_URL`           | URL for organization's archive/data specification documentation | `http://127.0.0.1:8000` |
-| `VUE_APP_ORGANIZATION_HOMEPAGE_LINK`  | Link to organization's homepage | `http://127.0.0.1:8000` |
+| `VUE_APP_DOCUMENTATION_URL`           | URL for organization's archive/data specification documentation | `https://observatorycontrolsystem.github.io/integration/data_flow/` |
+| `VUE_APP_ORGANIZATION_HOMEPAGE_URL`  | Link to organization's homepage | _empty string_ |
 | `VUE_APP_ORGANIZATION_HOMEPAGE_TEXT`  | Text for link to organization's homepage | 'Organization Home' |
 | `VUE_APP_COPYRIGHT_ORGANIZATION`      | Organization to cite in the copyright text | 'Organization' |
-| `VUE_APP_TERMS_OF_SERVICE_URL`        | URL for organization's terms of service | `http://127.0.0.1:8000` |
-| `VUE_APP_PRIVACY_POLICY_URL`          | URL for organization's privacy policy | `http://127.0.0.1:8000` |
+| `VUE_APP_TERMS_OF_SERVICE_URL`        | URL for organization's terms of service | _empty string_ |
+| `VUE_APP_PRIVACY_POLICY_URL`          | URL for organization's privacy policy | _empty string_ |
 | `VUE_APP_FEEDBACK_EMAIL`              | Organization email for user feedback | `mailto:support@organization.com`
 | `VUE_APP_GITHUB_API_URL`              | URL for GitHub API source code repository | `https://github.com/observatorycontrolsystem/science-archive`
-| `VUE_APP_API_DOCUMENTATION_URL`       | URL for organization's Archive API documentation | `http://127.0.0.1:8000`
-| `VUE_APP_GENERAL_DOCUMENTATION_URL`   | URL for organization's top-level documentation | `http://127.0.0.1:8000`
+| `VUE_APP_API_DOCUMENTATION_URL`       | URL for organization's Archive API documentation | `https://observatorycontrolsystem.github.io/api/science_archive/`
+| `VUE_APP_GENERAL_DOCUMENTATION_URL`   | URL for organization's top-level user documentation | `https://observatorycontrolsystem.github.io/`
 | `VUE_APP_REDUCTION_LEVEL_OPTIONS`     | List of integer reduction level (RLEVEL) options to be presented in the frontend | '[0,1,2,3]'
 
 

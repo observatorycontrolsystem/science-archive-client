@@ -516,7 +516,7 @@ export default {
       return dropdownOptions;
     },
     archiveApiUrl: function() {
-      return this.$store.state.urls.archiveApi;
+      return this.$store.state.urls.archiveApiUrl;
     },
     profile: function() {
       return this.$store.state.profile;
@@ -641,7 +641,7 @@ export default {
       return _.get(this.semesters, semesterIndex, {});
     },
     initializeDataEndpoint: function() {
-      return `${this.$store.state.urls.archiveApi}/frames/`;
+      return `${this.$store.state.urls.archiveApiUrl}/frames/`;
     },
     preventDownloadUncompressed: function() {
       return this.selected.length > this.maxFunpackedFrames && this.dltype === 'zip-uncompressed';
@@ -875,3 +875,4 @@ th {
   position: relative;
 }
 </style>
+

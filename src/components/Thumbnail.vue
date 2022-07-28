@@ -23,7 +23,7 @@ export default {
   },
   methods: {
     initializeDataEndpoint: function() {
-      return `${this.$store.state.urls.thumbnailService}/${this.frameId}/?width=300`;
+      return `${this.$store.state.urls.thumbnailServiceUrl}/${this.frameId}/?width=300`;
     }
   }
 };
