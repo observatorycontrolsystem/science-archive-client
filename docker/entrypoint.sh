@@ -19,6 +19,21 @@ then
     check_and_set_config "${VUE_APP_ARCHIVE_API_URL}" "archiveApiUrl" "${CONFIG_FILE_PATH}"
     check_and_set_config "${VUE_APP_SIMBAD_SERVICE_URL}" "simbadServiceUrl" "${CONFIG_FILE_PATH}"
     check_and_set_config "${VUE_APP_THUMBNAIL_SERVICE_URL}" "thumbnailServiceUrl" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_NAVBAR_BRAND_URL}" "navbarBrandUrl" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_BRAND_IMAGE_LARGE}" "brandImageLarge" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_BRAND_IMAGE_SMALL}" "brandImageSmall" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_BRAND_IMAGE_ALT_TEXT}" "brandImageAltText" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_DOCUMENTATION_URL}" "documentationUrl" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_ORGANIZATION_HOMEPAGE_URL}" "organizationHomepageUrl" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_ORGANIZATION_HOMEPAGE_TEXT}" "organizationHomepageText" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_COPYRIGHT_ORGANIZATION}" "copyrightOrganization" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_TERMS_OF_SERVICE_URL}" "termsOfServiceUrl" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_PRIVACY_POLICY_URL}" "privacyPolicyUrl" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_FEEDBACK_EMAIL}" "feedbackEmail" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_GITHUB_API_URL}" "githubApiUrl" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_API_DOCUMENTATION_URL}" "apiDocumentationUrl" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_GENERAL_DOCUMENTATION_URL}" "generalDocumentationUrl" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_REDUCTION_LEVEL_OPTIONS}" "reductionLevelOptions" "${CONFIG_FILE_PATH}"
 fi
 
 exec nginx -g 'daemon off;'
