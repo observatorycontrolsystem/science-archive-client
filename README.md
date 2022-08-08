@@ -42,7 +42,7 @@ The following environment variables can be used to configure your specific scien
 | `VUE_APP_GITHUB_API_URL`              | URL for GitHub API source code repository | `https://github.com/observatorycontrolsystem/science-archive`
 | `VUE_APP_API_DOCUMENTATION_URL`       | URL for organization's Archive API documentation | `https://observatorycontrolsystem.github.io/api/science_archive/`
 | `VUE_APP_GENERAL_DOCUMENTATION_URL`   | URL for organization's top-level user documentation | `https://observatorycontrolsystem.github.io/`
-| `VUE_APP_REDUCTION_LEVEL_OPTIONS`     | List of integer reduction level (RLEVEL) options to be presented in the frontend | '[0,1,2,3]'
+| `VUE_APP_REDUCTION_LEVEL_OPTIONS`     | Key/value mapping from numeric reduction level to human-readable reduction level | '{"0": "Raw", "10": "Processed"}'
 
 
 ## Project setup

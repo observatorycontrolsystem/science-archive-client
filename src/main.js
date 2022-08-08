@@ -17,6 +17,7 @@ $.ajax({
   url: '/config/urls.json'
 }).done(function(data) {
   store.commit('setRuntimeConfig', {
+    // default to the environment variable if present, else use the data in urls.json
     observationPortalApiUrl: process.env.VUE_APP_OBSERVATION_PORTAL_API_URL || data.observationPortalApiUrl,
     archiveApiUrl: process.env.VUE_APP_ARCHIVE_API_URL || data.archiveApiUrl,
     simbadServiceUrl: process.env.VUE_APP_SIMBAD_SERVICE_URL || data.simbadServiceUrl,
@@ -35,7 +36,7 @@ $.ajax({
     githubApiUrl: process.env.VUE_APP_GITHUB_API_URL || data.githubApiUrl,
     apiDocumentationUrl: process.env.VUE_APP_API_DOCUMENTATION_URL || data.apiDocumentationUrl,
     generalDocumentationUrl: process.env.VUE_APP_GENERAL_DOCUMENTATION_URL || data.generalDocumentationUrl,
-    reductionLevelOptions: process.env.VUE_APP_REDUCTION_LEVEL_OPTIONS || data.reductionLevelOptions
+    reductionLevelOptions: process.env.VUE_APP_REDUCTION_LEVEL_OPTIONS || JSON.stringify(data.reductionLevelOptions)
   });
 
   // Add the archive token to a request being sent to the archive api or the thumbservice

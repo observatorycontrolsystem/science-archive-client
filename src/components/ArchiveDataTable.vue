@@ -510,8 +510,8 @@ export default {
       let dropdownOptions = [];
       // add default "All" option when reduction_level isn't specified
       dropdownOptions.push({ "value": "", "text": "All" });
-      for (let option of options) {
-        dropdownOptions.push({"value": String(option), "text": String(option)})
+      for (const [value, text] of Object.entries(options)) {
+        dropdownOptions.push({"value": String(value), "text": String(text)})
       }
       return dropdownOptions;
     },
