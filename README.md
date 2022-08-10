@@ -44,6 +44,9 @@ The following environment variables can be used to configure your specific scien
 | `VUE_APP_GENERAL_DOCUMENTATION_URL`   | URL for organization's top-level user documentation | `https://observatorycontrolsystem.github.io/`
 | `VUE_APP_REDUCTION_LEVEL_OPTIONS`     | Key/value mapping from numeric reduction level to human-readable reduction level | '{"0": "Raw", "10": "Processed"}'
 
+#### A note about Docker runtime configuration:
+
+When running this project via Docker, the values environment variables listed above will automatically be added to the `config/urls.json` for runtime configuration. This is due to the fact that when running this application in Docker, the `VUE_APP...` environment variables are not passed to the application, since nginx is being used and node is not responsible for serving the files. Please note that if an environment variable is added, then it will also need to be added to the list in `docker/entrypoint.sh`.
 
 ## Project setup
 ```
