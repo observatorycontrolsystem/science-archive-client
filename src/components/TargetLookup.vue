@@ -75,7 +75,7 @@ export default {
         this.lookup.isBusy = true;
         this.setLookupStatus(`Searching for target ${this.objectName}`);
         $.ajax({
-          url: `${this.$store.state.urls.simbadService}/${this.objectName}`
+          url: `${this.$store.state.urls.simbadServiceUrl}/${this.objectName}`
         })
           .done(response => {
             if (response.error) {

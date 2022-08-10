@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     initializeDataEndpoint: function() {
-      return `${this.$store.state.urls.archiveApi}/frames/${this.frameId}/headers/`;
+      return `${this.$store.state.urls.archiveApiUrl}/frames/${this.frameId}/headers/`;
     }
   }
 };

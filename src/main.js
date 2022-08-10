@@ -14,19 +14,35 @@ Vue.config.productionTip = false;
 
 $.ajax({
   method: 'GET',
-  url: '/config/urls.json'
+  url: '/config/config.json'
 }).done(function(data) {
   store.commit('setRuntimeConfig', {
-    observationPortalApi: process.env.VUE_APP_OBSERVATION_PORTAL_API_URL || data.observationPortalApiUrl,
-    archiveApi: process.env.VUE_APP_ARCHIVE_API_URL || data.archiveApiUrl,
-    simbadService: process.env.VUE_APP_SIMBAD_SERVICE_URL || data.simbadServiceUrl,
-    thumbnailService: process.env.VUE_APP_THUMBNAIL_SERVICE_URL || data.thumbnailServiceUrl
+    // default to the environment variable if present, else use the data in urls.json
+    observationPortalApiUrl: process.env.VUE_APP_OBSERVATION_PORTAL_API_URL || data.observationPortalApiUrl,
+    archiveApiUrl: process.env.VUE_APP_ARCHIVE_API_URL || data.archiveApiUrl,
+    simbadServiceUrl: process.env.VUE_APP_SIMBAD_SERVICE_URL || data.simbadServiceUrl,
+    thumbnailServiceUrl: process.env.VUE_APP_THUMBNAIL_SERVICE_URL || data.thumbnailServiceUrl,
+    navbarBrandUrl: process.env.VUE_APP_NAVBAR_BRAND_URL || data.navbarBrandUrl,
+    brandImageLarge: process.env.VUE_APP_BRAND_IMAGE_LARGE || data.brandImageLarge,
+    brandImageSmall: process.env.VUE_APP_BRAND_IMAGE_SMALL || data.brandImageSmall,
+    brandImageAltText: process.env.VUE_APP_BRAND_IMAGE_ALT_TEXT || data.brandImageAltText,
+    documentationUrl: process.env.VUE_APP_DOCUMENTATION_URL || data.documentationUrl,
+    organizationHomepageUrl: process.env.VUE_APP_ORGANIZATION_HOMEPAGE_URL || data.organizationHomepageUrl,
+    organizationHomepageText: process.env.VUE_APP_ORGANIZATION_HOMEPAGE_TEXT || data.organizationHomepageText,
+    copyrightOrganization: process.env.VUE_APP_COPYRIGHT_ORGANIZATION || data.copyrightOrganization,
+    termsOfServiceUrl: process.env.VUE_APP_TERMS_OF_SERVICE_URL || data.termsOfServiceUrl,
+    privacyPolicyUrl: process.env.VUE_APP_PRIVACY_POLICY_URL || data.privacyPolicyUrl,
+    feedbackEmail: process.env.VUE_APP_FEEDBACK_EMAIL || data.feedbackEmail,
+    githubApiUrl: process.env.VUE_APP_GITHUB_API_URL || data.githubApiUrl,
+    apiDocumentationUrl: process.env.VUE_APP_API_DOCUMENTATION_URL || data.apiDocumentationUrl,
+    generalDocumentationUrl: process.env.VUE_APP_GENERAL_DOCUMENTATION_URL || data.generalDocumentationUrl,
+    reductionLevelOptions: process.env.VUE_APP_REDUCTION_LEVEL_OPTIONS || JSON.stringify(data.reductionLevelOptions)
   });
 
   // Add the archive token to a request being sent to the archive api or the thumbservice
   $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
     if (
-      (options.url.startsWith(store.state.urls.archiveApi) || options.url.startsWith(store.state.urls.thumbnailService)) &&
+      (options.url.startsWith(store.state.urls.archiveApiUrl) || options.url.startsWith(store.state.urls.thumbnailServiceUrl)) &&
       store.state.archiveToken
     ) {
       jqXHR.setRequestHeader('Authorization', 'Token ' + store.state.archiveToken);

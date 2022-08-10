@@ -1,0 +1,20 @@
+{
+  "observationPortalApiUrl": "http://127.0.0.1:8000",
+  "archiveApiUrl": "http://127.0.0.1:9500",
+  "simbadServiceUrl": "http://127.0.0.1:9800",
+  "thumbnailServiceUrl": "http://127.0.0.1:8500",
+  "navbarBrandUrl": "",
+  "brandImageLarge": "",
+  "brandImageSmall": "",
+  "brandImageAltText": "Brand Image",
+  "documentationUrl": "https://observatorycontrolsystem.github.io/integration/data_flow/",
+  "organizationHomepageUrl": "",
+  "organizationHomepageText": "Organization Homepage",
+  "copyrightOrganization": "Organization",
+  "termsOfServiceUrl": "",
+  "feedbackEmail": "mailto:support@organization.com",
+  "githubApiUrl": "https://github.com/observatorycontrolsystem/science-archive",
+  "apiDocumentationUrl": "https://observatorycontrolsystem.github.io/api/science_archive/",
+  "generalDocumentationUrl": "https://observatorycontrolsystem.github.io/",
+  "reductionLevelOptions": {"0": "Raw", "10": "Processed"}
+}

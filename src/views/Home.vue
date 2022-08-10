@@ -13,7 +13,6 @@
 <script>
 import moment from 'moment';
 import { OCSMixin } from 'ocs-component-lib';
-
 import ArchiveDataTable from '@/components/ArchiveDataTable.vue';
 
 export default {
@@ -25,7 +24,7 @@ export default {
   methods: {
     initializeDataEndpoint: function() {
       let now = moment.utc().format('YYYY-MM-DD HH:mm');
-      return `${this.$store.state.urls.observationPortalApi}/api/semesters/?start_lte=${now}`;
+      return `${this.$store.state.urls.observationPortalApiUrl}/api/semesters/?start_lte=${now}`;
     }
   }
 };

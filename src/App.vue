@@ -1,27 +1,23 @@
 <template>
   <div id="app" class="d-flex flex-column h-100">
     <div>
-      <b-navbar toggleable="lg" variant="lco-dark-blue" type="dark">
-        <b-navbar-brand href="https://lco.global">
-          <b-img
-            class="brand-image-small d-inline-block align-top d-lg-none"
-            src="https://cdn.lco.global/mainstyle/img/LCO_logo_transparent_with_coords.png"
-            alt="Las Cumbres Observatory"
-          />
-          <b-img
-            class="brand-image-large align-top d-none d-lg-inline-block"
-            src="https://cdn.lco.global/mainstyle/img/LCO_logo_transparent_with_coords.png"
-            alt="Las Cumbres Observatory"
-          />
-          <div id="lco-name-large" class="lco-name text-left pl-2 align-top d-none d-lg-inline-block">Science<br />Archive</div>
-          <div id="lco-name-small" class="lco-name text-left pl-2 align-top d-inline-block d-lg-none">Science<br />Archive</div>
+      <b-navbar toggleable="lg" variant="dark-blue" type="dark">
+        <b-navbar-brand :href="this.$store.state.urls.navbarBrandUrl">
+          <b-img class="brand-image-small d-inline-block align-top d-lg-none"
+            :src="this.$store.state.urls.brandImageSmall"
+            :alt="this.$store.state.urls.brandImageAltText" />
+          <b-img class="brand-image-large align-top d-none d-lg-inline-block"
+            :src="this.$store.state.urls.brandImageLarge"
+            :alt="this.$store.state.urls.brandImageAltText" />
+          <div id="name-large" class="name text-left pl-2 align-top d-none d-lg-inline-block">Science<br />Archive</div>
+          <div id="name-small" class="name text-left pl-2 align-top d-inline-block d-lg-none">Science<br />Archive</div>
         </b-navbar-brand>
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
         <b-collapse id="nav-collapse" is-nav>
           <b-navbar-nav>
-            <b-nav-item href="https://lco.global/documentation/archive-documentation/">Documentation</b-nav-item>
-            <b-nav-item :href="scienceArchiveUrl">API</b-nav-item>
-            <b-nav-item href="https://lco.global/">LCO Home</b-nav-item>
+            <b-nav-item :href="this.$store.state.urls.documentationUrl">Documentation</b-nav-item>
+            <b-nav-item :href="this.$store.state.urls.archiveApiUrl">API</b-nav-item>
+            <b-nav-item :href="this.$store.state.urls.organizationHomepageUrl">{{ this.$store.state.urls.organizationHomepageText }}</b-nav-item>
             <template v-if="userIsAuthenticated">
               <hr class="w-100 d-lg-none border-light" />
               <b-nav-text class="d-lg-none">
@@ -55,40 +51,26 @@
     <b-container class="flex-shrink-0 p-1">
       <router-view class="my-3" />
     </b-container>
-    <div class="footer text-center mt-auto pt-2">
-      Copyright <span class="align-top"><i class="far fa-copyright fa-xs"></i></span> {{ year }} Las Cumbres Observatory. All rights reserved.
-      <ul>
-        <li><a class="black" title="terms of service" href="https://lco.global/observatory/termsofservice/">Terms of Service</a></li>
-        <li><a class="black" title="privacy policy" href="https://lco.global/observatory/privacy-policy/">Privacy Policy</a></li>
-        <li><a class="black" title="feedback" href="mailto:science-support@lco.global">Feedback</a></li>
-        <li>
-          <a class="black" title="github" href="https://github.com/observatorycontrolsystem/science-archive">
-            <i class="fab fa-github"></i> View API on Github
-          </a>
-        </li>
-        <li><a class="black" title="API" :href="scienceArchiveUrl">API</a></li>
-        <li><a class="black" title="API documentation" href="https://developers.lco.global/#archive">API Documentation</a></li>
-        <li>
-          <a class="black" title="general documentation" href="https://lco.global/documentation/archive-documentation/">General Documentation</a>
-        </li>
-      </ul>
-    </div>
+    <ArchiveFooter
+      :copyright-organization="this.$store.state.urls.copyrightOrganization"
+      :terms-of-service-url="this.$store.state.urls.termsOfServiceUrl"
+      :privacy-policy-url="this.$store.state.urls.privacyPolicyUrl"
+      :feedback-email="this.$store.state.urls.feedbackEmail"
+      :github-api-url="this.$store.state.urls.githubApiUrl"
+      :science-archive-api-url="this.$store.state.urls.archiveApiUrl"
+      :api-documentation-url="this.$store.state.urls.apiDocumentationUrl"
+      :general-documentation-url="this.$store.state.urls.generalDocumentationUrl" />
   </div>
 </template>
 <script>
-import moment from 'moment';
+import ArchiveFooter from '@/components/ArchiveFooter.vue';
 
 export default {
   name: 'App',
-  data: function() {
-    return {
-      year: moment.utc().format('YYYY')
-    };
+  components: {
+    ArchiveFooter
   },
   computed: {
-    scienceArchiveUrl: function() {
-      return this.$store.state.urls.archiveApi;
-    },
     profile: function() {
       return this.$store.state.profile;
     },
@@ -115,13 +97,13 @@ export default {
 .brand-image-small {
   max-height: 45px;
 }
-.lco-name {
+.name {
   font-family: 'Heebo', sans-serif;
 }
-#lco-name-large {
+#name-large {
   font-size: 1.2rem;
 }
-#lco-name-small {
+#name-small {
   font-size: 1rem;
 }
 .basic-small {
