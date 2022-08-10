@@ -73,7 +73,16 @@
           <template #label>
             <b>Reduction Level</b>
           </template>
-          <simple-select id="input-rlevel" v-model="queryParams.reduction_level" :options="reductionLevelOptions" @input="refreshData"></simple-select>
+          <template #description>
+            See <a href="https://lco.global/documentation/archive-documentation/#products" target="blank">documentation
+            on reduction levels</a>.
+          </template>
+          <simple-select
+            id="input-rlevel"
+            v-model="selectedReductionLevel"
+            :options="reductionLevelOptions"
+            @input="refreshData">
+          </simple-select>
         </b-form-group>
         <aggregated-options-select
           id="sites"
@@ -333,6 +342,14 @@ export default {
         { value: '100', text: '100 rows per page' },
         { value: '500', text: '500 rows per page' },
       ],
+      reductionLevelOptions: [
+        { value: 'All', text: 'All' },
+        { value: 'Raw', text: 'Raw' },
+        { value: 'ORAC', text: 'ORAC' },
+        { value: 'NRES Commissioning', text: 'NRES Commissioning' },
+        { value: 'BANZAI', text: 'BANZAI' },
+        { value: 'BANZAI-NRES', text: 'BANZAI-NRES' }
+      ],
       categorizedAggregatedOptions: {
         sites: {
           available: [],
@@ -473,6 +490,9 @@ export default {
           sortable: true,
           hideable: true,
           hidden: false,
+          formatter: (value, key, item) => {
+            return this.getReductionLevelText(value.toString(), item.telescope_id);
+          }
         }
       ]
     };
@@ -505,15 +525,39 @@ export default {
         this.refreshData();
       }, 500)
     },
-    reductionLevelOptions: function() {
-      let options = JSON.parse(this.$store.state.urls.reductionLevelOptions);
-      let dropdownOptions = [];
-      // add default "All" option when reduction_level isn't specified
-      dropdownOptions.push({ "value": "", "text": "All" });
-      for (const [value, text] of Object.entries(options)) {
-        dropdownOptions.push({"value": String(value), "text": String(text)})
+    selectedReductionLevel: {
+      // Return the correct human-readable representation of the selected reduction level
+      get: function () {
+        return this.getReductionLevelText(this.queryParams.reduction_level, this.queryParams.telescope_id);
+      },
+      // Based on the reduction level selected, set the query parameters accordingly.
+      set: function (reductionLevel) {
+        if (this.queryParams.telescope_id === 'igla') this.queryParams.telescope_id = '';
+        switch (reductionLevel) {
+          case 'All':
+            this.queryParams.reduction_level = '';
+            break;
+          case 'Raw':
+            this.queryParams.reduction_level = '0';
+            break;
+          case 'ORAC':
+            this.queryParams.reduction_level = '90';
+            break;
+          case 'BANZAI':
+            this.queryParams.reduction_level = '91';
+            break;
+          // NRES Commissioning and BANZAI-Imaging share the same reduction_level, so they must be differentiated by telescope_id
+          case 'NRES Commissioning':
+            this.queryParams.reduction_level = '91';
+            this.queryParams.telescope_id = 'igla';
+            break;
+          case 'BANZAI-NRES':
+            this.queryParams.reduction_level = '92';
+            break;
+          default:
+            this.queryParams.reduction_level = '';
+        }
       }
-      return dropdownOptions;
     },
     archiveApiUrl: function() {
       return this.$store.state.urls.archiveApiUrl;
@@ -703,6 +747,28 @@ export default {
         downloadZip(frameIds, uncompress, this.archiveApiUrl, archiveToken);
       } else if (this.dltype === 'wget') {
         downloadWget(frameIds, archiveToken, this.archiveApiUrl);
+      }
+    },
+    getReductionLevelText: function (numericReductionLevel, telescopeId) {
+      // Given the numeric reduction level and telescope ID, get a human readable representation of the reduction level.
+      switch (numericReductionLevel) {
+        case '':
+          return 'All';
+        case '0':
+          return 'Raw';
+        case '90':
+          return 'ORAC';
+        // Due to BANZAI-Imaging and NRES Commissioning sharing the numeric reduction_level 91, we must differentiate them by telescope_id
+        case '91':
+          if (telescopeId === 'igla') {
+            return 'NRES Commissioning';
+          } else {
+            return 'BANZAI';
+          }
+        case '92':
+          return 'BANZAI-NRES';
+        default:
+          return '';
       }
     },
     initializeDefaultQueryParams: function() {

@@ -15,6 +15,5 @@
   "feedbackEmail": "mailto:support@organization.com",
   "githubApiUrl": "https://github.com/observatorycontrolsystem/science-archive",
   "apiDocumentationUrl": "https://observatorycontrolsystem.github.io/api/science_archive/",
-  "generalDocumentationUrl": "https://observatorycontrolsystem.github.io/",
-  "reductionLevelOptions": {"0": "Raw", "10": "Processed"}
+  "generalDocumentationUrl": "https://observatorycontrolsystem.github.io/"
 }

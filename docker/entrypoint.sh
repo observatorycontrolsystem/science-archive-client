@@ -39,7 +39,6 @@ then
     check_and_set_config "${VUE_APP_GITHUB_API_URL}" "githubApiUrl" "${CONFIG_FILE_PATH}"
     check_and_set_config "${VUE_APP_API_DOCUMENTATION_URL}" "apiDocumentationUrl" "${CONFIG_FILE_PATH}"
     check_and_set_config "${VUE_APP_GENERAL_DOCUMENTATION_URL}" "generalDocumentationUrl" "${CONFIG_FILE_PATH}"
-    check_and_set_config "${VUE_APP_REDUCTION_LEVEL_OPTIONS}" "reductionLevelOptions" "${CONFIG_FILE_PATH}"
 fi
 
 exec nginx -g 'daemon off;'
