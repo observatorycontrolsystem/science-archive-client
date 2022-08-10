@@ -46,7 +46,7 @@ The following environment variables can be used to configure your specific scien
 
 #### A note about Docker runtime configuration:
 
-When running this project via Docker, the values environment variables listed above will automatically be added to the `config/urls.json` for runtime configuration. This is due to the fact that when running this application in Docker, the `VUE_APP...` environment variables are not passed to the application, since nginx is being used and node is not responsible for serving the files. Please note that if an environment variable is added, then it will also need to be added to the list in `docker/entrypoint.sh`.
+When running this project via Docker, the values environment variables listed above will automatically be added to the `config/config.json` for runtime configuration. This is due to the fact that when running this application in Docker, the `VUE_APP...` environment variables are not passed to the application, since nginx is being used and node is not responsible for serving the files. Please note that if an environment variable is added, then it will also need to be added to the list in `docker/entrypoint.sh`.
 
 ## Project setup
 ```

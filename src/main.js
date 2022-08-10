@@ -14,7 +14,7 @@ Vue.config.productionTip = false;
 
 $.ajax({
   method: 'GET',
-  url: '/config/urls.json'
+  url: '/config/config.json'
 }).done(function(data) {
   store.commit('setRuntimeConfig', {
     // default to the environment variable if present, else use the data in urls.json

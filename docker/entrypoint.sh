@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CONFIG_FILE_PATH=/app/config/urls.json
+CONFIG_FILE_PATH=/app/config/config.json
 
 check_and_set_config() {
     env_var_value=$1
