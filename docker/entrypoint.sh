@@ -42,6 +42,4 @@ then
     check_and_set_config "${VUE_APP_REDUCTION_LEVEL_OPTIONS}" "reductionLevelOptions" "${CONFIG_FILE_PATH}"
 fi
 
-cat ${CONFIG_FILE_PATH}
-
 exec nginx -g 'daemon off;'
