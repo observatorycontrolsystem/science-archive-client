@@ -839,7 +839,7 @@ export default {
       };
       for (let p in this.queryParams) {
         if (this.queryParams[p]) {
-          isParamForFilter = ['site_id', 'telescope_id', 'instrument_id', 'primary_optical_element', 'configuration_type', 'start', 'end'].indexOf(p) >= 0;
+          isParamForFilter = ['site_id', 'telescope_id', 'instrument_id', 'primary_optical_element', 'configuration_type', 'start', 'end', 'public'].indexOf(p) >= 0;
           // Only add the proposal to the filters if the chosen proposal is a public one as those are the ones that are
           // populated by the aggregate endpoint. Profile proposals are handled differently.
           isProposalForFilter = p === 'proposal_id' && this.allAggregatedOptions.proposals.indexOf(this.queryParams[p]) >= 0;
