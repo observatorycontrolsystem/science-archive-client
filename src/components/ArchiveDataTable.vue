@@ -608,7 +608,10 @@ export default {
         showDropdowns: true,
         startDate: this.queryParams.start,
         endDate: this.queryParams.end,
-        ranges: this.filterDateRangeOptions
+        ranges: this.filterDateRangeOptions,
+        maxSpan: {
+          "years": 1
+        }
       },
       (start, end) => {
         this.queryParams.start = start.format(this.getDateFormat());
@@ -636,14 +639,16 @@ export default {
       return 'YYYY-MM-DD HH:mm';
     },
     getTimeRangeFilters: function() {
-      let filterDateRangeOptions = {
-        'All Time': [
-          moment('2000-01-01'),
-          moment
-            .utc()
-            .endOf('day')
-            .add(1, 'days')
-        ],
+      let filterDateRangeOptions = {};
+      let currentSemester = this.getCurrentOrLastSemester('current');
+      if (currentSemester.start && currentSemester.end) {
+        filterDateRangeOptions['This Semester'] = [moment.utc(currentSemester.start), moment.utc(currentSemester.end)];
+      }
+      let lastSemester = this.getCurrentOrLastSemester('last');
+      if (lastSemester.start && lastSemester.end) {
+        filterDateRangeOptions['Last Semester'] = [moment.utc(lastSemester.start), moment.utc(lastSemester.end)];
+      }
+      _.merge(filterDateRangeOptions, {
         Today: [moment.utc().startOf('day'), moment.utc().endOf('day')],
         Yesterday: [
           moment
@@ -669,15 +674,7 @@ export default {
             .subtract(29, 'days'),
           moment.utc().endOf('day')
         ]
-      };
-      let currentSemester = this.getCurrentOrLastSemester('current');
-      if (currentSemester.start && currentSemester.end) {
-        filterDateRangeOptions['This Semester'] = [moment.utc(currentSemester.start), moment.utc(currentSemester.end)];
-      }
-      let lastSemester = this.getCurrentOrLastSemester('last');
-      if (lastSemester.start && lastSemester.end) {
-        filterDateRangeOptions['Last Semester'] = [moment.utc(lastSemester.start), moment.utc(lastSemester.end)];
-      }
+      });
       return filterDateRangeOptions;
     },
     getCurrentOrLastSemester: function(currentOrLast) {
