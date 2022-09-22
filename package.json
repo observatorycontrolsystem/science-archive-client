@@ -12,6 +12,7 @@
   "dependencies": {
     "@terraformer/spatial": "^2.0.7",
     "@terraformer/wkt": "^2.0.7",
+    "@vue/composition-api": "^1.7.0",
     "bootstrap": "^4.5.3",
     "bootstrap-daterangepicker": "^3.1.0",
     "bootstrap-vue": "^2.20.1",
@@ -20,7 +21,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "ocs-component-lib": "^0.5.0",
-    "vis": "^4.21.0-EOL",
+    "vis": "^4.19.0",
     "vue": "^2.6.12",
     "vue-router": "^3.2.0",
     "vuex": "^3.4.0"

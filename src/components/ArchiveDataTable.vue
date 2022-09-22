@@ -587,6 +587,7 @@ export default {
   },
   created: function() {
     this.updateFilters();
+    this.setPublicParam();
   },
   mounted: function() {
     // Set up alert modal to clear message when it it hidden
@@ -608,7 +609,10 @@ export default {
         showDropdowns: true,
         startDate: this.queryParams.start,
         endDate: this.queryParams.end,
-        ranges: this.filterDateRangeOptions
+        ranges: this.filterDateRangeOptions,
+        maxSpan: {
+          "years": 1
+        }
       },
       (start, end) => {
         this.queryParams.start = start.format(this.getDateFormat());
@@ -636,14 +640,16 @@ export default {
       return 'YYYY-MM-DD HH:mm';
     },
     getTimeRangeFilters: function() {
-      let filterDateRangeOptions = {
-        'All Time': [
-          moment('2000-01-01'),
-          moment
-            .utc()
-            .endOf('day')
-            .add(1, 'days')
-        ],
+      let filterDateRangeOptions = {};
+      let currentSemester = this.getCurrentOrLastSemester('current');
+      if (currentSemester.start && currentSemester.end) {
+        filterDateRangeOptions['This Semester'] = [moment.utc(currentSemester.start), moment.utc(currentSemester.end)];
+      }
+      let lastSemester = this.getCurrentOrLastSemester('last');
+      if (lastSemester.start && lastSemester.end) {
+        filterDateRangeOptions['Last Semester'] = [moment.utc(lastSemester.start), moment.utc(lastSemester.end)];
+      }
+      _.merge(filterDateRangeOptions, {
         Today: [moment.utc().startOf('day'), moment.utc().endOf('day')],
         Yesterday: [
           moment
@@ -669,15 +675,7 @@ export default {
             .subtract(29, 'days'),
           moment.utc().endOf('day')
         ]
-      };
-      let currentSemester = this.getCurrentOrLastSemester('current');
-      if (currentSemester.start && currentSemester.end) {
-        filterDateRangeOptions['This Semester'] = [moment.utc(currentSemester.start), moment.utc(currentSemester.end)];
-      }
-      let lastSemester = this.getCurrentOrLastSemester('last');
-      if (lastSemester.start && lastSemester.end) {
-        filterDateRangeOptions['Last Semester'] = [moment.utc(lastSemester.start), moment.utc(lastSemester.end)];
-      }
+      });
       return filterDateRangeOptions;
     },
     getCurrentOrLastSemester: function(currentOrLast) {
@@ -798,12 +796,28 @@ export default {
         end: defaultRange[1].format(this.getDateFormat()),
         id: '',
         covers: '',
-        public: 'true',
+        // keep public as undefined for now, we will set it for users as appropriate on creation of the component
+        public: undefined,
         ordering: '',
         limit: 20,
         offset: 0
       };
       return defaultQueryParams;
+    },
+    setPublicParam: function() {
+    // if the route contains a public parameter, honor that
+    if (this.$route.query.public != undefined) {
+      this.queryParams.public = this.$route.query.public;
+     }
+     else {
+       if (this.userIsAuthenticated) {
+          this.queryParams.public = 'false';
+        }
+        else {
+          this.queryParams.public = 'true';
+        }
+      }
+      this.update();
     },
     onErrorRetrievingData: function(response) {
       if (response.status == 429) {
@@ -840,7 +854,7 @@ export default {
       let filters = {};
       for (let p in this.queryParams) {
         if (this.queryParams[p]) {
-          isParamForFilter = ['site_id', 'telescope_id', 'instrument_id', 'primary_optical_element', 'configuration_type', 'start', 'end'].indexOf(p) >= 0;
+          isParamForFilter = ['site_id', 'telescope_id', 'instrument_id', 'primary_optical_element', 'configuration_type', 'start', 'end', 'public'].indexOf(p) >= 0;
           // Only add the proposal to the filters if the chosen proposal is a public one as those are the ones that are
           // populated by the aggregate endpoint. Profile proposals are handled differently.
           isProposalForFilter = p === 'proposal_id' && this.allAggregatedOptions.proposals.indexOf(this.queryParams[p]) >= 0;
