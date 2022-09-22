@@ -297,8 +297,8 @@ import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
 const Terraformer = require('@terraformer/spatial');
-import 'bootstrap-daterangepicker';
-import 'bootstrap-daterangepicker/daterangepicker.css';
+import 'bootstrap-daterangepicker-v2';
+import 'bootstrap-daterangepicker-v2/daterangepicker.css';
 import { OCSMixin, OCSUtil } from 'ocs-component-lib';
 
 import { itemInList, removeItemFromList } from '@/util.js';
@@ -605,19 +605,18 @@ export default {
         opens: 'right',
         timePicker: true,
         timePicker24Hour: true,
-        timePickerIncrement: 10,
+        timePickerIncrement: 1,
         showDropdowns: true,
         startDate: this.queryParams.start,
         endDate: this.queryParams.end,
         ranges: this.filterDateRangeOptions,
-        maxSpan: {
-          "years": 1
+        dateLimit: {
+          "days": 365
         }
       },
       (start, end) => {
         this.queryParams.start = start.format(this.getDateFormat());
         this.queryParams.end = end.format(this.getDateFormat());
-        this.updateFilters();
         this.refreshData();
       }
     );
@@ -873,6 +872,13 @@ export default {
         this.setOptions('instruments', response.instruments);
         this.setOptions('filters', response.filters);
         this.setOptions('telescopes', response.telescopes);
+      }).fail(() => {
+        this.setOptions('proposals', this.allAggregatedOptions.proposals);
+        this.setOptions('obstypes', this.allAggregatedOptions.obstypes);
+        this.setOptions('sites', this.allAggregatedOptions.sites);
+        this.setOptions('instruments', this.allAggregatedOptions.instruments);
+        this.setOptions('filters', this.allAggregatedOptions.filters);
+        this.setOptions('telescopes', this.allAggregatedOptions.telescopes);
       });
     },
     getAllFiltersAndUpdateOptions: function() {
@@ -936,5 +942,14 @@ https://github.com/bootstrap-vue/bootstrap-vue/issues/6326
 th {
   position: relative;
 }
+
+.daterangepicker .clearfix {
+  display: inline-flex;
+}
+
+.daterangepicker .apply-cancel-buttons {
+  text-align: right;
+}
+
 </style>
 
