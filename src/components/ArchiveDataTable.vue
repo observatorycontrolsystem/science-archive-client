@@ -835,11 +835,9 @@ export default {
       }
       this.categorizedAggregatedOptions[optionKey].unavailable = unavailable;
     },
-    updateOptions: function(aggregateField) {
+    updateOptions: function() {
       let isParamForFilter, isProposalForFilter;
-      let filters = {
-        aggregate_field: aggregateField
-      };
+      let filters = {};
       for (let p in this.queryParams) {
         if (this.queryParams[p]) {
           isParamForFilter = ['site_id', 'telescope_id', 'instrument_id', 'primary_optical_element', 'configuration_type', 'start', 'end'].indexOf(p) >= 0;
@@ -855,50 +853,34 @@ export default {
         url: `${this.archiveApiUrl}/frames/aggregate/`,
         data: filters
       }).done(response => {
-        if (aggregateField === 'proposal_id') {
-          this.setOptions('proposals', response.proposals);
-        } else if (aggregateField === 'configuration_type') {
-          this.setOptions('obstypes', response.obstypes);
-        } else if (aggregateField === 'site_id') {
-          this.setOptions('sites', response.sites);
-        } else if (aggregateField === 'instrument_id') {
-          this.setOptions('instruments', response.instruments);
-        } else if (aggregateField === 'primary_optical_element') {
-          this.setOptions('filters', response.filters);
-        } else if (aggregateField === 'telescope_id') {
-          this.setOptions('telescopes', response.telescopes);
-        }
+        this.setOptions('proposals', response.proposals);
+        this.setOptions('obstypes', response.obstypes);
+        this.setOptions('sites', response.sites);
+        this.setOptions('instruments', response.instruments);
+        this.setOptions('filters', response.filters);
+        this.setOptions('telescopes', response.telescopes);
       });
     },
-    getAllFiltersAndUpdateOptions: function(aggregateField) {
+    getAllFiltersAndUpdateOptions: function() {
       $.ajax({
         url: `${this.archiveApiUrl}/frames/aggregate/`,
-        data: { aggregate_field: aggregateField }
+        data: { }
       }).done(response => {
-        if (aggregateField === 'site_id') {
-          this.allAggregatedOptions.sites = response.sites.sort();
-        } else if (aggregateField === 'primary_optical_element') {
-          this.allAggregatedOptions.filters = response.filters.sort();
-        } else if (aggregateField === 'instrument_id') {
-          this.allAggregatedOptions.instruments = response.instruments.sort();
-        } else if (aggregateField === 'telescope_id') {
-          this.allAggregatedOptions.telescopes = response.telescopes.sort();
-        } else if (aggregateField === 'configuration_type') {
-          this.allAggregatedOptions.obstypes = response.obstypes.sort();
-        } else if (aggregateField === 'proposal_id') {
-          this.allAggregatedOptions.proposals = response.proposals.sort();
-        }
-        this.updateOptions(aggregateField);
+        this.allAggregatedOptions.sites = response.sites.sort();
+        this.allAggregatedOptions.filters = response.filters.sort();
+        this.allAggregatedOptions.instruments = response.instruments.sort();
+        this.allAggregatedOptions.telescopes = response.telescopes.sort();
+        this.allAggregatedOptions.obstypes = response.obstypes.sort();
+        this.allAggregatedOptions.proposals = response.proposals.sort();
+        this.updateOptions();
       });
     },
     updateFilters: function() {
       // Populate all the dropdowns from the aggregate endpoint.
-      for (let filterName of ['site_id', 'telescope_id', 'configuration_type', 'primary_optical_element', 'instrument_id', 'proposal_id']) {
-        if (this.allAggregatedOptions.sites.length < 1) {
-          this.getAllFiltersAndUpdateOptions(filterName);
-        } else {
-          this.updateOptions(filterName);
-        }
+      if (this.allAggregatedOptions.sites.length < 1) {
+        this.getAllFiltersAndUpdateOptions();
+      } else {
+        this.updateOptions();
       }
     },
     getSortByFromOrdering: function() {
