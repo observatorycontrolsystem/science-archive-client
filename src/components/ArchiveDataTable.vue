@@ -587,7 +587,6 @@ export default {
   },
   created: function() {
     this.updateFilters();
-    this.setPublicParam();
   },
   mounted: function() {
     // Set up alert modal to clear message when it it hidden
@@ -802,21 +801,6 @@ export default {
         offset: 0
       };
       return defaultQueryParams;
-    },
-    setPublicParam: function() {
-    // if the route contains a public parameter, honor that
-    if (this.$route.query.public != undefined) {
-      this.queryParams.public = this.$route.query.public;
-     }
-     else {
-       if (this.userIsAuthenticated) {
-          this.queryParams.public = 'false';
-        }
-        else {
-          this.queryParams.public = 'true';
-        }
-      }
-      this.update();
     },
     onErrorRetrievingData: function(response) {
       if (response.status == 429) {
