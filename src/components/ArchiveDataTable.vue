@@ -606,12 +606,14 @@ export default {
         timePicker24Hour: true,
         timePickerIncrement: 1,
         showDropdowns: true,
-        startDate: this.queryParams.start,
-        endDate: this.queryParams.end,
+        startDate: moment.utc(this.queryParams.start, this.getDateFormat()),
+        endDate: moment.utc(this.queryParams.end, this.getDateFormat()),
         ranges: this.filterDateRangeOptions,
         dateLimit: {
           "days": 365
-        }
+        },
+        linkedCalendars: false,
+        minDate: moment.utc("2010")
       },
       (start, end) => {
         this.queryParams.start = start.format(this.getDateFormat());
@@ -641,11 +643,11 @@ export default {
       let filterDateRangeOptions = {};
       let currentSemester = this.getCurrentOrLastSemester('current');
       if (currentSemester.start && currentSemester.end) {
-        filterDateRangeOptions['This Semester'] = [moment.utc(currentSemester.start), moment.utc(currentSemester.end)];
+        filterDateRangeOptions['This Semester'] = [moment.utc(currentSemester.start, this.getDateFormat()), moment.utc(currentSemester.end, this.getDateFormat())];
       }
       let lastSemester = this.getCurrentOrLastSemester('last');
       if (lastSemester.start && lastSemester.end) {
-        filterDateRangeOptions['Last Semester'] = [moment.utc(lastSemester.start), moment.utc(lastSemester.end)];
+        filterDateRangeOptions['Last Semester'] = [moment.utc(lastSemester.start, this.getDateFormat()), moment.utc(lastSemester.end, this.getDateFormat())];
       }
       _.merge(filterDateRangeOptions, {
         Today: [moment.utc().startOf('day'), moment.utc().endOf('day')],
