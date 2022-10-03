@@ -297,8 +297,8 @@ import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
 const Terraformer = require('@terraformer/spatial');
-import 'bootstrap-daterangepicker';
-import 'bootstrap-daterangepicker/daterangepicker.css';
+import 'bootstrap-daterangepicker-v2';
+import 'bootstrap-daterangepicker-v2/daterangepicker.css';
 import { OCSMixin, OCSUtil } from 'ocs-component-lib';
 
 import { itemInList, removeItemFromList } from '@/util.js';
@@ -604,16 +604,20 @@ export default {
         opens: 'right',
         timePicker: true,
         timePicker24Hour: true,
-        timePickerIncrement: 10,
+        timePickerIncrement: 1,
         showDropdowns: true,
-        startDate: this.queryParams.start,
-        endDate: this.queryParams.end,
-        ranges: this.filterDateRangeOptions
+        startDate: moment.utc(this.queryParams.start, this.getDateFormat()),
+        endDate: moment.utc(this.queryParams.end, this.getDateFormat()),
+        ranges: this.filterDateRangeOptions,
+        dateLimit: {
+          "days": 365
+        },
+        linkedCalendars: false,
+        minDate: moment.utc("2010")
       },
       (start, end) => {
         this.queryParams.start = start.format(this.getDateFormat());
         this.queryParams.end = end.format(this.getDateFormat());
-        this.updateFilters();
         this.refreshData();
       }
     );
@@ -636,14 +640,16 @@ export default {
       return 'YYYY-MM-DD HH:mm';
     },
     getTimeRangeFilters: function() {
-      let filterDateRangeOptions = {
-        'All Time': [
-          moment('2000-01-01'),
-          moment
-            .utc()
-            .endOf('day')
-            .add(1, 'days')
-        ],
+      let filterDateRangeOptions = {};
+      let currentSemester = this.getCurrentOrLastSemester('current');
+      if (currentSemester.start && currentSemester.end) {
+        filterDateRangeOptions['This Semester'] = [moment.utc(currentSemester.start, this.getDateFormat()), moment.utc(currentSemester.end, this.getDateFormat())];
+      }
+      let lastSemester = this.getCurrentOrLastSemester('last');
+      if (lastSemester.start && lastSemester.end) {
+        filterDateRangeOptions['Last Semester'] = [moment.utc(lastSemester.start, this.getDateFormat()), moment.utc(lastSemester.end, this.getDateFormat())];
+      }
+      _.merge(filterDateRangeOptions, {
         Today: [moment.utc().startOf('day'), moment.utc().endOf('day')],
         Yesterday: [
           moment
@@ -669,15 +675,7 @@ export default {
             .subtract(29, 'days'),
           moment.utc().endOf('day')
         ]
-      };
-      let currentSemester = this.getCurrentOrLastSemester('current');
-      if (currentSemester.start && currentSemester.end) {
-        filterDateRangeOptions['This Semester'] = [moment.utc(currentSemester.start), moment.utc(currentSemester.end)];
-      }
-      let lastSemester = this.getCurrentOrLastSemester('last');
-      if (lastSemester.start && lastSemester.end) {
-        filterDateRangeOptions['Last Semester'] = [moment.utc(lastSemester.start), moment.utc(lastSemester.end)];
-      }
+      });
       return filterDateRangeOptions;
     },
     getCurrentOrLastSemester: function(currentOrLast) {
@@ -798,7 +796,8 @@ export default {
         end: defaultRange[1].format(this.getDateFormat()),
         id: '',
         covers: '',
-        public: 'true',
+        // keep public as undefined for now, we will set it for users as appropriate on creation of the component
+        public: undefined,
         ordering: '',
         limit: 20,
         offset: 0
@@ -835,14 +834,12 @@ export default {
       }
       this.categorizedAggregatedOptions[optionKey].unavailable = unavailable;
     },
-    updateOptions: function(aggregateField) {
+    updateOptions: function() {
       let isParamForFilter, isProposalForFilter;
-      let filters = {
-        aggregate_field: aggregateField
-      };
+      let filters = {};
       for (let p in this.queryParams) {
         if (this.queryParams[p]) {
-          isParamForFilter = ['site_id', 'telescope_id', 'instrument_id', 'primary_optical_element', 'configuration_type', 'start', 'end'].indexOf(p) >= 0;
+          isParamForFilter = ['site_id', 'telescope_id', 'instrument_id', 'primary_optical_element', 'configuration_type', 'start', 'end', 'public'].indexOf(p) >= 0;
           // Only add the proposal to the filters if the chosen proposal is a public one as those are the ones that are
           // populated by the aggregate endpoint. Profile proposals are handled differently.
           isProposalForFilter = p === 'proposal_id' && this.allAggregatedOptions.proposals.indexOf(this.queryParams[p]) >= 0;
@@ -855,50 +852,41 @@ export default {
         url: `${this.archiveApiUrl}/frames/aggregate/`,
         data: filters
       }).done(response => {
-        if (aggregateField === 'proposal_id') {
-          this.setOptions('proposals', response.proposals);
-        } else if (aggregateField === 'configuration_type') {
-          this.setOptions('obstypes', response.obstypes);
-        } else if (aggregateField === 'site_id') {
-          this.setOptions('sites', response.sites);
-        } else if (aggregateField === 'instrument_id') {
-          this.setOptions('instruments', response.instruments);
-        } else if (aggregateField === 'primary_optical_element') {
-          this.setOptions('filters', response.filters);
-        } else if (aggregateField === 'telescope_id') {
-          this.setOptions('telescopes', response.telescopes);
-        }
+        this.setOptions('proposals', response.proposals);
+        this.setOptions('obstypes', response.obstypes);
+        this.setOptions('sites', response.sites);
+        this.setOptions('instruments', response.instruments);
+        this.setOptions('filters', response.filters);
+        this.setOptions('telescopes', response.telescopes);
+      }).fail(() => {
+        this.setOptions('proposals', this.allAggregatedOptions.proposals);
+        this.setOptions('obstypes', this.allAggregatedOptions.obstypes);
+        this.setOptions('sites', this.allAggregatedOptions.sites);
+        this.setOptions('instruments', this.allAggregatedOptions.instruments);
+        this.setOptions('filters', this.allAggregatedOptions.filters);
+        this.setOptions('telescopes', this.allAggregatedOptions.telescopes);
       });
     },
-    getAllFiltersAndUpdateOptions: function(aggregateField) {
+    getAllFiltersAndUpdateOptions: function() {
       $.ajax({
         url: `${this.archiveApiUrl}/frames/aggregate/`,
-        data: { aggregate_field: aggregateField }
+        data: { }
       }).done(response => {
-        if (aggregateField === 'site_id') {
-          this.allAggregatedOptions.sites = response.sites.sort();
-        } else if (aggregateField === 'primary_optical_element') {
-          this.allAggregatedOptions.filters = response.filters.sort();
-        } else if (aggregateField === 'instrument_id') {
-          this.allAggregatedOptions.instruments = response.instruments.sort();
-        } else if (aggregateField === 'telescope_id') {
-          this.allAggregatedOptions.telescopes = response.telescopes.sort();
-        } else if (aggregateField === 'configuration_type') {
-          this.allAggregatedOptions.obstypes = response.obstypes.sort();
-        } else if (aggregateField === 'proposal_id') {
-          this.allAggregatedOptions.proposals = response.proposals.sort();
-        }
-        this.updateOptions(aggregateField);
+        this.allAggregatedOptions.sites = response.sites.sort();
+        this.allAggregatedOptions.filters = response.filters.sort();
+        this.allAggregatedOptions.instruments = response.instruments.sort();
+        this.allAggregatedOptions.telescopes = response.telescopes.sort();
+        this.allAggregatedOptions.obstypes = response.obstypes.sort();
+        this.allAggregatedOptions.proposals = response.proposals.sort();
+        this.updateOptions();
       });
     },
     updateFilters: function() {
       // Populate all the dropdowns from the aggregate endpoint.
-      for (let filterName of ['site_id', 'telescope_id', 'configuration_type', 'primary_optical_element', 'instrument_id', 'proposal_id']) {
-        if (this.allAggregatedOptions.sites.length < 1) {
-          this.getAllFiltersAndUpdateOptions(filterName);
-        } else {
-          this.updateOptions(filterName);
-        }
+      if (this.allAggregatedOptions.sites.length < 1) {
+        this.getAllFiltersAndUpdateOptions();
+      } else {
+        this.updateOptions();
       }
     },
     getSortByFromOrdering: function() {
@@ -940,5 +928,14 @@ https://github.com/bootstrap-vue/bootstrap-vue/issues/6326
 th {
   position: relative;
 }
+
+.daterangepicker .clearfix {
+  display: inline-flex;
+}
+
+.daterangepicker .apply-cancel-buttons {
+  text-align: right;
+}
+
 </style>
 
