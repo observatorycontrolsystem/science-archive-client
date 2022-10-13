@@ -21,7 +21,7 @@ The following environment variables can be used to configure your specific scien
 ### External Services (**Required to be set**)
 | Variable                              | Description                           | Default                 |
 | ------------------------------------- | ------------------------------------- | ----------------------- |
-| `VUE_APP_OBSERVATION_PORTAL_API_URL`  | Observation portal API URL            | `http://127.0.0.1:8000` |
+| `VUE_APP_OBSERVATION_PORTAL_API_URL`  | Observation portal API URL            | `http://127.0.0.1:8000/api` |
 | `VUE_APP_ARCHIVE_API_URL`             | Archive API URL                       | `http://127.0.0.1:9500` |
 | `VUE_APP_SIMBAD_SERVICE_URL`          | Simbad service URL                    | `http://127.0.0.1:9800` |
 | `VUE_APP_THUMBNAIL_SERVICE_URL`       | Thumbnail service URL                 | `http://127.0.0.1:8500` |
