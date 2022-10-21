@@ -5,7 +5,9 @@
       <related-frames-table :frame-id="frameId" :selected-items="selectedItems" v-on="$listeners" />
     </b-col>
     <b-col md="4" cols="12">
+      <frame-data :frame-id="frameId"></frame-data>
       <b-button v-b-modal="modalId" variant="outline-secondary" class="my-1" block>View Headers</b-button>
+      <b-button v-b-modal="" variant="outline-secondary" class="my-1" block>Open FITS in JS9</b-button>
       <headers-modal :modal-id="modalId" :frame-id="frameId" />
       <thumbnail v-if="hasThumbnail" :frame-id="frameId"></thumbnail>
       <div v-else>No preview available for this filetype</div>
@@ -16,13 +18,15 @@
 import Thumbnail from '@/components/Thumbnail.vue';
 import RelatedFramesTable from '@/components/RelatedFramesTable.vue';
 import HeadersModal from '@/components/HeadersModal.vue';
+import FrameData from '@/components/FrameData.vue';
 
 export default {
   name: 'FrameDetail',
   components: {
     Thumbnail,
     RelatedFramesTable,
-    HeadersModal
+    HeadersModal,
+    FrameData
   },
   props: {
     frameId: {

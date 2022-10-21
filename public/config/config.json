@@ -1,5 +1,5 @@
 {
-  "observationPortalApiUrl": "http://127.0.0.1:8000",
+  "observationPortalApiUrl": "http://127.0.0.1:8000/api",
   "archiveApiUrl": "http://127.0.0.1:9500",
   "simbadServiceUrl": "http://127.0.0.1:9800",
   "thumbnailServiceUrl": "http://127.0.0.1:8500",
