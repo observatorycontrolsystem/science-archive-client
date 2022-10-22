@@ -8,6 +8,7 @@
 </template>
 <script>
 import { OCSMixin } from 'ocs-component-lib';
+import _ from 'lodash';
 
 export default {
     name: 'FrameData',
@@ -38,12 +39,15 @@ export default {
     },
     computed: {
         headerItems: function() {
-            let headers = [];
-            for (const keyword of this.data.fields) {
-                console.log(keyword);
-                headers.push({ key: keyword.key, value: this.data.data[keyword.key] });
+            let row = {};
+            if (this.data.data) {
+                for (let keyword of this.fields) {
+                    let value = _.get(this.data.data, keyword.key, '-')
+                    // truncate numbers to two decimal places
+                    row[keyword.key] = _.isNumber(value) ? value.toFixed(2) : value;
+                }
             }
-            return headers;
+            return [row];
         }
     },
     methods: {
