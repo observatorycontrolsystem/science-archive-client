@@ -15,5 +15,7 @@
   "feedbackEmail": "mailto:support@organization.com",
   "githubApiUrl": "https://github.com/observatorycontrolsystem/science-archive",
   "apiDocumentationUrl": "https://observatorycontrolsystem.github.io/api/science_archive/",
-  "generalDocumentationUrl": "https://observatorycontrolsystem.github.io/"
+  "generalDocumentationUrl": "https://observatorycontrolsystem.github.io/",
+  "networkMonitoringPortalUrl": "https://sites.google.com/lco.global/docs/netmon",
+  "roguesGalleryUrl": "https://sites.google.com/lco.global/docs/netmon/heroes-and-rogues"
 }

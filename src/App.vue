@@ -11,6 +11,9 @@
             :alt="this.$store.state.urls.brandImageAltText" />
           <div id="name-large" class="name text-left pl-2 align-top d-none d-lg-inline-block">Science<br />Archive</div>
           <div id="name-small" class="name text-left pl-2 align-top d-inline-block d-lg-none">Science<br />Archive</div>
+          <div class="verticalLine d-inline-flex align-top pl-2" v-if="userIsStaff"></div>
+          <div id="name-large" class="name text-left pl-2 align-top d-none d-lg-inline-block" v-if="userIsStaff">Data<br />Inspector</div>
+          <div id="name-small" class="name text-left pl-2 align-top d-inline-block d-lg-none" v-if="userIsStaff">Data<br />Inspector</div>
         </b-navbar-brand>
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
         <b-collapse id="nav-collapse" is-nav>
@@ -18,6 +21,8 @@
             <b-nav-item :href="this.$store.state.urls.documentationUrl">Documentation</b-nav-item>
             <b-nav-item :href="this.$store.state.urls.archiveApiUrl">API</b-nav-item>
             <b-nav-item :href="this.$store.state.urls.organizationHomepageUrl">{{ this.$store.state.urls.organizationHomepageText }}</b-nav-item>
+            <b-nav-item :href="this.$store.state.urls.networkMonitoringPortalUrl" v-if="userIsStaff">Network Monitoring Portal</b-nav-item>
+            <b-nav-item :href="this.$store.state.urls.roguesGalleryUrl" v-if="userIsStaff">Rogue's Gallery</b-nav-item>
             <template v-if="userIsAuthenticated">
               <hr class="w-100 d-lg-none border-light" />
               <b-nav-text class="d-lg-none">
@@ -79,6 +84,9 @@ export default {
     },
     userIsAuthenticatedAndNotMemberOfProposals: function() {
       return this.userIsAuthenticated && this.profile.profile.proposals.length < 1;
+    },
+    userIsStaff: function() {
+      return this.$store.state.profile.is_staff;
     }
   },
   methods: {
@@ -91,6 +99,10 @@ export default {
 };
 </script>
 <style scoped>
+.verticalLine {
+  border-right: 4px solid #ffcd05;
+  height: 48px;
+}
 .brand-image-large {
   max-height: 50px;
 }
