@@ -32,7 +32,7 @@ function generateScript(frameIds, archiveToken, archiveRoot, callback) {
 function downloadWget(frameIds, archiveToken, archiveRoot) {
   generateScript(frameIds, archiveToken, archiveRoot, function(data) {
     var a = window.document.createElement('a');
-    a.href = window.URL.createObjectURL(new Blob([data], { type: 'text/plain' }));
+    a.href = window.URL.createObjectURL(new Blob([data], {type: 'text/plain'}));
     a.download = 'archivedownload.sh';
     document.body.appendChild(a);
     a.click();

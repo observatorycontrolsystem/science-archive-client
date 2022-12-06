@@ -22,9 +22,9 @@ const routes = [
       // otherwise send authenticated users to public=false
       // and unauthenticated users to public=true
       if (store.state.userIsAuthenticated) {
-        next({ name: 'Home', query: { ...to.query, public: 'false' } });
+          next({ name: 'Home', query: { ...to.query, public: "false"} });
       } else {
-        next({ name: 'Home', query: { ...to.query, public: 'true' } });
+          next({ name: 'Home', query: { ...to.query, public: "true"} });
       }
     }
   },
