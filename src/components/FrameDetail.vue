@@ -7,7 +7,7 @@
     <b-col md="4" cols="12">
       <frame-data :frame-id="frame.id" v-if="userIsStaff"></frame-data>
       <b-button v-b-modal="modalId" variant="outline-secondary" class="my-1" block>View Headers</b-button>
-      <b-button variant="outline-secondary" class="my-1" v-if="userIsStaff" @click="openJS9">Open FITS in JS9</b-button>
+      <b-button variant="outline-secondary" class="my-1" v-if="userIsStaff" @click="openJS9" block>Open FITS in JS9</b-button>
       <headers-modal :modal-id="modalId" :frame-id="frame.id" />
       <thumbnail v-if="hasThumbnail" :frame-id="frame.id"></thumbnail>
       <div v-else>No preview available for this filetype</div>
