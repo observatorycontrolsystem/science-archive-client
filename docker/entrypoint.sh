@@ -39,7 +39,7 @@ then
     check_and_set_config "${VUE_APP_GITHUB_API_URL}" "githubApiUrl" "${CONFIG_FILE_PATH}"
     check_and_set_config "${VUE_APP_API_DOCUMENTATION_URL}" "apiDocumentationUrl" "${CONFIG_FILE_PATH}"
     check_and_set_config "${VUE_APP_GENERAL_DOCUMENTATION_URL}" "generalDocumentationUrl" "${CONFIG_FILE_PATH}"
-    check_and_set_config "${VUE_APP_NETMON_PORTAL_URL}" "networkMonitoringPortalUrl" "${CONFIG_FILE_PATH}"
+    check_and_set_config "${VUE_APP_NETWORK_MONITORING_PORTAL_URL}" "networkMonitoringPortalUrl" "${CONFIG_FILE_PATH}"
     check_and_set_config "${VUE_APP_ROGUES_GALLERY_URL}" "roguesGalleryUrl" "${CONFIG_FILE_PATH}"
 fi
 
