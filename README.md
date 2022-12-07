@@ -1,4 +1,4 @@
-# Science Archive Client
+# LCO Science Archive Client / Data Inspector
 
 A user-friendly frontend interface to an OCS Science Archive written in [Vue](https://vuejs.org/).
 
@@ -7,6 +7,10 @@ A user-friendly frontend interface to an OCS Science Archive written in [Vue](ht
 This repository presents a frontend largely based off of Las Cumbres Observatory's [Science Archive](https://archive.lco.global), with configurable external service URLs and a set of frontend customizations. Users who wish to use the frontend as-is may minimally customize the frontend using environment variables.
 
 For users who wish to further customize the layout and functionality of their archive frontend, we recommend forking this project and overriding logic where necessary.
+
+## Data Inspector
+
+LCO has added additional customizations to this base OCS Science Archive client in provide staff users additional data monitoring and inspection tools. Staff users (denoted by the is_staff flag in their Observation Portal account profile) will be provided these tools. They are opt-in by default, and can be enabled in the login menu.
 
 ## Prerequesites:
 * An OCS [Science Archive](https://github.com/observatorycontrolsystem/science-archive/)
@@ -43,6 +47,9 @@ The following environment variables can be used to configure your specific scien
 | `VUE_APP_API_DOCUMENTATION_URL`       | URL for organization's Archive API documentation | `https://observatorycontrolsystem.github.io/api/science_archive/`
 | `VUE_APP_GENERAL_DOCUMENTATION_URL`   | URL for organization's top-level user documentation | `https://observatorycontrolsystem.github.io/`
 | `VUE_APP_REDUCTION_LEVEL_OPTIONS`     | Key/value mapping from numeric reduction level to human-readable reduction level | '{"0": "Raw", "10": "Processed"}'
+| `VUE_APP_NETWORK_MONITORING_PORTAL_URL`     | Network monitoring portal URL for staff view (data inspector) | https://sites.google.com/lco.global/docs/netmon
+| `VUE_APP_ROGUES_GALLERY_URL`     | Rogue's Gallery URL for staff view (data inspector) | https://sites.google.com/lco.global/docs/netmon/heroes-and-rogues
+
 
 #### A note about Docker runtime configuration:
 

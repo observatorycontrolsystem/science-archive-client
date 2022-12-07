@@ -253,7 +253,7 @@
         </template>
         <template #row-details="data">
           <frame-detail
-            :frame-id="data.item.id"
+            :frame="data.item"
             :obstype="data.item.configuration_type"
             :selected-items="selected"
             class="p-3"

@@ -41,13 +41,19 @@ export default new Vuex.Store({
       if (storedArchiveToken) {
         state.archiveToken = storedArchiveToken;
       }
+    },
+    initializeStaffDataInspector(state) {
+      state.inspectorViewEnabled = localStorage.getItem('staff-inspector-view') ? true : false;
+    },
+    toggleStaffDataInspector(state) {
+      state.inspectorViewEnabled = state.inspectorViewEnabled ? false : true;
     }
   },
   actions: {
     getArchiveToken(context, credentials) {
       return new Promise((resolve, reject) => {
         $.ajax({
-          url: context.state.urls.archiveApiUrl + '/api-token-auth/',
+          url: context.state.urls.observationPortalApiUrl + '/api-token-auth/',
           method: 'POST',
           contentType: 'application/json',
           data: JSON.stringify({

@@ -16,7 +16,7 @@ const routes = [
       // if the route contains a public parameter, honor that
       if (to.query.public != undefined) {
         next();
-        return
+        return;
       }
 
       // otherwise send authenticated users to public=false
