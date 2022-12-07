@@ -95,7 +95,7 @@ export default {
     },
     dataInspectorViewEnabled: {
       get: function() {
-        return this.$store.state.inspectorViewEnabled;
+        return this.userIsStaff && this.$store.state.inspectorViewEnabled;
       },
       set: function() {
         if (localStorage.getItem('staff-inspector-view')) {
