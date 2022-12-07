@@ -41,6 +41,12 @@ export default new Vuex.Store({
       if (storedArchiveToken) {
         state.archiveToken = storedArchiveToken;
       }
+    },
+    initializeStaffDataInspector(state) {
+      state.inspectorViewEnabled = localStorage.getItem('staff-inspector-view') ? true : false;
+    },
+    toggleStaffDataInspector(state) {
+      state.inspectorViewEnabled = state.inspectorViewEnabled ? false : true;
     }
   },
   actions: {

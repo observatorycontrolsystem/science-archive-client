@@ -53,6 +53,9 @@ $.ajax({
   // Initialize archive token if it is available in local storage already
   store.commit('initializeArchiveToken');
 
+  // Initialize the data inspector state based on local storage
+  store.commit('initializeStaffDataInspector');
+
   store
     .dispatch('getProfileData')
     .then(() => {

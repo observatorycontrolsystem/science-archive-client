@@ -5,9 +5,9 @@
       <related-frames-table :frame-id="frame.id" :selected-items="selectedItems" v-on="$listeners" />
     </b-col>
     <b-col md="4" cols="12">
-      <frame-data :frame-id="frame.id" v-if="userIsStaff"></frame-data>
+      <frame-data :frame-id="frame.id" v-if="dataInspectorViewEnabled"></frame-data>
       <b-button v-b-modal="modalId" variant="outline-secondary" class="my-1" block>View Headers</b-button>
-      <b-button variant="outline-secondary" class="my-1" v-if="userIsStaff" @click="openJS9" block>Open FITS in JS9</b-button>
+      <b-button variant="outline-secondary" class="my-1" v-if="dataInspectorViewEnabled" @click="openJS9" block>Open FITS in JS9</b-button>
       <headers-modal :modal-id="modalId" :frame-id="frame.id" />
       <thumbnail v-if="hasThumbnail" :frame-id="frame.id"></thumbnail>
       <div v-else>No preview available for this filetype</div>
@@ -54,6 +54,9 @@ export default {
     },
     userIsStaff: function() {
       return this.$store.state.profile.is_staff;
+    },
+    dataInspectorViewEnabled: function() {
+      return this.userIsStaff && this.$store.state.inspectorViewEnabled;
     }
   },
   methods: {
