@@ -10,7 +10,7 @@ For users who wish to further customize the layout and functionality of their ar
 
 ## Data Inspector
 
-LCO has added additional customizations to this base OCS Science Archive client in provide staff users additional data monitoring and inspection tools. Staff users (denoted by the is_staff flag in their Observation Portal account profile) will automatically be provided these additional tools.
+LCO has added additional customizations to this base OCS Science Archive client in provide staff users additional data monitoring and inspection tools. Staff users (denoted by the is_staff flag in their Observation Portal account profile) will be provided these tools. They are opt-in by default, and can be enabled in the login menu.
 
 ## Prerequesites:
 * An OCS [Science Archive](https://github.com/observatorycontrolsystem/science-archive/)
