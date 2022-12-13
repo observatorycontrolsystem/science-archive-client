@@ -164,6 +164,9 @@
             <template><i class="fa fa-times"/></template>
           </b-button>
         </b-col>
+        <b-col>
+          <b-button variant="outline-secondary" v-if="dataInspectorViewEnabled" :href="'lcods9://' + ds9LinkSuffix">Open Selected FITS in DS9</b-button>
+        </b-col>
         <b-col class="text-right">
           <b-button-group>
             <b-button variant="outline-secondary" @click="refreshData"><i class="fas fa-sync-alt"></i></b-button>
@@ -583,6 +586,16 @@ export default {
         start: _.min([offset + 1, this.data.count]),
         end: _.min([offset + limit, this.data.count])
       };
+    },
+    userIsStaff: function() {
+      return this.$store.state.profile.is_staff;
+    },
+    dataInspectorViewEnabled: function() {
+      return this.userIsStaff && this.$store.state.inspectorViewEnabled;
+    },
+    ds9LinkSuffix: function() {
+      let archiveToken = localStorage.getItem('archiveToken');
+      return '?frame_ids=' + String(this.selected) + '&token=' + archiveToken + '&frame_url=' + this.archiveApiUrl + '/frames/';
     }
   },
   created: function() {
