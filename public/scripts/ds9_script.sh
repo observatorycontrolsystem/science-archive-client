@@ -28,7 +28,14 @@ for f in $(echo $frames | tr "," "\n"); do
 done
 
 # now open these in ds9
-ds9 -zscale -lock frame wcs -view colorbar yes /tmp/archive_download/*
+files=( /tmp/archive_download/* )
+if [[ "${files[0]}" == *"fa"* && "${files[0]}" == *"00.fits"* ]]; then
+  echo "opening in mosaic mode"
+  ds9 -zscale -lock frame image -mosaicimage iraf /tmp/archive_download/*
+else
+  echo "opening in non-mosaic mode"
+  ds9 -zscale -lock frame image /tmp/archive_download/*
+fi
 
 # now remove the files
 rm -rf /tmp/archive_download
