@@ -165,7 +165,7 @@
           </b-button>
         </b-col>
         <b-col>
-          <b-button variant="outline-secondary" v-if="dataInspectorViewEnabled" :href="'lcods9://' + ds9LinkSuffix">Open Selected FITS in DS9</b-button>
+          <b-button variant="outline-secondary" v-if="dataInspectorViewEnabled" :href="'archive+ds9://' + ds9LinkSuffix">Open Selected FITS in DS9</b-button>
         </b-col>
         <b-col class="text-right">
           <b-button-group>
