@@ -5,7 +5,7 @@
         {{ alertModalMessage }}
       </div>
     </b-modal>
-    <b-col md="2">
+    <b-col :md="sidebarWidth">
       <b-form @submit="onSubmit" @reset="onReset">
         <b-form-group id="input-group-daterange" class="my-1">
           <div id="date-range-picker" class="border border-secondary rounded p-1 w-100 text-center">
@@ -160,15 +160,15 @@
               </b-form-group>
             </b-dropdown-form>
           </b-dropdown>
+          <b-button :disabled="selected.length <= 0" variant="primary" class="ml-1" v-if="dataInspectorViewEnabled" :href="'archive+ds9://' + ds9LinkSuffix">Open Selected FITS in DS9</b-button>
           <b-button :disabled="selected.length <= 0" variant="primary" class="mx-1" @click="clearSelected">
             <template><i class="fa fa-times"/></template>
           </b-button>
         </b-col>
-        <b-col>
-          <b-button variant="outline-secondary" v-if="dataInspectorViewEnabled" :href="'archive+ds9://' + ds9LinkSuffix">Open Selected FITS in DS9</b-button>
-        </b-col>
         <b-col class="text-right">
           <b-button-group>
+            <b-button variant="outline-secondary" :disabled="queryParams.limit > 20" @click="expandAll"><i class="fas fa-plus"></i></b-button>
+            <b-button variant="outline-secondary" :disabled="queryParams.limit > 20" @click="collapseAll"><i class="fas fa-minus"></i></b-button>
             <b-button variant="outline-secondary" @click="refreshData"><i class="fas fa-sync-alt"></i></b-button>
             <b-dropdown variant="outline-secondary" right>
               <template #button-content>
@@ -596,6 +596,9 @@ export default {
     ds9LinkSuffix: function() {
       let archiveToken = localStorage.getItem('archiveToken');
       return '?frame_ids=' + String(this.selected) + '&token=' + archiveToken + '&frame_url=' + this.archiveApiUrl + '/frames/';
+    },
+    sidebarWidth: function() {
+      return this.dataInspectorViewEnabled ? '1.5' : '2'
     }
   },
   created: function() {
@@ -651,6 +654,16 @@ export default {
     },
     getDateFormat: function() {
       return 'YYYY-MM-DD HH:mm';
+    },
+    expandAll: function() {
+      for (let item of this.data.results){
+        this.$set(item, '_showDetails', true)
+      }
+    },
+    collapseAll: function() {
+      for (let item of this.data.results){
+        this.$set(item, '_showDetails', false)
+      }
     },
     getTimeRangeFilters: function() {
       let filterDateRangeOptions = {};
@@ -813,7 +826,8 @@ export default {
         public: undefined,
         ordering: '',
         limit: 20,
-        offset: 0
+        offset: 0,
+        expand_all: false
       };
       return defaultQueryParams;
     },
@@ -832,6 +846,11 @@ export default {
       this.update();
       // update the available selections based on the newly-selected params
       this.updateFilters();
+    },
+    onSuccessfulDataRetrieval: function() {
+      if(this.queryParams.expand_all === 'true' && this.queryParams.limit <= 20) {
+        this.expandAll()
+      }
     },
     setOptions: function(optionKey, availableOptions) {
       // optionKey must be (is expected to be) one of the keys inside allAggregatedOptions
