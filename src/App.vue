@@ -58,7 +58,7 @@
     <b-alert v-if="userIsAuthenticatedAndNotMemberOfProposals" variant="info" dismissible>
       <div>You are not a member of any proposals. Only public data will be shown.</div>
     </b-alert>
-    <b-container :fluid="dataInspectorViewEnabled" class="flex-shrink-0 px-4 py-1">
+    <b-container :fluid="dataInspectorViewEnabled" class="flex-shrink-0 px-5 py-1">
       <router-view class="my-3" />
     </b-container>
     <ArchiveFooter

@@ -167,8 +167,8 @@
         </b-col>
         <b-col class="text-right">
           <b-button-group>
-            <b-button variant="outline-secondary" :disabled="queryParams.limit > 20" @click="expandAll"><i class="fas fa-plus"></i></b-button>
-            <b-button variant="outline-secondary" :disabled="queryParams.limit > 20" @click="collapseAll"><i class="fas fa-minus"></i></b-button>
+            <b-button variant="outline-secondary" :disabled="expandAllDisabled" @click="expandAll"><i class="fas fa-plus"></i></b-button>
+            <b-button variant="outline-secondary" :disabled="expandAllDisabled" @click="collapseAll"><i class="fas fa-minus"></i></b-button>
             <b-button variant="outline-secondary" @click="refreshData"><i class="fas fa-sync-alt"></i></b-button>
             <b-dropdown variant="outline-secondary" right>
               <template #button-content>
@@ -184,6 +184,7 @@
                     :name="'checkbox-' + value.key"
                     :value="false"
                     :unchecked-value="true"
+                    @change="onFieldsChanged"
                   >
                     <span v-if="value.label">{{ value.label }}</span>
                     <span v-else>{{ value.key }}</span>
@@ -598,7 +599,11 @@ export default {
       return '?frame_ids=' + String(this.selected) + '&token=' + archiveToken + '&frame_url=' + this.archiveApiUrl + '/frames/';
     },
     sidebarWidth: function() {
-      return this.dataInspectorViewEnabled ? '1.5' : '2'
+      // make the data inspector sidebar a bit smaller to maximize data table space
+      return this.dataInspectorViewEnabled ? '1.5' : '2';
+    },
+    expandAllDisabled: function() {
+      return this.queryParams.limit > 50
     }
   },
   created: function() {
@@ -637,6 +642,7 @@ export default {
         this.refreshData();
       }
     );
+    this.setSelectedFields();
   },
   methods: {
     exportTable: function(type) {
@@ -656,13 +662,22 @@ export default {
       return 'YYYY-MM-DD HH:mm';
     },
     expandAll: function() {
-      for (let item of this.data.results){
-        this.$set(item, '_showDetails', true)
+      for (let item of this.data.results) {
+        this.$set(item, '_showDetails', true);
       }
     },
     collapseAll: function() {
-      for (let item of this.data.results){
-        this.$set(item, '_showDetails', false)
+      for (let item of this.data.results) {
+        this.$set(item, '_showDetails', false);
+      }
+    },
+    setSelectedFields: function() {
+      // if visible fields preferences are set in local storage, set them here
+      let visibleFields = JSON.parse(localStorage.getItem('visibleFields'));
+      if (visibleFields !== null) {
+        for (let field of this.fields) {
+          field.hidden = _.includes(visibleFields, field.key) ? false : true;
+        }
       }
     },
     getTimeRangeFilters: function() {
@@ -848,8 +863,9 @@ export default {
       this.updateFilters();
     },
     onSuccessfulDataRetrieval: function() {
-      if(this.queryParams.expand_all === 'true' && this.queryParams.limit <= 20) {
-        this.expandAll()
+      // if the expand_all param is specified in the query params, make sure we automatically expand all the rows
+      if (this.queryParams.expand_all === 'true' && !this.expandAllDisabled) {
+        this.expandAll();
       }
     },
     setOptions: function(optionKey, availableOptions) {
@@ -942,6 +958,13 @@ export default {
       this.queryParams.ordering = this.getOrderingFromSort(event.sortDesc, event.sortBy);
       this.goToFirstPage();
       this.update();
+    },
+    onFieldsChanged: function() {
+      // store the names of the visible fields in local storage to persist them
+      let visibleFieldNames = _.map(this.visibleFields, function(field) {
+        return field.key;
+      });
+      localStorage.setItem('visibleFields', JSON.stringify(visibleFieldNames));
     }
   }
 };
