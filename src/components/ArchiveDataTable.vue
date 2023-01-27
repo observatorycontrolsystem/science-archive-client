@@ -161,7 +161,7 @@
             </b-dropdown-form>
           </b-dropdown>
           <b-button :disabled="selected.length <= 0" variant="primary" class="ml-1" v-if="dataInspectorViewEnabled" :href="'archive+ds9://' + ds9LinkSuffix">Open Selected FITS in DS9</b-button>
-          <b-button :disabled="selected.length <= 0" variant="primary" class="mx-1" @click="clearSelected">
+          <b-button :disabled="selected.length <= 0" variant="primary" class="mx-1" @click="clearSelected" v-b-tooltip.hover title="Clear selected data">
             <template><i class="fa fa-times"/></template>
           </b-button>
         </b-col>
