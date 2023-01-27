@@ -167,10 +167,10 @@
         </b-col>
         <b-col class="text-right">
           <b-button-group>
-            <b-button variant="outline-secondary" :disabled="expandAllDisabled" @click="expandAll"><i class="fas fa-plus"></i></b-button>
-            <b-button variant="outline-secondary" :disabled="expandAllDisabled" @click="collapseAll"><i class="fas fa-minus"></i></b-button>
-            <b-button variant="outline-secondary" @click="refreshData"><i class="fas fa-sync-alt"></i></b-button>
-            <b-dropdown variant="outline-secondary" right>
+            <b-button variant="outline-secondary" :disabled="expandAllDisabled" @click="expandAll" v-b-tooltip.hover title="Expand all table rows"><i class="fas fa-plus"></i></b-button>
+            <b-button variant="outline-secondary" :disabled="expandAllDisabled" @click="collapseAll" v-b-tooltip.hover title="Collapse all table rows"><i class="fas fa-minus"></i></b-button>
+            <b-button variant="outline-secondary" @click="refreshData"><i class="fas fa-sync-alt" v-b-tooltip.hover title="Refresh data"></i></b-button>
+            <b-dropdown variant="outline-secondary" right v-b-tooltip.hover title="Select/deselect data fields">
               <template #button-content>
                 <i class="fas fa-table"></i>
               </template>
@@ -192,7 +192,7 @@
                 </div>
               </b-dropdown-form>
             </b-dropdown>
-            <b-dropdown variant="outline-secondary" right>
+            <b-dropdown variant="outline-secondary" right v-b-tooltip.hover title="Export data">
               <template #button-content>
                 <i class="fas fa-file-export"></i>
               </template>
