@@ -5,7 +5,7 @@
         {{ alertModalMessage }}
       </div>
     </b-modal>
-    <b-col md="2">
+    <b-col :md="sidebarWidth">
       <b-form @submit="onSubmit" @reset="onReset">
         <b-form-group id="input-group-daterange" class="my-1">
           <div id="date-range-picker" class="border border-secondary rounded p-1 w-100 text-center">
@@ -160,14 +160,17 @@
               </b-form-group>
             </b-dropdown-form>
           </b-dropdown>
-          <b-button :disabled="selected.length <= 0" variant="primary" class="mx-1" @click="clearSelected">
+          <b-button :disabled="selected.length <= 0" variant="primary" class="ml-1" v-if="dataInspectorViewEnabled" :href="'archive+ds9://' + ds9LinkSuffix">Open Selected FITS in DS9</b-button>
+          <b-button :disabled="selected.length <= 0" variant="primary" class="mx-1" @click="clearSelected" v-b-tooltip.hover title="Clear selected data">
             <template><i class="fa fa-times"/></template>
           </b-button>
         </b-col>
         <b-col class="text-right">
           <b-button-group>
-            <b-button variant="outline-secondary" @click="refreshData"><i class="fas fa-sync-alt"></i></b-button>
-            <b-dropdown variant="outline-secondary" right>
+            <b-button variant="outline-secondary" :disabled="expandAllDisabled" @click="expandAll" v-b-tooltip.hover title="Expand all table rows"><i class="fas fa-plus"></i></b-button>
+            <b-button variant="outline-secondary" :disabled="expandAllDisabled" @click="collapseAll" v-b-tooltip.hover title="Collapse all table rows"><i class="fas fa-minus"></i></b-button>
+            <b-button variant="outline-secondary" @click="refreshData"><i class="fas fa-sync-alt" v-b-tooltip.hover title="Refresh data"></i></b-button>
+            <b-dropdown variant="outline-secondary" right v-b-tooltip.hover title="Select/deselect data fields">
               <template #button-content>
                 <i class="fas fa-table"></i>
               </template>
@@ -181,6 +184,7 @@
                     :name="'checkbox-' + value.key"
                     :value="false"
                     :unchecked-value="true"
+                    @change="onFieldsChanged"
                   >
                     <span v-if="value.label">{{ value.label }}</span>
                     <span v-else>{{ value.key }}</span>
@@ -188,7 +192,7 @@
                 </div>
               </b-dropdown-form>
             </b-dropdown>
-            <b-dropdown variant="outline-secondary" right>
+            <b-dropdown variant="outline-secondary" right v-b-tooltip.hover title="Export data">
               <template #button-content>
                 <i class="fas fa-file-export"></i>
               </template>
@@ -583,6 +587,23 @@ export default {
         start: _.min([offset + 1, this.data.count]),
         end: _.min([offset + limit, this.data.count])
       };
+    },
+    userIsStaff: function() {
+      return this.$store.state.profile.is_staff;
+    },
+    dataInspectorViewEnabled: function() {
+      return this.userIsStaff && this.$store.state.inspectorViewEnabled;
+    },
+    ds9LinkSuffix: function() {
+      let archiveToken = localStorage.getItem('archiveToken');
+      return '?frame_ids=' + String(this.selected) + '&token=' + archiveToken + '&frame_url=' + this.archiveApiUrl + '/frames/';
+    },
+    sidebarWidth: function() {
+      // make the data inspector sidebar a bit smaller to maximize data table space
+      return this.dataInspectorViewEnabled ? '1.5' : '2';
+    },
+    expandAllDisabled: function() {
+      return this.queryParams.limit > 50
     }
   },
   created: function() {
@@ -621,6 +642,7 @@ export default {
         this.refreshData();
       }
     );
+    this.setSelectedFields();
   },
   methods: {
     exportTable: function(type) {
@@ -638,6 +660,25 @@ export default {
     },
     getDateFormat: function() {
       return 'YYYY-MM-DD HH:mm';
+    },
+    expandAll: function() {
+      for (let item of this.data.results) {
+        this.$set(item, '_showDetails', true);
+      }
+    },
+    collapseAll: function() {
+      for (let item of this.data.results) {
+        this.$set(item, '_showDetails', false);
+      }
+    },
+    setSelectedFields: function() {
+      // if visible fields preferences are set in local storage, set them here
+      let visibleFields = JSON.parse(localStorage.getItem('visibleFields'));
+      if (visibleFields !== null) {
+        for (let field of this.fields) {
+          field.hidden = _.includes(visibleFields, field.key) ? false : true;
+        }
+      }
     },
     getTimeRangeFilters: function() {
       let filterDateRangeOptions = {};
@@ -800,7 +841,8 @@ export default {
         public: undefined,
         ordering: '',
         limit: 20,
-        offset: 0
+        offset: 0,
+        expand_all: false
       };
       return defaultQueryParams;
     },
@@ -819,6 +861,12 @@ export default {
       this.update();
       // update the available selections based on the newly-selected params
       this.updateFilters();
+    },
+    onSuccessfulDataRetrieval: function() {
+      // if the expand_all param is specified in the query params, make sure we automatically expand all the rows
+      if (this.queryParams.expand_all === 'true' && !this.expandAllDisabled) {
+        this.expandAll();
+      }
     },
     setOptions: function(optionKey, availableOptions) {
       // optionKey must be (is expected to be) one of the keys inside allAggregatedOptions
@@ -910,6 +958,13 @@ export default {
       this.queryParams.ordering = this.getOrderingFromSort(event.sortDesc, event.sortBy);
       this.goToFirstPage();
       this.update();
+    },
+    onFieldsChanged: function() {
+      // store the names of the visible fields in local storage to persist them
+      let visibleFieldNames = _.map(this.visibleFields, function(field) {
+        return field.key;
+      });
+      localStorage.setItem('visibleFields', JSON.stringify(visibleFieldNames));
     }
   }
 };
