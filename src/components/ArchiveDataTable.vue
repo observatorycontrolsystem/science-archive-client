@@ -218,6 +218,7 @@
         :fields="visibleFields"
         :busy="isBusy"
         small
+        :striped="dataInspectorViewEnabled"
         show-empty
         responsive
         selectable
