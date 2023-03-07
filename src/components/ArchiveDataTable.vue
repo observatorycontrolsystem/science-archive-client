@@ -980,7 +980,9 @@ Make table header position relative to avoid horizontal overflow.
 Should be fixed in boostrap-vue 2.22.0
 https://github.com/bootstrap-vue/bootstrap-vue/issues/6326
 -->
-<style>
+<style lang="scss">
+@import '@/assets/scss/custom-colors.scss';
+
 th {
   position: relative;
 }
@@ -991,6 +993,10 @@ th {
 
 .daterangepicker .apply-cancel-buttons {
   text-align: right;
+}
+
+.table-hover tbody tr:hover td {
+    background: $tan;
 }
 
 </style>
