@@ -71,6 +71,13 @@ a.nav-link{
   background-color: $blue;
 }
 
+.modal-header {
+  background-color: $blue;
+}
+
+.modal-header .close{
+  color: $white;
+}
 // General styling
 
 html {
