@@ -71,6 +71,11 @@ a.nav-link{
   background-color: $blue;
 }
 
+.mx-table tbody td:hover {
+  background-color: $blue !important;
+  color: $white !important;
+}
+
 .modal-header {
   background-color: $blue;
 }
