@@ -549,8 +549,38 @@ export default {
       return [{text: "This Semester", 
                onClick: () => {
                 return[this.filterDateRangeOptions["This Semester"][0].toJSDate(), this.filterDateRangeOptions["This Semester"][1].toJSDate()]
-               },    
+               }
+              },
+               {text: "Last Semester", 
+               onClick: () => {
+                return[this.filterDateRangeOptions["Last Semester"][0].toJSDate(), this.filterDateRangeOptions["Last Semester"][1].toJSDate()]
+               }
+              },
+               {text: "Last 7 Days", 
+               onClick: () => {
+                return[this.filterDateRangeOptions["Last 7 Days"][0].toJSDate(), this.filterDateRangeOptions["Last 7 Days"][1].toJSDate()]
+               }
+              },
+               {text: "Last 30 Days", 
+               onClick: () => {
+                return[this.filterDateRangeOptions["Last 30 Days"][0].toJSDate(), this.filterDateRangeOptions["Last 30 Days"][1].toJSDate()]
+               }
+              },
+               {text: "All Time", 
+               onClick: () => {
+                if (this.allTimeAllowed) {
+                  this.queryParams.public = true;
+                  return[this.filterDateRangeOptions["All Time"][0].toJSDate(), this.filterDateRangeOptions["All Time"][1].toJSDate()]
+                }
+                else {
+                  this.alertModalMessage = "The 'All Time' filter requires either the proposal name or object name to be set. Please constrain your query further."
+                  this.$bvModal.show('bv-modal-alert');
+                }
+               },
               }]
+    },
+    allTimeAllowed: function() {
+      return this.queryParams.proposal_id != '' || this.queryParams.target_name != ''
     },
     selectedReductionLevel: {
       // Return the correct human-readable representation of the selected reduction level
@@ -726,16 +756,12 @@ export default {
             .startOf('day')
             .minus({ days: 29 }),
           DateTime.utc().endOf('day')
-        ]
-      });
-      if (this.allTimeAllowed) {
-        _.merge(filterDateRangeOptions, {
-          'All Time': [
-          DateTime.utc('2014-01-01 00:00'),
+        ],
+        'All Time': [
+          DateTime.fromISO('2014-01-01T00:00:00', {zone: 'utc'}),
           DateTime.utc().endOf('day')
         ]
-      })
-      }
+      });
       return filterDateRangeOptions;
     },
     getCurrentOrLastSemester: function(currentOrLast) {
@@ -1017,5 +1043,11 @@ th {
   display: none;
 }
 
-</style>
+.mx-datepicker-sidebar {
+  width: auto;
+}
 
+.mx-datepicker-sidebar + .mx-datepicker-content {
+  margin-left: 150px;
+}
+</style>
