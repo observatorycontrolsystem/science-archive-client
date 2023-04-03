@@ -688,17 +688,17 @@ export default {
     getDateFormat: function() {
       return 'yyyy-LL-dd HH:mm';
     },
-    setStartEnd: function(startEndArray) {
-      this.queryParams.start = startEndArray[0].toFormat(this.getDateFormat());
-      this.queryParams.end = startEndArray[1].toFormat(this.getDateFormat());
-      this.refreshData();
-    },
     onDatePickerChange: function() {
-      this.queryParams.start = DateTime.fromJSDate(this.selectedTimeRange[0])
-      this.queryParams.end = DateTime.fromJSDate(this.selectedTimeRange[1])
+      let start = DateTime.fromJSDate(this.selectedTimeRange[0])
+      let end = DateTime.fromJSDate(this.selectedTimeRange[1])
+
+      // if the start is greater than a year back from today, then set query params to public
+      if (DateTime.now().toUTC().diff(start, ['years']).toObject().years > 1) {
+        this.queryParams.public = true;
+      }
       
-      this.queryParams.start = this.queryParams.start.startOf('day').toFormat(this.getDateFormat());
-      this.queryParams.end = this.queryParams.end.endOf('day').toFormat(this.getDateFormat());
+      this.queryParams.start = start.startOf('day').toFormat(this.getDateFormat());
+      this.queryParams.end = end.endOf('day').toFormat(this.getDateFormat());
 
       this.refreshData();
     },
