@@ -38,18 +38,6 @@
         >
           <template #label><b> Proposal </b><sup v-b-tooltip.hover.right class="blue" title="Log in to view your proposals">?</sup> </template>
         </aggregated-options-select>
-        <b-form-group id="input-group-public" class="my-0">
-          <b-form-checkbox
-            id="checkbox-public"
-            v-model="queryParams.public"
-            name="checkbox-public"
-            value="true"
-            unchecked-value="false"
-            @input="refreshData"
-          >
-            Include public data
-          </b-form-checkbox>
-        </b-form-group>
         <b-form-group id="input-group-basename" class="my-1">
           <template #label>
             <b>Image Name</b>
@@ -569,7 +557,6 @@ export default {
                {text: "All Time", 
                onClick: () => {
                 if (this.allTimeAllowed) {
-                  this.queryParams.public = true;
                   return[this.filterDateRangeOptions["All Time"][0].toJSDate(), this.filterDateRangeOptions["All Time"][1].toJSDate()]
                 }
                 else {
@@ -691,11 +678,6 @@ export default {
     onDatePickerChange: function() {
       let start = DateTime.fromJSDate(this.selectedTimeRange[0])
       let end = DateTime.fromJSDate(this.selectedTimeRange[1])
-
-      // if the start is greater than a year back from today, then set query params to public
-      if (DateTime.now().toUTC().diff(start, ['years']).toObject().years > 1) {
-        this.queryParams.public = true;
-      }
       
       this.queryParams.start = start.startOf('day').toFormat(this.getDateFormat());
       this.queryParams.end = end.endOf('day').toFormat(this.getDateFormat());
@@ -881,9 +863,8 @@ export default {
         start: defaultRange[0].toFormat(this.getDateFormat()),
         end: defaultRange[1].toFormat(this.getDateFormat()),
         id: '',
-        covers: '',
-        // keep public as undefined for now, we will set it for users as appropriate on creation of the component
         public: undefined,
+        covers: '',
         ordering: '',
         limit: 20,
         offset: 0,
