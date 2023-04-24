@@ -38,6 +38,34 @@
         >
           <template #label><b> Proposal </b><sup v-b-tooltip.hover.right class="blue" title="Log in to view your proposals">?</sup> </template>
         </aggregated-options-select>
+        <b-form-group id="input-group-science-data" class="my-0">
+          <b-form-checkbox
+            id="checkbox-science-data"
+            v-model="viewOnlyScienceData"
+            name="checkbox-science-data"
+            @input="toggleScienceOnly"
+          >
+            View only science data
+            <sup v-b-tooltip.hover.right class="blue" title="Science data excludes all calibration data">
+              ?
+            </sup>
+          </b-form-checkbox>
+        </b-form-group>
+        <b-form-group id="input-group-public" class="my-0">
+          <b-form-checkbox
+            id="checkbox-public"
+            v-model="queryParams.public"
+            name="checkbox-public"
+            value="true"
+            unchecked-value="false"
+            @input="refreshData"
+          >
+            Include public data
+            <sup v-b-tooltip.hover.right class="blue" title="This will include all public data that is beyond its proprietary period">
+              ?
+            </sup>
+          </b-form-checkbox>
+        </b-form-group>
         <b-form-group id="input-group-basename" class="my-1">
           <template #label>
             <b>Image Name</b>
@@ -321,7 +349,7 @@ export default {
     SimpleSelect,
     TargetLookup,
     FrameDetail,
-    DatePicker
+    DatePicker,
   },
   mixins: [OCSMixin.paginationAndFilteringMixin],
   props: {
@@ -344,6 +372,7 @@ export default {
       selectedTimeRange: null,
       filterDateRangeOptions: filterDateRangeOptions,
       alertModalMessage: '',
+      viewOnlyScienceData: true,
       perPageOptions: [
         { value: '20', text: '20 rows per page' },
         { value: '50', text: '50 rows per page' },
@@ -694,6 +723,10 @@ export default {
         this.$set(item, '_showDetails', false);
       }
     },
+    toggleScienceOnly: function() {
+      this.queryParams.include_configuration_type = this.viewOnlyScienceData ? this.defaultQueryParams.include_configuration_type : '';
+      this.refreshData();
+    },
     setSelectedFields: function() {
       // if visible fields preferences are set in local storage, set them here
       let visibleFields = JSON.parse(localStorage.getItem('visibleFields'));
@@ -868,7 +901,8 @@ export default {
         ordering: '',
         limit: 20,
         offset: 0,
-        expand_all: false
+        expand_all: false,
+        include_configuration_type: ["EXPOSE", "TARGET", "SPECTRUM", "CATALOG", "OBJECT"]
       };
       return defaultQueryParams;
     },
