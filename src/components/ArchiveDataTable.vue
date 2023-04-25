@@ -61,7 +61,7 @@
             @input="refreshData"
           >
             Include public data
-            <sup v-b-tooltip.hover.right class="blue" title="This will include all public data that is beyond its proprietary period">
+            <sup v-b-tooltip.hover.right class="blue" title="This will include all public data that is beyond its proprietary period and not a part of any of your proposals.">
               ?
             </sup>
           </b-form-checkbox>
