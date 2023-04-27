@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-export { itemInList, removeItemFromList };
+export { itemInList, removeItemFromList, scienceConfigurationTypes };
 
 function itemInList(list, item) {
   return _.includes(list, item);
@@ -11,4 +11,8 @@ function removeItemFromList(list, item) {
     return value != item;
   });
   return list;
+}
+
+function scienceConfigurationTypes () {
+  return ["EXPOSE", "TARGET", "SPECTRUM", "CATALOG", "OBJECT"];
 }
