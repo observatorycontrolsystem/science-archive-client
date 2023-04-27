@@ -43,7 +43,6 @@
             id="checkbox-science-data"
             v-model="viewOnlyScienceData"
             name="checkbox-science-data"
-            @input="toggleScienceOnly"
           >
             View only science data
             <sup v-b-tooltip.hover.right class="blue" title="Science data excludes all calibration data">
@@ -333,7 +332,7 @@ import 'bootstrap-daterangepicker-v2';
 import 'bootstrap-daterangepicker-v2/daterangepicker.css';
 import { OCSMixin, OCSUtil } from 'ocs-component-lib';
 import { DateTime } from 'luxon';
-import { itemInList, removeItemFromList } from '@/util.js';
+import { itemInList, removeItemFromList, scienceConfigurationTypes} from '@/util.js';
 import { downloadZip, downloadWget } from '@/download.js';
 import AggregatedOptionsSelect from '@/components/AggregatedOptionsSelect.vue';
 import SimpleSelect from '@/components/SimpleSelect.vue';
@@ -372,7 +371,6 @@ export default {
       selectedTimeRange: null,
       filterDateRangeOptions: filterDateRangeOptions,
       alertModalMessage: '',
-      viewOnlyScienceData: true,
       perPageOptions: [
         { value: '20', text: '20 rows per page' },
         { value: '50', text: '50 rows per page' },
@@ -562,6 +560,16 @@ export default {
         this.refreshData();
       }, 500)
     },
+    viewOnlyScienceData: {
+      get: function() {
+        let configurationTypes = scienceConfigurationTypes();
+        return _.isEqual(this.queryParams.include_configuration_type, configurationTypes);
+      },
+      set: function(newValue) {
+          this.queryParams.include_configuration_type = newValue ? scienceConfigurationTypes() : null;
+          this.refreshData();
+      }
+    },
     datepickerShortcuts: function() {
       return [{text: "This Semester", 
                onClick: () => {
@@ -722,10 +730,6 @@ export default {
       for (let item of this.data.results) {
         this.$set(item, '_showDetails', false);
       }
-    },
-    toggleScienceOnly: function() {
-      this.queryParams.include_configuration_type = this.viewOnlyScienceData ? this.defaultQueryParams.include_configuration_type : '';
-      this.refreshData();
     },
     setSelectedFields: function() {
       // if visible fields preferences are set in local storage, set them here
@@ -896,13 +900,14 @@ export default {
         start: defaultRange[0].toFormat(this.getDateFormat()),
         end: defaultRange[1].toFormat(this.getDateFormat()),
         id: '',
-        public: undefined,
         covers: '',
         ordering: '',
         limit: 20,
         offset: 0,
         expand_all: false,
-        include_configuration_type: ["EXPOSE", "TARGET", "SPECTRUM", "CATALOG", "OBJECT"]
+        // set these two in the router
+        public: undefined,
+        include_configuration_type: undefined
       };
       return defaultQueryParams;
     },
