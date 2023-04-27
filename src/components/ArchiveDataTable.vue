@@ -94,7 +94,7 @@
           v-model="queryParams.configuration_type"
           label="Observation Type"
           :options="categorizedAggregatedOptions.obstypes"
-          @input="refreshData"
+          @input="onConfigurationTypeInput"
         />
         <b-form-group id="input-group-rlevel" class="my-1">
           <template #label>
@@ -567,6 +567,10 @@ export default {
       },
       set: function(newValue) {
           this.queryParams.include_configuration_type = newValue ? scienceConfigurationTypes() : null;
+          // make sure we clear out selected configuration type if we're viewing only science frames
+          if (newValue) {
+            this.queryParams.configuration_type = '';
+          }
           this.refreshData();
       }
     },
@@ -711,6 +715,13 @@ export default {
     },
     getDateFormat: function() {
       return 'yyyy-LL-dd HH:mm';
+    },
+    onConfigurationTypeInput: function() {
+      if (this.queryParams.configuration_type != '')
+      {
+        this.queryParams.include_configuration_type = '';
+      }
+      this.refreshData();
     },
     onDatePickerChange: function() {
       let start = DateTime.fromJSDate(this.selectedTimeRange[0])
