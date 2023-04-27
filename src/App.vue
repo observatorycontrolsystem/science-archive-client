@@ -74,6 +74,7 @@
 </template>
 <script>
 import ArchiveFooter from '@/components/ArchiveFooter.vue';
+import { scienceConfigurationTypes } from '@/util';
 
 export default {
   name: 'App',
@@ -105,6 +106,8 @@ export default {
           localStorage.setItem('staff-inspector-view', true);
         }
         this.$store.commit('toggleStaffDataInspector');
+        // set the query params properly before reload
+        this.$router.replace({ path: "/", params: { include_configuration_type: localStorage.getItem('staff-inspector-view') ? null : scienceConfigurationTypes() }});
         location.reload();
       }
     }
