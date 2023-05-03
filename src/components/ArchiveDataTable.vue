@@ -332,7 +332,7 @@ import 'bootstrap-daterangepicker-v2';
 import 'bootstrap-daterangepicker-v2/daterangepicker.css';
 import { OCSMixin, OCSUtil } from 'ocs-component-lib';
 import { DateTime } from 'luxon';
-import { itemInList, removeItemFromList, scienceConfigurationTypes} from '@/util.js';
+import { itemInList, removeItemFromList } from '@/util.js';
 import { downloadZip, downloadWget } from '@/download.js';
 import AggregatedOptionsSelect from '@/components/AggregatedOptionsSelect.vue';
 import SimpleSelect from '@/components/SimpleSelect.vue';
@@ -562,13 +562,12 @@ export default {
     },
     viewOnlyScienceData: {
       get: function() {
-        let configurationTypes = scienceConfigurationTypes();
-        return _.isEqual(this.queryParams.include_configuration_type, configurationTypes);
+        return this.queryParams.exclude_calibrations;
       },
-      set: function(newValue) {
-          this.queryParams.include_configuration_type = newValue ? scienceConfigurationTypes() : null;
+      set: function(scienceOnly) {
+          this.queryParams.exclude_calibrations = scienceOnly ? true : false;
           // make sure we clear out selected configuration type if we're viewing only science frames
-          if (newValue) {
+          if (scienceOnly) {
             this.queryParams.configuration_type = '';
           }
           this.refreshData();
@@ -717,9 +716,8 @@ export default {
       return 'yyyy-LL-dd HH:mm';
     },
     onConfigurationTypeInput: function() {
-      if (this.queryParams.configuration_type != '')
-      {
-        this.queryParams.include_configuration_type = '';
+      if (this.queryParams.configuration_type != '') {
+        this.queryParams.exclude_calibrations = false;
       }
       this.refreshData();
     },
@@ -918,7 +916,7 @@ export default {
         expand_all: false,
         // set these two in the router
         public: undefined,
-        include_configuration_type: undefined
+        exclude_calibrations: undefined
       };
       return defaultQueryParams;
     },
@@ -1081,4 +1079,5 @@ th {
 .mx-datepicker-sidebar + .mx-datepicker-content {
   margin-left: 150px;
 }
+
 </style>

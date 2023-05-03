@@ -4,7 +4,6 @@ import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
 import NotFound from '../components/NotFound.vue';
 import store from '../store';
-import { scienceConfigurationTypes } from '../util';
 
 Vue.use(VueRouter);
 
@@ -15,7 +14,7 @@ const routes = [
     component: Home,
     beforeEnter: (to, from, next) => {
       // if the route contains a public parameter, honor that
-      if (to.query.public != undefined || to.query.include_configuration_type != undefined) {
+      if (to.query.public != undefined || to.query.exclude_calibrations != undefined) {
         next();
         return;
       }
@@ -25,11 +24,11 @@ const routes = [
       if (store.state.userIsAuthenticated) {
         let query = {...to.query, public: "false"};
         // make sure we set the include_configuration_type correctly based on the DQI setting
-        query.include_configuration_type = store.state.inspectorViewEnabled ? null : scienceConfigurationTypes();
+        query.exclude_calibrations = store.state.inspectorViewEnabled ? false : true;
         next({ name: 'Home', query: query});
       } else {
         // anonymous users should only see public data and science data by default
-          next({ name: 'Home', query: {...to.query, public: "true", include_configuration_type: scienceConfigurationTypes()}});
+          next({ name: 'Home', query: {...to.query, public: "true", exclude_calibrations: "true"}});
       }
     }
   },
