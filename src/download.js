@@ -3,7 +3,7 @@ import 'jquery-file-download';
 
 export { downloadZip, downloadWget };
 
-function downloadZip(frameIds, uncompress, archiveRoot, archiveToken) {
+function downloadZip(frameIds, uncompress, catalog, archiveRoot, archiveToken) {
   let postData = {};
 
   frameIds.forEach(function(value, i) {
@@ -11,6 +11,7 @@ function downloadZip(frameIds, uncompress, archiveRoot, archiveToken) {
   });
   postData['auth_token'] = archiveToken;
   postData['uncompress'] = uncompress;
+  postData['catalog_only'] = catalog;
 
   $.fileDownload(`${archiveRoot}/frames/zip/`, {
     httpMethod: 'POST',

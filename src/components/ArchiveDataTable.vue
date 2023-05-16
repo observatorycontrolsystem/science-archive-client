@@ -184,6 +184,15 @@
                 </b-form-radio>
                 <b-dropdown-divider />
                 <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="wget">wget script</b-form-radio>
+                <b-dropdown-divider />
+                <b-form-radio
+                  v-model="dltype"
+                  :aria-describedby="ariaDescribedby"
+                  name="dltype"
+                  value="zip-catalog"
+                >
+                  zip download (catalog only)
+                </b-form-radio>
               </b-form-group>
             </b-dropdown-form>
           </b-dropdown>
@@ -857,7 +866,13 @@ export default {
       if (this.dltype === 'zip-compressed' || this.dltype === 'zip-uncompressed') {
         let uncompress = this.dltype === 'zip-compressed' ? false : true;
         downloadZip(frameIds, uncompress, this.archiveApiUrl, archiveToken);
-      } else if (this.dltype === 'wget') {
+      }
+      else if (this.dltype === 'zip-catalog') {
+        let uncompress = false;
+        let catalog = true;
+        downloadZip(frameIds, uncompress, catalog, this.archiveApiUrl, archiveToken);
+      }
+      else if (this.dltype === 'wget') {
         downloadWget(frameIds, archiveToken, this.archiveApiUrl);
       }
     },
