@@ -865,7 +865,8 @@ export default {
       let frameIds = this.selected;
       if (this.dltype === 'zip-compressed' || this.dltype === 'zip-uncompressed') {
         let uncompress = this.dltype === 'zip-compressed' ? false : true;
-        downloadZip(frameIds, uncompress, this.archiveApiUrl, archiveToken);
+        let catalog = false;
+        downloadZip(frameIds, uncompress, catalog, this.archiveApiUrl, archiveToken);
       }
       else if (this.dltype === 'zip-catalog') {
         let uncompress = false;
