@@ -183,8 +183,6 @@
                   zip download (with uncompressed fits files)
                 </b-form-radio>
                 <b-dropdown-divider />
-                <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="wget">wget script</b-form-radio>
-                <b-dropdown-divider />
                 <b-form-radio
                   v-model="dltype"
                   :aria-describedby="ariaDescribedby"
@@ -193,6 +191,9 @@
                 >
                   zip download (catalog only)
                 </b-form-radio>
+                <b-dropdown-divider />
+                <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="wget">wget script</b-form-radio>
+                <b-dropdown-divider />
               </b-form-group>
             </b-dropdown-form>
           </b-dropdown>
