@@ -14,7 +14,7 @@ const routes = [
     component: Home,
     beforeEnter: (to, from, next) => {
       // if the route contains a public parameter, honor that
-      if (to.query.public != undefined) {
+      if (to.query.public != undefined || to.query.exclude_calibrations != undefined) {
         next();
         return;
       }
@@ -22,9 +22,13 @@ const routes = [
       // otherwise send authenticated users to public=false
       // and unauthenticated users to public=true
       if (store.state.userIsAuthenticated) {
-          next({ name: 'Home', query: {...to.query, public: "false"}});
+        let query = {...to.query, public: "false"};
+        // make sure we set the include_configuration_type correctly based on the DQI setting
+        query.exclude_calibrations = store.state.inspectorViewEnabled ? false : true;
+        next({ name: 'Home', query: query});
       } else {
-          next({ name: 'Home', query: {...to.query, public: "true"}});
+        // anonymous users should only see public data and science data by default
+          next({ name: 'Home', query: {...to.query, public: "true", exclude_calibrations: "true"}});
       }
     }
   },

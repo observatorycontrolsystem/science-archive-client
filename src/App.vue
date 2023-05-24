@@ -105,6 +105,8 @@ export default {
           localStorage.setItem('staff-inspector-view', true);
         }
         this.$store.commit('toggleStaffDataInspector');
+        // set the query params properly before reload
+        this.$router.replace({ path: "/", params: { exclude_calibrations : localStorage.getItem('staff-inspector-view') ? false : true }});
         location.reload();
       }
     }

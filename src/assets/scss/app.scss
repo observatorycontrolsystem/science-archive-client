@@ -62,6 +62,27 @@ a.nav-link{
   color: $black;
 }
 
+.mx-calendar-content .cell.in-range {
+  color: #e7eff5;
+  background-color: #5c94bc;
+}
+
+.mx-calendar-content .cell.active {
+  background-color: $blue;
+}
+
+.mx-table tbody td:hover {
+  background-color: $blue !important;
+  color: $white !important;
+}
+
+.modal-header {
+  background-color: $blue;
+}
+
+.modal-header .close{
+  color: $white;
+}
 // General styling
 
 html {

@@ -8,10 +8,22 @@
     <b-col :md="sidebarWidth">
       <b-form @submit="onSubmit" @reset="onReset">
         <b-form-group id="input-group-daterange" class="my-1">
-          <div id="date-range-picker" class="border border-secondary rounded p-1 w-100 text-center">
-            <i class="far fa-calendar"></i> {{ queryParams.start }} <br />
-            <i class="fas fa-caret-down"></i> {{ queryParams.end }}
-          </div>
+          <date-picker 
+            v-model=selectedTimeRange 
+            range
+            :clearable="false"
+            ref="datePicker"
+            format='YYYY-MM-DD'
+            @change="onDatePickerChange"
+            :shortcuts = "datepickerShortcuts"
+            >
+            <template v-slot:input>
+              <div id="date-range-picker" class="border border-secondary rounded p-1 w-100 text-center">
+                <i class="far fa-calendar"></i> {{ queryParams.start }} <br />
+                <i class="fas fa-caret-down"></i> {{ queryParams.end }}
+              </div>
+            </template>
+          </date-picker>
         </b-form-group>
         <aggregated-options-select
           id="proposals"
@@ -26,6 +38,18 @@
         >
           <template #label><b> Proposal </b><sup v-b-tooltip.hover.right class="blue" title="Log in to view your proposals">?</sup> </template>
         </aggregated-options-select>
+        <b-form-group id="input-group-science-data" class="my-0">
+          <b-form-checkbox
+            id="checkbox-science-data"
+            v-model="viewOnlyScienceData"
+            name="checkbox-science-data"
+          >
+            View only science data
+            <sup v-b-tooltip.hover.right class="blue" title="Science data excludes all calibration data">
+              ?
+            </sup>
+          </b-form-checkbox>
+        </b-form-group>
         <b-form-group id="input-group-public" class="my-0">
           <b-form-checkbox
             id="checkbox-public"
@@ -36,6 +60,9 @@
             @input="refreshData"
           >
             Include public data
+            <sup v-b-tooltip.hover.right class="blue" title="This will include all public data that is beyond its proprietary period and not a part of any of your proposals.">
+              ?
+            </sup>
           </b-form-checkbox>
         </b-form-group>
         <b-form-group id="input-group-basename" class="my-1">
@@ -67,7 +94,7 @@
           v-model="queryParams.configuration_type"
           label="Observation Type"
           :options="categorizedAggregatedOptions.obstypes"
-          @input="refreshData"
+          @input="onConfigurationTypeInput"
         />
         <b-form-group id="input-group-rlevel" class="my-1">
           <template #label>
@@ -156,7 +183,17 @@
                   zip download (with uncompressed fits files)
                 </b-form-radio>
                 <b-dropdown-divider />
+                <b-form-radio
+                  v-model="dltype"
+                  :aria-describedby="ariaDescribedby"
+                  name="dltype"
+                  value="zip-catalog"
+                >
+                  zip download (catalog only)
+                </b-form-radio>
+                <b-dropdown-divider />
                 <b-form-radio v-model="dltype" :aria-describedby="ariaDescribedby" name="dltype" value="wget">wget script</b-form-radio>
+                <b-dropdown-divider />
               </b-form-group>
             </b-dropdown-form>
           </b-dropdown>
@@ -300,18 +337,19 @@
 <script>
 import _ from 'lodash';
 import $ from 'jquery';
-import moment from 'moment';
 const Terraformer = require('@terraformer/spatial');
 import 'bootstrap-daterangepicker-v2';
 import 'bootstrap-daterangepicker-v2/daterangepicker.css';
 import { OCSMixin, OCSUtil } from 'ocs-component-lib';
-
+import { DateTime } from 'luxon';
 import { itemInList, removeItemFromList } from '@/util.js';
 import { downloadZip, downloadWget } from '@/download.js';
 import AggregatedOptionsSelect from '@/components/AggregatedOptionsSelect.vue';
 import SimpleSelect from '@/components/SimpleSelect.vue';
 import TargetLookup from '@/components/TargetLookup.vue';
 import FrameDetail from '@/components/FrameDetail.vue';
+import DatePicker from 'vue2-datepicker';
+import 'vue2-datepicker/index.css';
 
 export default {
   name: 'ArchiveDataTable',
@@ -319,7 +357,8 @@ export default {
     AggregatedOptionsSelect,
     SimpleSelect,
     TargetLookup,
-    FrameDetail
+    FrameDetail,
+    DatePicker,
   },
   mixins: [OCSMixin.paginationAndFilteringMixin],
   props: {
@@ -339,6 +378,7 @@ export default {
       dltype: 'zip-compressed',
       maxFunpackedFrames: 10,
       selected: [],
+      selectedTimeRange: null,
       filterDateRangeOptions: filterDateRangeOptions,
       alertModalMessage: '',
       perPageOptions: [
@@ -499,7 +539,7 @@ export default {
             return this.getReductionLevelText(value.toString(), item.telescope_id);
           }
         }
-      ]
+      ],
     };
   },
   computed: {
@@ -529,6 +569,55 @@ export default {
         this.queryParams.exposure_time = newExposureTime;
         this.refreshData();
       }, 500)
+    },
+    viewOnlyScienceData: {
+      get: function() {
+        return this.queryParams.exclude_calibrations;
+      },
+      set: function(scienceOnly) {
+          this.queryParams.exclude_calibrations = scienceOnly ? true : false;
+          // make sure we clear out selected configuration type if we're viewing only science frames
+          if (scienceOnly) {
+            this.queryParams.configuration_type = '';
+          }
+          this.refreshData();
+      }
+    },
+    datepickerShortcuts: function() {
+      return [{text: "This Semester", 
+               onClick: () => {
+                return[this.filterDateRangeOptions["This Semester"][0].toJSDate(), this.filterDateRangeOptions["This Semester"][1].toJSDate()]
+               }
+              },
+               {text: "Last Semester", 
+               onClick: () => {
+                return[this.filterDateRangeOptions["Last Semester"][0].toJSDate(), this.filterDateRangeOptions["Last Semester"][1].toJSDate()]
+               }
+              },
+               {text: "Last 7 Days", 
+               onClick: () => {
+                return[this.filterDateRangeOptions["Last 7 Days"][0].toJSDate(), this.filterDateRangeOptions["Last 7 Days"][1].toJSDate()]
+               }
+              },
+               {text: "Last 30 Days", 
+               onClick: () => {
+                return[this.filterDateRangeOptions["Last 30 Days"][0].toJSDate(), this.filterDateRangeOptions["Last 30 Days"][1].toJSDate()]
+               }
+              },
+               {text: "All Time", 
+               onClick: () => {
+                if (this.allTimeAllowed) {
+                  return[this.filterDateRangeOptions["All Time"][0].toJSDate(), this.filterDateRangeOptions["All Time"][1].toJSDate()]
+                }
+                else {
+                  this.alertModalMessage = "The 'All Time' filter requires either the proposal name or object name to be set. Please constrain your query further."
+                  this.$bvModal.show('bv-modal-alert');
+                }
+               },
+              }]
+    },
+    allTimeAllowed: function() {
+      return this.queryParams.proposal_id != '' || this.queryParams.target_name != ''
     },
     selectedReductionLevel: {
       // Return the correct human-readable representation of the selected reduction level
@@ -605,7 +694,7 @@ export default {
     },
     expandAllDisabled: function() {
       return this.queryParams.limit > 50
-    }
+    },
   },
   created: function() {
     this.updateFilters();
@@ -617,32 +706,6 @@ export default {
         this.alertModalMessage = '';
       }
     });
-
-    $('#date-range-picker').daterangepicker(
-      {
-        locale: {
-          format: this.getDateFormat()
-        },
-        opens: 'right',
-        timePicker: true,
-        timePicker24Hour: true,
-        timePickerIncrement: 1,
-        showDropdowns: true,
-        startDate: moment.utc(this.queryParams.start, this.getDateFormat()),
-        endDate: moment.utc(this.queryParams.end, this.getDateFormat()),
-        ranges: this.filterDateRangeOptions,
-        dateLimit: {
-          "days": 365
-        },
-        linkedCalendars: false,
-        minDate: moment.utc("2010")
-      },
-      (start, end) => {
-        this.queryParams.start = start.format(this.getDateFormat());
-        this.queryParams.end = end.format(this.getDateFormat());
-        this.refreshData();
-      }
-    );
     this.setSelectedFields();
   },
   methods: {
@@ -660,7 +723,22 @@ export default {
       });
     },
     getDateFormat: function() {
-      return 'YYYY-MM-DD HH:mm';
+      return 'yyyy-LL-dd HH:mm';
+    },
+    onConfigurationTypeInput: function() {
+      if (this.queryParams.configuration_type != '') {
+        this.queryParams.exclude_calibrations = false;
+      }
+      this.refreshData();
+    },
+    onDatePickerChange: function() {
+      let start = DateTime.fromJSDate(this.selectedTimeRange[0])
+      let end = DateTime.fromJSDate(this.selectedTimeRange[1])
+      
+      this.queryParams.start = start.startOf('day').toFormat(this.getDateFormat());
+      this.queryParams.end = end.endOf('day').toFormat(this.getDateFormat());
+
+      this.refreshData();
     },
     expandAll: function() {
       for (let item of this.data.results) {
@@ -685,37 +763,41 @@ export default {
       let filterDateRangeOptions = {};
       let currentSemester = this.getCurrentOrLastSemester('current');
       if (currentSemester.start && currentSemester.end) {
-        filterDateRangeOptions['This Semester'] = [moment.utc(currentSemester.start, this.getDateFormat()), moment.utc(currentSemester.end, this.getDateFormat())];
+        filterDateRangeOptions['This Semester'] = [DateTime.fromISO(currentSemester.start, {zone: 'utc'}), DateTime.fromISO(currentSemester.end, {zone: 'utc'})];
       }
       let lastSemester = this.getCurrentOrLastSemester('last');
       if (lastSemester.start && lastSemester.end) {
-        filterDateRangeOptions['Last Semester'] = [moment.utc(lastSemester.start, this.getDateFormat()), moment.utc(lastSemester.end, this.getDateFormat())];
+        filterDateRangeOptions['Last Semester'] = [DateTime.fromISO(lastSemester.start,  {zone: 'utc'}), DateTime.fromISO(lastSemester.end,  {zone: 'utc'})];
       }
       _.merge(filterDateRangeOptions, {
-        Today: [moment.utc().startOf('day'), moment.utc().endOf('day')],
+        Today: [DateTime.utc().startOf('day'), DateTime.utc().endOf('day')],
         Yesterday: [
-          moment
+          DateTime
             .utc()
             .startOf('day')
-            .subtract(1, 'days'),
-          moment
+            .minus({ days : 1 }),
+          DateTime
             .utc()
             .endOf('day')
-            .subtract(1, 'days')
+            .minus({ days: 1 })
         ],
         'Last 7 Days': [
-          moment
+          DateTime
             .utc()
             .startOf('day')
-            .subtract(6, 'days'),
-          moment.utc().endOf('day')
+            .minus({ days: 6 }),
+          DateTime.utc().endOf('day')
         ],
         'Last 30 Days': [
-          moment
+          DateTime
             .utc()
             .startOf('day')
-            .subtract(29, 'days'),
-          moment.utc().endOf('day')
+            .minus({ days: 29 }),
+          DateTime.utc().endOf('day')
+        ],
+        'All Time': [
+          DateTime.fromISO('2014-01-01T00:00:00', {zone: 'utc'}),
+          DateTime.utc().endOf('day')
         ]
       });
       return filterDateRangeOptions;
@@ -784,8 +866,15 @@ export default {
       let frameIds = this.selected;
       if (this.dltype === 'zip-compressed' || this.dltype === 'zip-uncompressed') {
         let uncompress = this.dltype === 'zip-compressed' ? false : true;
-        downloadZip(frameIds, uncompress, this.archiveApiUrl, archiveToken);
-      } else if (this.dltype === 'wget') {
+        let catalog = false;
+        downloadZip(frameIds, uncompress, catalog, this.archiveApiUrl, archiveToken);
+      }
+      else if (this.dltype === 'zip-catalog') {
+        let uncompress = false;
+        let catalog = true;
+        downloadZip(frameIds, uncompress, catalog, this.archiveApiUrl, archiveToken);
+      }
+      else if (this.dltype === 'wget') {
         downloadWget(frameIds, archiveToken, this.archiveApiUrl);
       }
     },
@@ -834,16 +923,17 @@ export default {
         observation_id: '',
         request_id: '',
         basename: '',
-        start: defaultRange[0].format(this.getDateFormat()),
-        end: defaultRange[1].format(this.getDateFormat()),
+        start: defaultRange[0].toFormat(this.getDateFormat()),
+        end: defaultRange[1].toFormat(this.getDateFormat()),
         id: '',
         covers: '',
-        // keep public as undefined for now, we will set it for users as appropriate on creation of the component
-        public: undefined,
         ordering: '',
         limit: 20,
         offset: 0,
-        expand_all: false
+        expand_all: false,
+        // set these two in the router
+        public: undefined,
+        exclude_calibrations: undefined
       };
       return defaultQueryParams;
     },
@@ -987,17 +1077,24 @@ th {
   position: relative;
 }
 
-.daterangepicker .clearfix {
-  display: inline-flex;
-}
-
-.daterangepicker .apply-cancel-buttons {
-  text-align: right;
-}
-
 .table-hover tbody tr:hover td {
     background: $tan;
 }
 
-</style>
+.mx-datepicker {
+  width: 100%;
+}
 
+.mx-icon-calendar {  
+  display: none;
+}
+
+.mx-datepicker-sidebar {
+  width: auto;
+}
+
+.mx-datepicker-sidebar + .mx-datepicker-content {
+  margin-left: 150px;
+}
+
+</style>
