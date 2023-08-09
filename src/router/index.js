@@ -22,7 +22,7 @@ const routes = [
       // otherwise send authenticated users to public=false
       // and unauthenticated users to public=true
       if (store.state.userIsAuthenticated) {
-        let query = {...to.query, public: "false"};
+        let query = {...to.query, public: "true"};
         // make sure we set the include_configuration_type correctly based on the DQI setting
         query.exclude_calibrations = store.state.inspectorViewEnabled ? false : true;
         next({ name: 'Home', query: query});
