@@ -308,7 +308,7 @@
         <b-row>
           <b-col>
             <div class="text-right text-muted">
-              Showing {{ currentPageRange.start }} to {{ currentPageRange.end }} of {{ data.count }} row{{ data.count === 1 ? '' : 's' }}
+              Showing {{ currentPageRange.start }} to {{ currentPageRange.end }} of {{ !!data.count_estimated ? '~' : '' }}{{ data.count }} row{{ data.count === 1 ? '' : 's' }}
             </div>
           </b-col>
         </b-row>
@@ -317,10 +317,10 @@
             <ocs-pagination
               table-id="archive-table"
               :per-page="queryParams.limit"
-              :total-rows="data.count"
+              :total-rows="totalRows"
               :current-page="currentPage"
               :display-per-page-dropdown="true"
-              :pagination-attrs="{ 'first-number': true, 'last-number': true }"
+              :pagination-attrs="{ 'first-number': true, 'last-number': !data.count_estimated }"
               :per-page-options="perPageOptions"
               @limitChange="onLimitChange"
               @pageChange="onPageChange"
@@ -695,6 +695,9 @@ export default {
     expandAllDisabled: function() {
       return this.queryParams.limit > 50
     },
+    totalRows: function() {
+      return !this.data.count_estimated ? this.data.count : Number.MAX_SAFE_INTEGER;
+    }
   },
   created: function() {
     this.updateFilters();
