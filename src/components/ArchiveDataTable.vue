@@ -308,7 +308,7 @@
         <b-row>
           <b-col>
             <div class="text-right text-muted">
-              Showing {{ currentPageRange.start }} to {{ currentPageRange.end }} of {{ !!data.count_estimated ? 'estimated ' : '' }}{{ data.count }} row{{ data.count === 1 ? '' : 's' }}
+              Showing {{ currentPageRange.start }} to {{ currentPageRange.end }} of {{ !!data.count_estimated ? '~' : '' }}{{ data.count }} row{{ data.count === 1 ? '' : 's' }}
             </div>
           </b-col>
         </b-row>
