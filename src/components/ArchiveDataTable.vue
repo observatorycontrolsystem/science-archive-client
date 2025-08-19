@@ -257,7 +257,7 @@
         <b-row>
           <b-col>
             <div class="text-right text-muted">
-              Showing {{ currentPageRange.start }} to {{ currentPageRange.end }} of {{ data.count }} row{{ data.count === 1 ? '' : 's' }}
+              Showing {{ currentPageRange.start }} to {{ currentPageRange.end }} of {{ data.count_estimated ? '~' : '' }}{{ data.count }} row{{ data.count === 1 ? '' : 's' }}
             </div>
           </b-col>
         </b-row>
@@ -269,7 +269,7 @@
               :total-rows="data.count"
               :current-page="currentPage"
               :display-per-page-dropdown="true"
-              :pagination-attrs="{ 'first-number': true, 'last-number': true }"
+              :pagination-attrs="{ 'first-number': true, 'last-number': data.count_estimated ? false : true, 'hide-goto-end-buttons': data.count_estimated ? true : false }"
               :per-page-options="perPageOptions"
               @limitChange="onLimitChange"
               @pageChange="onPageChange"
