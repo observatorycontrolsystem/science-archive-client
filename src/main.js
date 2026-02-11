@@ -52,17 +52,9 @@ $.ajax({
   // Initialize archive token if it is available in local storage already
   store.commit('initializeArchiveToken');
 
-  store
-    .dispatch('getProfileData')
-    .then(() => {
-      new Vue({
-        router,
-        store,
-        render: h => h(App)
-      }).$mount('#app');
-    })
-    .catch(() => {
-      // TODO: Display error page
-      console.log('Error getting profile data');
-    });
+  new Vue({
+    router,
+    store,
+    render: h => h(App)
+  }).$mount('#app');
 });
