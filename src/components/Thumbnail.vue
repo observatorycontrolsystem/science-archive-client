@@ -56,6 +56,8 @@ export default {
         .done(function(response) {
           let data = response;
           if (_.isArray(data.thumbnails) && data.thumbnails.length > 0) {
+            // This sorting works to put 'small' before 'large', should also work for 'medium',
+            // but falls back to at least using a thumbnail if one exists for the frame in the archive.
             let thumbnails = _.orderBy(data.thumbnails, ['size'], ['desc']);
             that.thumbnailSmallUrl = thumbnails[0].url || '';
             that.thumbnailLargeUrl = thumbnails[1].url || '';
