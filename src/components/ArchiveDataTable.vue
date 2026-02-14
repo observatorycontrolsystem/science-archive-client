@@ -542,7 +542,7 @@ export default {
     }
   },
   created: function() {
-    this.updateFilters();
+    this.getAllFiltersAndUpdateOptions();
   },
   mounted: function() {
     // Set up alert modal to clear message when it it hidden
@@ -751,55 +751,12 @@ export default {
       // when refreshing data to display, go to the first page of results.
       this.goToFirstPage();
       this.update();
-      // update the available selections based on the newly-selected params
-      this.updateFilters();
     },
     setOptions: function(optionKey, availableOptions) {
       // optionKey must be (is expected to be) one of the keys inside allAggregatedOptions
       availableOptions.sort();
       this.categorizedAggregatedOptions[optionKey].available = availableOptions;
-      let unavailable = this.allAggregatedOptions[optionKey].slice(0);
-      let unavailableIdx;
-      for (let availableIdx in availableOptions) {
-        unavailableIdx = unavailable.indexOf(availableOptions[availableIdx]);
-        if (unavailableIdx >= 0) {
-          unavailable.splice(unavailableIdx, 1);
-        }
-      }
-      this.categorizedAggregatedOptions[optionKey].unavailable = unavailable;
-    },
-    updateOptions: function() {
-      let isParamForFilter, isProposalForFilter;
-      let filters = {};
-      for (let p in this.queryParams) {
-        if (this.queryParams[p]) {
-          isParamForFilter = ['site_id', 'telescope_id', 'instrument_id', 'primary_optical_element', 'configuration_type', 'start', 'end', 'public'].indexOf(p) >= 0;
-          // Only add the proposal to the filters if the chosen proposal is a public one as those are the ones that are
-          // populated by the aggregate endpoint. Profile proposals are handled differently.
-          isProposalForFilter = p === 'proposal_id' && this.allAggregatedOptions.proposals.indexOf(this.queryParams[p]) >= 0;
-          if (isParamForFilter || isProposalForFilter) {
-            filters[p] = this.queryParams[p];
-          }
-        }
-      }
-      $.ajax({
-        url: `${this.archiveApiUrl}/frames/aggregate/`,
-        data: filters
-      }).done(response => {
-        this.setOptions('proposals', response.proposals);
-        this.setOptions('obstypes', response.obstypes);
-        this.setOptions('sites', response.sites);
-        this.setOptions('instruments', response.instruments);
-        this.setOptions('filters', response.filters);
-        this.setOptions('telescopes', response.telescopes);
-      }).fail(() => {
-        this.setOptions('proposals', this.allAggregatedOptions.proposals);
-        this.setOptions('obstypes', this.allAggregatedOptions.obstypes);
-        this.setOptions('sites', this.allAggregatedOptions.sites);
-        this.setOptions('instruments', this.allAggregatedOptions.instruments);
-        this.setOptions('filters', this.allAggregatedOptions.filters);
-        this.setOptions('telescopes', this.allAggregatedOptions.telescopes);
-      });
+      this.categorizedAggregatedOptions[optionKey].unavailable = [];
     },
     getAllFiltersAndUpdateOptions: function() {
       $.ajax({
@@ -812,16 +769,13 @@ export default {
         this.allAggregatedOptions.telescopes = response.telescopes.sort();
         this.allAggregatedOptions.obstypes = response.obstypes.sort();
         this.allAggregatedOptions.proposals = response.proposals.sort();
-        this.updateOptions();
+        this.setOptions('proposals', this.allAggregatedOptions.proposals);
+        this.setOptions('obstypes', this.allAggregatedOptions.obstypes);
+        this.setOptions('sites', this.allAggregatedOptions.sites);
+        this.setOptions('instruments', this.allAggregatedOptions.instruments);
+        this.setOptions('filters', this.allAggregatedOptions.filters);
+        this.setOptions('telescopes', this.allAggregatedOptions.telescopes);
       });
-    },
-    updateFilters: function() {
-      // Populate all the dropdowns from the aggregate endpoint.
-      if (this.allAggregatedOptions.sites.length < 1) {
-        this.getAllFiltersAndUpdateOptions();
-      } else {
-        this.updateOptions();
-      }
     },
     getSortByFromOrdering: function() {
       // Return what field the data is currently sorted by given the `ordering` field in the query params
