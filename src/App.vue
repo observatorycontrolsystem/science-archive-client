@@ -45,10 +45,13 @@
         </b-collapse>
       </b-navbar>
     </div>
-    <b-alert v-if="userIsAuthenticatedAndNotMemberOfProposals" variant="info" dismissible>
-      <div>You are not a member of any proposals. Only public data will be shown.</div>
-    </b-alert>
     <b-container class="flex-shrink-0 p-1">
+      <b-alert v-if="userIsAuthenticatedAndNotMemberOfProposals" variant="info" show dismissible>
+        <div>You are not a member of any proposals. Only public data will be shown.</div>
+      </b-alert>
+      <b-alert v-if="profileError" show variant="danger" dismissible @dismissed="profileError = ''">
+        <p>{{ profileError }}</p>
+      </b-alert>
       <router-view class="my-3" />
     </b-container>
     <ArchiveFooter
@@ -70,6 +73,11 @@ export default {
   components: {
     ArchiveFooter
   },
+  data: function() {
+    return {
+      profileError: ''
+    };
+  },
   computed: {
     profile: function() {
       return this.$store.state.profile;
@@ -80,6 +88,17 @@ export default {
     userIsAuthenticatedAndNotMemberOfProposals: function() {
       return this.userIsAuthenticated && this.profile.profile.proposals.length < 1;
     }
+  },
+  created: function () {
+    this.$store
+      .dispatch('getProfileData')
+      .then(() => {
+        this.profileError = '';
+      })
+      .catch((response) => {
+        this.profileError= `Failed to load profile data - ${response.status}: ${response.statusText} - ${response.responseText}`;
+        console.error(this.profileError);
+      });
   },
   methods: {
     logout: function() {
