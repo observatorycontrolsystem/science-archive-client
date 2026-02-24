@@ -257,7 +257,7 @@
         <b-row>
           <b-col>
             <div class="text-right text-muted">
-              Showing {{ currentPageRange.start }} to {{ currentPageRange.end }} of {{ data.count_estimated ? '~' : '' }}{{ data.count }} row{{ data.count === 1 ? '' : 's' }}
+              Showing {{ currentPageRange.start }} to {{ currentPageRange.end }} of {{ counteEstimatedSymbol }}{{ dataCount }} row{{ dataCount === 1 ? '' : 's' }}
             </div>
           </b-col>
         </b-row>
@@ -266,7 +266,7 @@
             <ocs-pagination
               table-id="archive-table"
               :per-page="queryParams.limit"
-              :total-rows="data.count"
+              :total-rows="dataCount"
               :current-page="currentPage"
               :display-per-page-dropdown="true"
               :pagination-attrs="{ 'first-number': true, 'last-number': data.count_estimated ? false : true, 'hide-goto-end-buttons': data.count_estimated ? true : false }"
@@ -505,6 +505,40 @@ export default {
         this.refreshData();
       }, 500)
     },
+    dataCount: function() {
+      if (this.data.count_estimated) {
+        let limit = _.toNumber(this.queryParams.limit);
+        let offset = _.toNumber(this.queryParams.offset);
+        if (this.data.results.length < limit) {
+          // If the length of results is < our limi, then there are no more results so we can cap the estimated count
+          return offset + this.data.results.length;
+        }
+        else {
+          // We know we have a count at least as large as our current offset and limit
+          // Add 1 so we have another page to check
+          return _.max([this.data.count, offset + limit +1])
+        }
+      }
+      else {
+        // If count is exact, then use that always
+        return this.data.count;
+      }
+    },
+    counteEstimatedSymbol: function() {
+      if (this.data.count_estimated) {
+        let limit = _.toNumber(this.queryParams.limit);
+        let offset = _.toNumber(this.queryParams.offset);
+        if (this.data.count <= offset + limit) {
+          // If the count equals our modified dataCount, then it is an "at least" count
+          return '>';
+        }
+        else {
+          // Otherwise the count is approximate, it might be greater or less then
+          return '~';
+        }
+      }
+      return '';
+    },
     reductionLevelOptions: function() {
       let options = JSON.parse(this.$store.state.urls.reductionLevelOptions);
       let dropdownOptions = [];
@@ -536,8 +570,8 @@ export default {
       let limit = _.toNumber(this.queryParams.limit);
       let offset = _.toNumber(this.queryParams.offset);
       return {
-        start: _.min([offset + 1, this.data.count]),
-        end: _.min([offset + limit, this.data.count])
+        start: _.min([offset + 1, this.dataCount]),
+        end: _.min([offset + limit, this.dataCount])
       };
     }
   },
