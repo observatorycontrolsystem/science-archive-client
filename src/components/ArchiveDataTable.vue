@@ -113,7 +113,19 @@
               >?</sup
             >
           </template>
-          <b-form-input v-model="exposureTime" type="number" class="border-secondary my-0"></b-form-input>
+          <b-form-input v-model="exposureTime" type="number" min="0" class="border-secondary my-0"></b-form-input>
+        </b-form-group>
+        <b-form-group id="input-group-request-id">
+          <template #label>
+            <b>Request ID</b
+            ><sup
+              v-b-tooltip.hover.right
+              class="blue"
+              title="Value of the Request ID from the submitted Observation Portal Request"
+              >?</sup
+            >
+          </template>
+          <b-form-input v-model="requestId" type="number" min="0" class="border-secondary my-0"></b-form-input>
         </b-form-group>
         <b-button-group class="w-100">
           <b-button type="reset" variant="outline-secondary" :disabled="isBusy">Reset</b-button>
@@ -502,6 +514,15 @@ export default {
       },
       set: _.debounce(function(newExposureTime) {
         this.queryParams.exposure_time = newExposureTime;
+        this.refreshData();
+      }, 500)
+    },
+    requestId: {
+      get: function() {
+        return this.queryParams.request_id;
+      },
+      set: _.debounce(function(newRequestId) {
+        this.queryParams.request_id = newRequestId;
         this.refreshData();
       }, 500)
     },
