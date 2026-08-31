@@ -236,7 +236,10 @@
           <b-form-checkbox :checked="itemInSelected(row.item.id)" @change="onRowChecked(row, ...arguments)" />
         </template>
         <template #empty>
-          <div v-if="!userIsAuthenticated" class="text-center my-2">
+          <div v-if="dataErrorMessage" class="text-center text-danger my-2">
+            {{ dataErrorMessage }}
+          </div>
+          <div v-else-if="!userIsAuthenticated" class="text-center my-2">
             No matching records found. You must be logged in to view proprietary data.
           </div>
           <div v-else class="text-center my-2">
@@ -339,6 +342,9 @@ export default {
       selected: [],
       filterDateRangeOptions: filterDateRangeOptions,
       alertModalMessage: '',
+      // Message from the last failed data request, displayed in place of the table results. Unlike
+      // `alertModalMessage` this is not cleared when the alert modal is dismissed.
+      dataErrorMessage: '',
       perPageOptions: [
         { value: '20', text: '20 rows per page' },
         { value: '50', text: '50 rows per page' },
@@ -793,13 +799,21 @@ export default {
       };
       return defaultQueryParams;
     },
+    onSuccessfulDataRetrieval: function() {
+      this.dataErrorMessage = '';
+    },
     onErrorRetrievingData: function(response) {
       if (response.status == 429) {
-        this.alertModalMessage =
+        this.dataErrorMessage =
           'Your account has been throttled due to too many requests. Please see https://lco.global/documentation/archive-documentation/#limits';
+      } else if (response.status == 400 && _.isString(response.responseJSON)) {
+        // The API returns a 400 with a plain string message when the chosen ordering requires a more
+        // constrained query than the one that was submitted.
+        this.dataErrorMessage = response.responseJSON;
       } else {
-        this.alertModalMessage = `There was a problem with your request. Status: ${response.status}. Please contact support.`;
+        this.dataErrorMessage = `There was a problem with your request. Status: ${response.status}. Please contact support.`;
       }
+      this.alertModalMessage = this.dataErrorMessage;
       this.$bvModal.show('bv-modal-alert');
     },
     refreshData: function() {
