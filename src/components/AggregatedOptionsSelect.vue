@@ -9,21 +9,41 @@
         <span v-else>{{ allOptionText | truncate }}</span>
       </template>
       <b-dropdown-form form-class="px-1">
-        <b-form-input v-model="filterOptionsBy" @keydown="onFilterKeydown"></b-form-input>
+        <b-form-input ref="filter" v-model="filterOptionsBy" @keydown="onFilterKeydown"></b-form-input>
       </b-dropdown-form>
-      <b-dropdown-item href="#" :active="isOptionActive(allValue)" @click="onUpdate(allValue)">
+      <b-dropdown-item
+        href="#"
+        :active="isOptionActive(allValue)"
+        @mouseenter.native="highlightOption(allValue)"
+        @focus.native="highlightOption(allValue)"
+        @click="onUpdate(allValue)"
+      >
         {{ allOptionText }}
       </b-dropdown-item>
       <slot name="first">
         <b-dropdown-group v-if="placeFirstOptionsInGroup && filteredFirstOptions.length > 0" :header="firstOptionGroupLabel">
           <b-dropdown-divider></b-dropdown-divider>
-          <b-dropdown-item v-for="option in filteredFirstOptions" :key="option" :active="isOptionActive(option)" @click="onUpdate(option)">
+          <b-dropdown-item
+            v-for="option in filteredFirstOptions"
+            :key="option"
+            :active="isOptionActive(option)"
+            @mouseenter.native="highlightOption(option)"
+            @focus.native="highlightOption(option)"
+            @click="onUpdate(option)"
+          >
             {{ option }}
           </b-dropdown-item>
         </b-dropdown-group>
         <template v-else-if="filteredFirstOptions.length > 0">
           <b-dropdown-divider></b-dropdown-divider>
-          <b-dropdown-item v-for="option in filteredFirstOptions" :key="option" :active="isOptionActive(option)" @click="onUpdate(option)">
+          <b-dropdown-item
+            v-for="option in filteredFirstOptions"
+            :key="option"
+            :active="isOptionActive(option)"
+            @mouseenter.native="highlightOption(option)"
+            @focus.native="highlightOption(option)"
+            @click="onUpdate(option)"
+          >
             {{ option }}
           </b-dropdown-item>
         </template>
@@ -34,6 +54,8 @@
           v-for="available in filteredOptions.available"
           :key="available"
           :active="isOptionActive(available)"
+          @mouseenter.native="highlightOption(available)"
+          @focus.native="highlightOption(available)"
           @click="onUpdate(available)"
         >
           {{ available }}
@@ -44,6 +66,8 @@
           :key="unavailable"
           :active="isOptionActive(unavailable)"
           link-class="text-muted"
+          @mouseenter.native="highlightOption(unavailable)"
+          @focus.native="highlightOption(unavailable)"
           @click="onUpdate(unavailable)"
         >
           {{ unavailable }}
@@ -54,6 +78,8 @@
           v-for="available in filteredOptions.available"
           :key="available"
           :active="isOptionActive(available)"
+          @mouseenter.native="highlightOption(available)"
+          @focus.native="highlightOption(available)"
           @click="onUpdate(available)"
         >
           {{ available }}
@@ -64,6 +90,8 @@
           :key="unavailable"
           :active="isOptionActive(unavailable)"
           link-class="text-muted"
+          @mouseenter.native="highlightOption(unavailable)"
+          @focus.native="highlightOption(unavailable)"
           @click="onUpdate(unavailable)"
         >
           {{ unavailable }}
@@ -152,7 +180,11 @@ export default {
   },
   watch: {
     filterOptionsBy: function() {
-      this.highlightedOptionIndex = 0;
+      let filter = _.toUpper(this.filterOptionsBy);
+      let exactMatchIndex = this.keyboardOptions.findIndex(function(option) {
+        return _.toUpper(option) === filter;
+      });
+      this.highlightedOptionIndex = exactMatchIndex === -1 ? 0 : exactMatchIndex;
       this.scrollHighlightedOptionIntoView();
     }
   },
@@ -175,10 +207,14 @@ export default {
     },
     initializeKeyboardSelection: function() {
       this.highlightedOptionIndex = this.keyboardOptions.indexOf(this.value);
+      this.$refs.filter.focus();
       this.scrollHighlightedOptionIntoView();
     },
     isOptionActive: function(option) {
-      return this.value === option || this.keyboardOptions[this.highlightedOptionIndex] === option;
+      return this.keyboardOptions[this.highlightedOptionIndex] === option;
+    },
+    highlightOption: function(option) {
+      this.highlightedOptionIndex = this.keyboardOptions.indexOf(option);
     },
     onFilterKeydown: function(event) {
       if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
@@ -198,8 +234,8 @@ export default {
       this.$nextTick(() => {
         this.$el
           .querySelector('.menu')
-          .querySelectorAll('.dropdown-item')[this.highlightedOptionIndex]
-          .scrollIntoView({ block: 'nearest' });
+          .querySelectorAll('.dropdown-item')
+          [this.highlightedOptionIndex].scrollIntoView({ block: 'nearest' });
       });
     },
     onUpdate: function(value) {
@@ -212,5 +248,21 @@ export default {
 .menu {
   max-height: 200px;
   overflow-y: scroll;
+}
+
+.menu .dropdown-item {
+  outline: none;
+  box-shadow: none;
+}
+
+.menu .dropdown-item.active {
+  background-color: #00adef;
+  color: #fff;
+}
+
+.menu .dropdown-item:hover:not(.active),
+.menu .dropdown-item:focus:not(.active) {
+  background-color: transparent;
+  color: inherit;
 }
 </style>
